@@ -1,0 +1,439 @@
+// ----------------------------------------------------------------------
+// TruOrigin — Database Schema
+// ----------------------------------------------------------------------
+// Models Users, Brands, Products, Product Images, Certificates, Claims,
+// Ingredients, OriginCards, Categories, QR Codes, Scan analytics, the
+// admin approval workflow, audit logging, billing, support, and CMS.
+// ----------------------------------------------------------------------
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  VISITOR
+  CONSUMER
+  BRAND
+  ADMIN
+}
+
+// Display/invite-time role within a brand's own team — not a global permission
+// system. Only gates who can manage the Team page itself (OWNER/ADMIN can
+// invite/remove members); no other page enforces this.
+enum BrandRole {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum ApprovalStatus {
+  DRAFT
+  SUBMITTED
+  IN_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum BrandStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum OriginCardStatus {
+  DRAFT
+  PUBLISHED
+  UNPUBLISHED
+  ARCHIVED
+}
+
+enum CertificateDocType {
+  CERTIFICATE
+  LAB_REPORT
+  INGREDIENT_LIST
+  SOURCING_PROOF
+  OTHER
+}
+
+enum ScanEventType {
+  SCAN
+  VIEW
+  CLAIM_VIEW
+  CERTIFICATE_VIEW
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  VOID
+}
+
+enum SupportTicketSource {
+  BRAND_TICKET
+  CUSTOMER_REPORT
+  CONTACT_MESSAGE
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum SupportTicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum CmsContentType {
+  INDUSTRY
+  RESOURCE
+  FAQ
+  BLOG_POST
+  CONTENT_BLOCK
+}
+
+enum CmsContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model User {
+  id                String     @id @default(cuid())
+  email             String     @unique
+  passwordHash      String
+  role              UserRole   @default(VISITOR)
+  active            Boolean    @default(true)
+  mustChangePassword Boolean   @default(false)
+  lastLoginAt       DateTime?
+  resetTokenHash    String?    @unique
+  resetTokenExpires DateTime?
+  brand             Brand?     @relation(fields: [brandId], references: [id])
+  brandId           String?
+  brandRole         BrandRole?
+  auditLogs         AuditLog[]
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}
+
+model Brand {
+  id              String          @id @default(cuid())
+  slug            String          @unique
+  name            String
+  logoUrl         String?
+  summary         String?
+  status          BrandStatus     @default(PENDING)
+  suspendedAt     DateTime?
+  suspendedReason String?
+  deletedAt       DateTime?
+  users           User[]
+  products        Product[]
+  subscriptions   Subscription[]
+  invoices        Invoice[]
+  supportTickets  SupportTicket[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  products Product[]
+}
+
+model Product {
+  id             String         @id @default(cuid())
+  slug           String         @unique
+  name           String
+  brand          Brand          @relation(fields: [brandId], references: [id])
+  brandId        String
+  category       Category       @relation(fields: [categoryId], references: [id])
+  categoryId     String
+  subcategory    String?
+  description    String?
+
+  // Generated only after admin approval — see lib/serial.ts and lib/qr.ts
+  serialNumber   String?        @unique // e.g. "TO-2026-000001"
+  qrCodeUrl      String?
+
+  status         ApprovalStatus @default(DRAFT)
+  submittedAt    DateTime?
+  reviewedAt     DateTime?
+  approvedAt     DateTime?
+  rejectionNote  String?
+
+  hidden         Boolean        @default(false)
+  archived       Boolean        @default(false)
+  archivedAt     DateTime?
+  deletedAt      DateTime?
+
+  images         ProductImage[]
+  claims         Claim[]
+  certificates   Certificate[]
+  ingredients    Ingredient[]
+  originCards    OriginCard[]
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  url       String
+  altText   String?
+  position  Int     @default(0)
+}
+
+enum ClaimStatus {
+  VERIFIED
+  PARTIALLY_VERIFIED
+  UNVERIFIED
+  REJECTED
+}
+
+model Claim {
+  id        String      @id @default(cuid())
+  product   Product     @relation(fields: [productId], references: [id])
+  productId String
+  label     String // e.g. "Organic", "Cruelty Free", "Lab Tested"
+  status    ClaimStatus @default(UNVERIFIED)
+  evidence  String? // free text or link to a Certificate
+  createdAt DateTime    @default(now())
+}
+
+model Certificate {
+  id        String             @id @default(cuid())
+  product   Product            @relation(fields: [productId], references: [id])
+  productId String
+  title     String
+  issuer    String?
+  fileUrl   String
+  docType   CertificateDocType @default(OTHER)
+  mimeType  String?
+  expiresAt DateTime?
+  createdAt DateTime           @default(now())
+}
+
+model Ingredient {
+  id        String  @id @default(cuid())
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  name      String
+  note      String?
+}
+
+enum OriginCardTemplate {
+  TEMPLATE_A
+  TEMPLATE_B
+  TEMPLATE_C
+}
+
+model OriginCard {
+  id               String             @id @default(cuid())
+  product          Product            @relation(fields: [productId], references: [id])
+  productId        String
+  template         OriginCardTemplate @default(TEMPLATE_A)
+  title            String?
+  status           OriginCardStatus   @default(DRAFT)
+  pdfUrl           String?
+  pngUrl           String?
+  publishedAt      DateTime?
+  archivedAt       DateTime?
+  duplicatedFromId String?
+  duplicatedFrom   OriginCard?        @relation("OriginCardDuplicates", fields: [duplicatedFromId], references: [id])
+  duplicates       OriginCard[]       @relation("OriginCardDuplicates")
+  generatedAt      DateTime           @default(now())
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model ScanEvent {
+  id             String        @id @default(cuid())
+  productId      String
+  eventType      ScanEventType @default(SCAN)
+  source         String? // "qr" | "serial-search"
+  claimId        String?
+  certificateId  String?
+  viewDurationMs Int?
+  sessionId      String?
+  country        String?
+  city           String?
+  device         String?
+  browser        String?
+  createdAt      DateTime      @default(now())
+
+  @@index([productId])
+  @@index([eventType])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorId     String?
+  actor       User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorEmail  String
+  actorRole   String
+  action      String
+  targetType  String
+  targetId    String
+  targetLabel String?
+  metadata    Json?
+  note        String?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([actorId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model Plan {
+  id            String         @id @default(cuid())
+  slug          String         @unique
+  name          String
+  priceMonthly  Int? // cents; null = "Custom"
+  priceYearly   Int?
+  currency      String         @default("inr")
+  maxProducts   Int?
+  features      String[]
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id                 String             @id @default(cuid())
+  brand              Brand              @relation(fields: [brandId], references: [id])
+  brandId            String
+  plan               Plan               @relation(fields: [planId], references: [id])
+  planId             String
+  status             SubscriptionStatus @default(TRIALING)
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean            @default(false)
+  startedAt          DateTime           @default(now())
+  canceledAt         DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  invoices           Invoice[]
+
+  @@index([brandId])
+}
+
+model Invoice {
+  id             String        @id @default(cuid())
+  invoiceNumber  String        @unique
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String
+  brand          Brand         @relation(fields: [brandId], references: [id])
+  brandId        String
+  amount         Int // cents
+  currency       String        @default("inr")
+  status         InvoiceStatus @default(PENDING)
+  issuedAt       DateTime      @default(now())
+  dueAt          DateTime?
+  paidAt         DateTime?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([brandId])
+  @@index([subscriptionId])
+}
+
+model SupportTicket {
+  id             String                 @id @default(cuid())
+  source         SupportTicketSource
+  status         SupportTicketStatus    @default(OPEN)
+  priority       SupportTicketPriority  @default(MEDIUM)
+  subject        String
+  message        String
+  name           String?
+  email          String?
+  brand          Brand?                 @relation(fields: [brandId], references: [id])
+  brandId        String?
+  productId      String?
+  assignedToId   String?
+  resolvedAt     DateTime?
+  resolutionNote String?
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  @@index([status])
+  @@index([source])
+  @@index([brandId])
+}
+
+model CmsContent {
+  id          String            @id @default(cuid())
+  type        CmsContentType
+  slug        String
+  title       String
+  subtitle    String?
+  body        String?
+  excerpt     String?
+  imageUrl    String?
+  category    String?
+  tags        String[]
+  order       Int               @default(0)
+  status      CmsContentStatus  @default(DRAFT)
+  data        Json?
+  publishedAt DateTime?
+  authorId    String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([type, slug])
+  @@index([type, status])
+}
+
+model PlatformSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+}
+
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  subject   String
+  body      String
+  updatedAt DateTime @updatedAt
+}
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  label       String
+  keyHash     String    @unique
+  keyPrefix   String
+  createdById String?
+  lastUsedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+}
