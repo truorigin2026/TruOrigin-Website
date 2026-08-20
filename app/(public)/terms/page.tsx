@@ -1,17 +1,14 @@
-import { PageHero } from "@/components/sections/page-hero";
-
 export default function TermsPage() {
   return (
-    <div className="section-spacing">
-      <PageHero
-        eyebrow="Terms and Conditions"
-        title="Terms and Conditions"
-        description="Effective Date: 11/05/2026"
-        centered
-      />
+    <div>
+      <header className="container-shell legal-page-header">
+        <p className="eyebrow">Legal</p>
+        <h1 className="legal-page-title">Terms &amp; Conditions</h1>
+        <p className="legal-page-meta">Effective Date: 11/05/2026</p>
+      </header>
 
-      <section className="container-shell legal-prose mt-12">
-        <p>
+      <section className="container-shell legal-prose">
+        <p className="legal-prose-lead">
           Welcome to TruOrigin. These Terms and Conditions (“Terms”) govern your access to and use
           of the TruOrigin platform, website, services, dashboards, QR systems, product pages,
           analytics features, submissions, and related tools (collectively referred to as the
@@ -397,8 +394,8 @@ export default function TermsPage() {
         <h2>25. Contact Information</h2>
         <p>For questions regarding these Terms and Conditions, please contact:</p>
         <p>TruOrigin</p>
-        <p>Email: [Insert Email]</p>
-        <p>Website: [Insert Website URL]</p>
+        <p>Email: info@truorigin.com</p>
+        <p>Website: www.truorigin.in</p>
 
         <h2>26. Acknowledgement</h2>
         <p>
