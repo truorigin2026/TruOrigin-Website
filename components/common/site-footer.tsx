@@ -22,8 +22,6 @@ const productLinks = [
 
 const legalLinks = [
   ["Terms", "/terms"],
-  ["Privacy", "/privacy"],
-  ["Disclaimer", "/disclaimer"],
 ] as const;
 
 const socialLinks = [

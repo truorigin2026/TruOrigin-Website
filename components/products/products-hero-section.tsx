@@ -140,7 +140,7 @@ export function ProductsHeroSection() {
     const params = new URLSearchParams();
     if (search.trim()) params.set("search", search.trim());
     const query = params.toString();
-    return query ? `/products?${query}` : "/products";
+    return query ? `/for-products/products?${query}` : "/for-products/products";
   };
 
   const navigateToProducts = (search: string) => {

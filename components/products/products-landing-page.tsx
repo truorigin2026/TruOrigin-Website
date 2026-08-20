@@ -88,8 +88,8 @@ export async function ProductsLandingPage() {
                   <Link
                     href={
                       category.name === "All Products"
-                        ? "/products"
-                        : `/products?category=${encodeURIComponent(category.name)}`
+                        ? "/for-products/products"
+                        : `/for-products/products?category=${encodeURIComponent(category.name)}`
                     }
                     className="products-category-card"
                     style={{ backgroundImage: `url('${category.image.src}')` }}

@@ -15,7 +15,7 @@ type ProductCardProps = {
 export function ProductCard({ slug, name, brand, brandLogoUrl, category, image, delay = 0 }: ProductCardProps) {
   return (
     <FadeIn delay={delay}>
-      <Link href={`/product/${slug}`} className="product-card">
+      <Link href={`/p/${slug}`} className="product-card">
         <div className="product-card-image-wrap">
           <Image src={image} alt={name} fill className="product-card-image" sizes="(max-width:768px) 100vw, 25vw" />
           {brandLogoUrl ? (

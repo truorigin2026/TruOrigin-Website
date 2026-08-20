@@ -47,7 +47,7 @@ export default async function AdminQrDetailPage({ params }: { params: Promise<{ 
             </CardHeader>
             <CardContent className="grid gap-2.5">
               <InfoRow label="Serial Number" value={product.serialNumber} />
-              <InfoRow label="Verification Link" value={`/product/${product.serialNumber}`} />
+              <InfoRow label="Verification Link" value={`/p/${product.serialNumber}`} />
               <div className="pt-2">
                 <QrActions productId={product.id} hasQr={Boolean(product.qrCodeUrl)} />
               </div>

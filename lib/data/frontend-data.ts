@@ -2,9 +2,6 @@ export type Audience = "brands" | "products";
 
 export const brandNavItems = [
   { href: "/", label: "Home" },
-  { href: "/how-it-works", label: "How It Works" },
-  { href: "/industries", label: "Industries" },
-  { href: "/contact", label: "Contact" },
 ] as const;
 
 export const productNavItems = [
@@ -82,79 +79,6 @@ export const brandFeatures = [
   },
 ] as const;
 
-export const brandWorkflowSteps = [
-  {
-    step: 1,
-    title: "Brand Registers Product",
-    description: "Upload product details, images, claims, and supporting documents to the TruOrigin platform.",
-  },
-  {
-    step: 2,
-    title: "Generate Unique QR Code",
-    description: "TruOrigin creates a secure, product-specific QR code linked to the product information page.",
-  },
-  {
-    step: 3,
-    title: "Attach QR To Product",
-    description: "Print or embed the QR on packaging, labels, or product inserts for customer access.",
-  },
-  {
-    step: 4,
-    title: "Consumer Scans QR",
-    description: "Shoppers scan with any smartphone camera to instantly access the product page.",
-  },
-  {
-    step: 5,
-    title: "Product Page Opens",
-    description: "A structured page displays product information, origin, certifications, and evidence.",
-  },
-] as const;
-
-export const industries = [
-  {
-    name: "Skincare",
-    slug: "skincare",
-    description: "Ingredient clarity and product information presentation for beauty brands.",
-    gradient: "from-emerald-100 to-teal-50",
-  },
-  {
-    name: "Food & Beverages",
-    slug: "food-beverages",
-    description: "Nutrition labels, sourcing notes, and allergen clarity for food producers.",
-    gradient: "from-amber-100 to-orange-50",
-  },
-  {
-    name: "Organic Products",
-    slug: "organic",
-    description: "Certification records and organic claim presentation for conscious consumers.",
-    gradient: "from-lime-100 to-green-50",
-  },
-  {
-    name: "Supplements",
-    slug: "supplements",
-    description: "Dosage details and evidence summaries for wellness brands.",
-    gradient: "from-violet-100 to-purple-50",
-  },
-  {
-    name: "Cosmetics",
-    slug: "cosmetics",
-    description: "Formula disclosure and product claim presentation for cosmetic lines.",
-    gradient: "from-rose-100 to-pink-50",
-  },
-  {
-    name: "Luxury Goods",
-    slug: "luxury",
-    description: "Anti-counterfeit protection and provenance records for premium products.",
-    gradient: "from-stone-200 to-neutral-100",
-  },
-  {
-    name: "Electronics",
-    slug: "electronics",
-    description: "Serial number structure and product record presentation for tech products.",
-    gradient: "from-sky-100 to-blue-50",
-  },
-] as const;
-
 export const productFilterCategories = [
   "All Products",
   "Skincare",
@@ -229,15 +153,7 @@ export const verificationTopics = [
 ] as const;
 
 export function getAudienceFromPath(pathname: string): Audience {
-  if (
-    pathname.startsWith("/products") ||
-    pathname.startsWith("/product/") ||
-    pathname === "/product" ||
-    pathname.startsWith("/p/") ||
-    pathname.startsWith("/support") ||
-    pathname.startsWith("/about-verification") ||
-    pathname.startsWith("/for-products")
-  ) {
+  if (pathname.startsWith("/p/") || pathname.startsWith("/for-products")) {
     return "products";
   }
   return "brands";
