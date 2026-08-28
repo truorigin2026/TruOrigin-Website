@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Privacy Policy",
+  description: "How TruOrigin collects, uses, stores, and safeguards information when you access our website, platform, and services.",
+  path: "/privacy",
+});
+
 export default function PrivacyPage() {
   return (
     <div>
@@ -234,7 +243,7 @@ export default function PrivacyPage() {
         <h2>15. Contact Us</h2>
         <p>If you have any questions, concerns, or requests related to this Privacy Policy or your information, please contact us:</p>
         <p>TruOrigin</p>
-        <p>Email: info@truorigin.com</p>
+        <p>Email: info@truorigin.in</p>
         <p>Website: www.truorigin.in</p>
       </section>
     </div>

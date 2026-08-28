@@ -14,6 +14,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
       category: true,
       images: { orderBy: { position: "asc" } },
       claims: true,
+      ingredients: true,
       certificates: true,
     },
   });
@@ -46,6 +47,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           description: product.description ?? "",
           images: product.images.map((img) => ({ id: img.id, url: img.url, altText: img.altText ?? "" })),
           claims: product.claims.map((c) => ({ id: c.id, label: c.label, evidence: c.evidence ?? "" })),
+          ingredients: product.ingredients.map((i) => ({ id: i.id, name: i.name, note: i.note ?? "" })),
           documents: product.certificates.map((c) => ({
             id: c.id,
             title: c.title,

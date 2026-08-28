@@ -201,7 +201,7 @@ export function ProductsContent({
             {paginated.map((product, index) => (
               <ProductCard
                 key={product.slug}
-                slug={product.slug}
+                code={product.scanCode}
                 name={product.name}
                 brand={product.brand}
                 brandLogoUrl={product.brandLogoUrl}

@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import ColorBends from "@/components/brands/color-bends";
 import { HeroReveal } from "@/components/motion";
+import { ButtonFillSweep } from "@/components/ui/button-fill-sweep";
+import { ButtonHoverUnderline } from "@/components/ui/button-hover-underline";
 
 export function BrandsHeroSection() {
   return (
@@ -43,7 +43,7 @@ export function BrandsHeroSection() {
 
                 <HeroReveal delay={0.3}>
                   <p className="brands-section-lead brands-section-lead-hero">
-                    OriginCard turns every unit you ship into a scannable, evidence-backed record —
+                    OriginCard turns every unit you ship into a scannable, evidence backed record
                     origin, certifications, and lab results customers can check in seconds, not take
                     on faith.
                   </p>
@@ -51,13 +51,10 @@ export function BrandsHeroSection() {
 
                 <HeroReveal delay={0.38}>
                   <div className="landing-hero-actions">
-                    <Link href="/login" className="landing-hero-primary">
-                      Start Building Trust
-                      <ArrowRight size={16} aria-hidden="true" />
-                    </Link>
-                    <Link href="/for-brands/contact" className="landing-hero-secondary">
-                      Book a Demo
-                    </Link>
+                    <ButtonFillSweep href="/for-brands/contact">Get Started</ButtonFillSweep>
+                    <ButtonHoverUnderline href="/for-brands/benefits" className="landing-hero-secondary-link">
+                      Know More
+                    </ButtonHoverUnderline>
                   </div>
                 </HeroReveal>
               </div>

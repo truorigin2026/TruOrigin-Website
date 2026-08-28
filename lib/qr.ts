@@ -2,13 +2,12 @@
  * QR Code Generation
  * ----------------------------------------------------------------------
  * Per dev notes: generated automatically after approval, points to
- *   https://truorigin.com/product/{serial-number}
+ *   https://truorigin.in/product/{serial-number}
  * No manual upload — always derived from the serial number.
  */
 
 import QRCode from "qrcode";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://truorigin.com";
+import { SITE_URL } from "@/lib/seo";
 
 export function productVerificationUrl(serialNumber: string): string {
   return `${SITE_URL}/product/${serialNumber}`;

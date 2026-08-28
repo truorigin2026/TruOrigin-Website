@@ -80,8 +80,13 @@ export default async function BrandOriginCardDetailPage({ params }: { params: Pr
               <Button variant="outline" disabled={!card.product.qrCodeUrl} render={<a href={card.product.qrCodeUrl ?? "#"} download={`${card.product.serialNumber ?? "qr"}.png`} />} nativeButton={false}>
                 Download QR
               </Button>
-              <Button variant="outline" disabled>
-                Download OriginCard (Coming soon)
+              <Button
+                variant="outline"
+                disabled={!card.product.serialNumber}
+                render={<a href={`/api/brand/origincards/${card.id}/tag`} download={`${card.product.serialNumber ?? "origincard"}-tag.png`} />}
+                nativeButton={false}
+              >
+                Download OriginCard
               </Button>
               <Button
                 variant="outline"

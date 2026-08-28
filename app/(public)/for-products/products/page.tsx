@@ -1,7 +1,14 @@
-import productsHero from "../../../../public/images/for-products/products-banner.webp";
-import { BrandHero } from "@/components/brands/brand-hero";
+import type { Metadata } from "next";
 import { ProductsContent } from "@/components/products/products-content";
 import { getProducts } from "@/lib/data/repository";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Verified Products",
+  description:
+    "Search verified products by name, brand, or category and review their origin, certifications, and supporting evidence.",
+  path: "/for-products/products",
+});
 
 type ProductsPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -25,11 +32,10 @@ export default async function ForProductsProductsPage({ searchParams }: Products
 
   return (
     <div className="saas-page">
-      <BrandHero
-        image={productsHero}
-        headline="Discover Verified Products"
-        subheadline="Browse authentic products with full transparency — origin, certifications, and evidence at your fingertips."
-      />
+      <header className="container-shell legal-page-header">
+        <p className="eyebrow">Products</p>
+        <h1 className="legal-page-title">Discover Verified Products</h1>
+      </header>
 
       <ProductsContent
         allProducts={allProducts}

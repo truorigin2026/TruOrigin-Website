@@ -1,5 +1,5 @@
 /**
- * GET /api/verify?serial=TO-2026-000001
+ * GET /api/verify?serial=TRU10101
  * ----------------------------------------------------------------------
  * This is what a scanned QR code, or a manually-entered serial number,
  * resolves to. It's already wired to the repository layer today (static

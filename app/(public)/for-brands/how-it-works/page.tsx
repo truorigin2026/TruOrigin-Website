@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { LayoutDashboard, Cpu, Users } from "lucide-react";
 import { HowItWorksTimeline } from "@/components/brands/how-it-works-timeline";
 import { FaqAccordion } from "@/components/brands/faq-accordion";
@@ -6,6 +7,15 @@ import { AssetImage } from "@/components/brands/asset-image";
 import { FadeIn, HeroReveal } from "@/components/motion";
 import { PillButton, ArrowIcon } from "@/components/ui/pill-button";
 import { howItWorksSteps, trustStats } from "@/lib/data/brands-landing-data";
+import { JsonLd } from "@/components/seo/json-ld";
+import { faqPageJsonLd, pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  title: "How It Works",
+  description:
+    "From product registration to a live OriginCard: how TruOrigin reviews evidence, generates QR codes, and publishes a verified product page in five steps.",
+  path: "/for-brands/how-it-works",
+});
 
 const systemLayers = [
   {
@@ -23,7 +33,7 @@ const systemLayers = [
   {
     icon: Users,
     title: "Consumer Experience",
-    description: "Shoppers scan, verify, and access full product transparency in seconds.",
+    description: "Shoppers can scan, verify, and access full product transparency in seconds.",
     points: ["QR & serial verification", "Origin & certification view", "Downloadable documents"],
   },
 ];
@@ -81,6 +91,7 @@ const processFaqs = [
 export default function ForBrandsHowItWorksPage() {
   return (
     <div className="saas-page hiw-page">
+      <JsonLd data={faqPageJsonLd(processFaqs)} />
       <section className="hiw-hero">
         <div className="hiw-hero-glow" aria-hidden="true" />
         <div className="hiw-hero-grid-bg" aria-hidden="true" />

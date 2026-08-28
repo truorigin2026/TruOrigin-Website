@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FadeIn } from "@/components/motion";
 
 type ProductCardProps = {
-  slug: string;
+  code: string;
   name: string;
   brand: string;
   brandLogoUrl?: string | null;
@@ -12,10 +12,10 @@ type ProductCardProps = {
   delay?: number;
 };
 
-export function ProductCard({ slug, name, brand, brandLogoUrl, category, image, delay = 0 }: ProductCardProps) {
+export function ProductCard({ code, name, brand, brandLogoUrl, category, image, delay = 0 }: ProductCardProps) {
   return (
     <FadeIn delay={delay}>
-      <Link href={`/p/${slug}`} className="product-card">
+      <Link href={`/p/${code}`} className="product-card">
         <div className="product-card-image-wrap">
           <Image src={image} alt={name} fill className="product-card-image" sizes="(max-width:768px) 100vw, 25vw" />
           {brandLogoUrl ? (

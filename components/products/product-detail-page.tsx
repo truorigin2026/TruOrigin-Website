@@ -2,16 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { FadeIn, HeroReveal } from "@/components/motion";
 import { AssetImage } from "@/components/brands/asset-image";
-import { ProductDetailAccordion } from "@/components/products/product-detail-accordion";
+import { ProductDetailTabs } from "@/components/products/product-detail-tabs";
 import { RelatedProductsStrip } from "@/components/products/related-products-strip";
-import { ProductStickyBar } from "@/components/products/product-sticky-bar";
-import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { ScanSessionProvider, ScanTracker } from "@/components/analytics/scan-tracking";
-import { ProductRecord, certificateDocTypeLabels } from "@/lib/data/site-data";
-import shieldElement from "../../public/images/claim-elements/shield.webp";
-import chemicalElement from "../../public/images/claim-elements/chemical.webp";
+import { ProductRecord } from "@/lib/data/site-data";
 import docElement from "../../public/images/claim-elements/doc.webp";
-import historyElement from "../../public/images/claim-elements/history.webp";
 
 export function ProductDetailPage({
   product,
@@ -26,26 +21,21 @@ export function ProductDetailPage({
   const claimsVerifiedValue = totalClaims > 0 ? `${verifiedClaims}/${totalClaims}` : "—";
 
   const highlightCards = [
-    { title: "Category", value: product.category, icon: chemicalElement },
-    { title: "Claims Verified", value: claimsVerifiedValue, icon: shieldElement },
+    { title: "Category", value: product.category },
+    { title: "Claims Verified", value: claimsVerifiedValue },
     {
       title: "Certificates",
       value: certificates.length > 0 ? `${certificates.length} linked document${certificates.length === 1 ? "" : "s"}` : "No documents yet",
-      icon: docElement,
     },
-    { title: "Last Updated", value: product.lastUpdated, icon: historyElement },
+    { title: "Last Updated", value: product.lastUpdated },
   ];
 
-  const certPreview = certificates.slice(0, 4);
-  const certOverflow = certificates.length - certPreview.length;
-  const showOverviewNote = Boolean(product.productNote) && product.productNote !== product.summary;
   const originCard = product.originCard;
 
   return (
     <ScanSessionProvider productId={product.id}>
       <div className="product-detail-page">
         <ScanTracker />
-        <ProductStickyBar name={product.name} brand={product.brand} />
         <section className="container-shell product-detail-hero" id="hero">
           <div className="product-detail-hero-grid">
             <HeroReveal className="product-detail-hero-media">
@@ -62,25 +52,22 @@ export function ProductDetailPage({
             </HeroReveal>
 
             <div className="product-detail-intro">
-              <HeroReveal delay={0.08}>
-                <VerifiedBadge />
-              </HeroReveal>
-              <HeroReveal delay={0.13}>
-                <p className="product-detail-brand">{product.brand}</p>
-              </HeroReveal>
-              <HeroReveal delay={0.18}>
+              <HeroReveal delay={0.18} className="product-detail-name-wrap">
                 <h1 className="product-detail-name">{product.name}</h1>
               </HeroReveal>
-              <HeroReveal delay={0.23}>
+              <HeroReveal delay={0.13} className="product-detail-brand-wrap">
+                <p className="product-detail-brand">{product.brand}</p>
+              </HeroReveal>
+              <HeroReveal delay={0.23} className="product-detail-status-wrap">
                 <p className="product-detail-status">
                   <span className="product-detail-status-dot" />
                   Verified Authentic Product
                 </p>
               </HeroReveal>
-              <HeroReveal delay={0.28}>
+              <HeroReveal delay={0.28} className="product-detail-summary-wrap">
                 <p className="product-detail-summary">{product.summary}</p>
               </HeroReveal>
-              <HeroReveal delay={0.33}>
+              <HeroReveal delay={0.33} className="product-detail-meta-wrap">
                 <div className="product-detail-meta">
                   <span>{product.category}</span>
                   <span>Updated {product.lastUpdated}</span>
@@ -89,7 +76,6 @@ export function ProductDetailPage({
               </HeroReveal>
             </div>
           </div>
-          <div id="hero-sentinel" className="product-detail-hero-sentinel" aria-hidden="true" />
         </section>
 
         <section className="container-shell product-detail-sections">
@@ -131,78 +117,19 @@ export function ProductDetailPage({
             </FadeIn>
           ) : null}
 
-          <div className="product-detail-highlight-grid">
-            {highlightCards.map((item, index) => (
-              <FadeIn key={item.title} delay={index * 0.05}>
-                <article className="product-highlight-card">
-                  <div className="product-highlight-icon">
-                    <Image src={item.icon} alt="" width={28} height={28} />
-                  </div>
-                  <div>
-                    <p>{item.title}</p>
-                    <h3>{item.value}</h3>
-                  </div>
-                </article>
-              </FadeIn>
-            ))}
-          </div>
+          <FadeIn>
+            <div className="product-stat-card">
+              {highlightCards.map((item) => (
+                <div key={item.title} className="product-stat-cell">
+                  <p>{item.title}</p>
+                  <h3>{item.value}</h3>
+                </div>
+              ))}
+            </div>
+          </FadeIn>
 
-          <div className="product-detail-overview-grid" id="overview">
-            <FadeIn>
-              <article className="detail-section-card detail-section-overview">
-                <h2>Overview</h2>
-                <p>{product.summary}</p>
-                {showOverviewNote ? <p className="detail-muted">{product.productNote}</p> : null}
-                <dl className="detail-dl">
-                  <div>
-                    <dt>Brand</dt>
-                    <dd>{product.brand}</dd>
-                  </div>
-                  <div>
-                    <dt>Category</dt>
-                    <dd>{product.category}</dd>
-                  </div>
-                  <div>
-                    <dt>Subcategory</dt>
-                    <dd>{product.subcategory}</dd>
-                  </div>
-                  <div>
-                    <dt>Scan Code</dt>
-                    <dd>{product.scanCode}</dd>
-                  </div>
-                </dl>
-              </article>
-            </FadeIn>
-            <FadeIn>
-              <div className="detail-section-card detail-section-certs" id="certificates">
-                <h2>Certifications</h2>
-                {certPreview.length > 0 ? (
-                  <>
-                    <ul className="detail-cert-summary-list">
-                      {certPreview.map((certificate) => (
-                        <li key={certificate.id} className="detail-cert-summary-row">
-                          <span className="detail-cert-summary-type">
-                            {certificateDocTypeLabels[certificate.docType] ?? certificate.docType}
-                          </span>
-                          <span className="detail-cert-summary-title">{certificate.title}</span>
-                          <span className="detail-cert-summary-issuer">{certificate.issuer ?? "Issuer not specified"}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    {certOverflow > 0 ? <p className="detail-cert-summary-more">+{certOverflow} more</p> : null}
-                  </>
-                ) : (
-                  <p className="detail-muted">No certificates have been linked to this product yet.</p>
-                )}
-                <a href="#claims-panel" className="detail-cert-summary-link">
-                  View all documents →
-                </a>
-              </div>
-            </FadeIn>
-          </div>
-
-          <FadeIn delay={0.16}>
-            <ProductDetailAccordion product={product} />
+          <FadeIn delay={0.1}>
+            <ProductDetailTabs product={product} />
           </FadeIn>
 
           {relatedProducts.length > 0 ? (

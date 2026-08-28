@@ -43,7 +43,7 @@ export const whyTruOriginPoints = [
   {
     title: "All Your Product Information, In One Place",
     description:
-      "Every product gets its own OriginCard, a single structured layer that brings together details, documents, certifications, test reports, ingredients, and sourcing information. Instead of that proof being scattered across PDFs, emails, and disconnected pages, brands maintain one authoritative record for each product, so anyone who looks it up sees the same complete picture.",
+      "Every product gets its own OriginCard, a structured record bringing together details, documents, certifications, test reports, ingredients, and sourcing information. Instead of proof being scattered across PDFs, emails, and disconnected pages, brands maintain one authoritative record, giving everyone a clear, complete, and up-to-date view of the product.",
   },
   {
     title: "Structured for Clarity",
@@ -58,7 +58,7 @@ export const whyTruOriginPoints = [
   {
     title: "Built to Evolve",
     description:
-      "Products change over time: formulas get updated, certifications renew, new test reports come in. Brands can update a product's OriginCard whenever documents, specifications, or details change, so customers are always looking at current information rather than a snapshot from launch day. Over time, that gives everyone a clearer, more accurate understanding of what a product contains, where it comes from, and how the brand stands behind it.",
+      "Products don’t stay the same forever. Formulas evolve, certifications are renewed, and new test reports become available. Brands can update a product’s OriginCard whenever its documents, specifications, or details change, ensuring customers always see the most current information, not just a snapshot from launch day.",
   },
 ] as const;
 
@@ -226,7 +226,7 @@ export const brandBenefits = [
   "Reduce returns caused by authenticity doubts",
   "Increase customer lifetime value with verified trust",
   "Streamline compliance and certification display",
-  "Gain real-time product engagement insights",
+  "Gain real time product engagement insights",
   "Differentiate on shelves with OriginCard",
 ] as const;
 
@@ -312,75 +312,3 @@ export const testimonials = [
   },
 ] as const;
 
-export const blogArticles = [
-  {
-    category: "Industry Insights",
-    title: "Why Product Transparency Is the New Brand Currency",
-    date: "Mar 12, 2026",
-    readTime: "5 min read",
-    image: "/images/for-brands/industries/skincare.jpg",
-  },
-  {
-    category: "Case Study",
-    title: "How Lumera Skincare Cut Counterfeits by 60%",
-    date: "Feb 28, 2026",
-    readTime: "7 min read",
-    image: "/images/for-brands/industries/cosmetics.jpg",
-  },
-  {
-    category: "Guide",
-    title: "The Complete Guide to QR Product Verification",
-    date: "Feb 14, 2026",
-    readTime: "10 min read",
-    image: "/images/for-brands/industries/organic.jpg",
-  },
-  {
-    category: "Trends",
-    title: "5 Industries Leading the Transparency Movement",
-    date: "Jan 30, 2026",
-    readTime: "4 min read",
-    image: "/images/for-brands/industries/luxury.jpg",
-  },
-  {
-    category: "Playbook",
-    title: "Rolling Out OriginCard Across Your Product Line",
-    date: "Jan 18, 2026",
-    readTime: "6 min read",
-    image: "/images/for-brands/how-it-works/verification-step1.webp",
-  },
-  {
-    category: "Best Practice",
-    title: "What Makes a Lab Report Actually Convincing",
-    date: "Jan 05, 2026",
-    readTime: "5 min read",
-    image: "/images/for-brands/how-it-works/verification-step2.webp",
-  },
-  {
-    category: "Research",
-    title: "How Shoppers Decide Which Claims to Trust",
-    date: "Dec 19, 2025",
-    readTime: "8 min read",
-    image: "/images/for-brands/industries/supplements.jpg",
-  },
-  {
-    category: "Product Update",
-    title: "New in Analytics: Scan Trends by Region and SKU",
-    date: "Dec 02, 2025",
-    readTime: "4 min read",
-    image: "/images/for-brands/how-it-works/verification-step3.webp",
-  },
-  {
-    category: "Spotlight",
-    title: "Telling Your Sourcing Story Without Overselling It",
-    date: "Nov 21, 2025",
-    readTime: "6 min read",
-    image: "/images/for-brands/industries/food.jpg",
-  },
-  {
-    category: "Compliance",
-    title: "Displaying Certifications Without Overstating Them",
-    date: "Nov 08, 2025",
-    readTime: "5 min read",
-    image: "/images/for-brands/industries/cosmetics.jpg",
-  },
-] as const;

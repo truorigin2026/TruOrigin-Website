@@ -17,9 +17,9 @@ const chromeHiddenPrefixes = [
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAudienceHome = pathname === "/for-brands/home" || pathname === "/for-products/home";
-  const hideChrome = chromeHiddenPrefixes.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-  );
+  const hideChrome =
+    pathname === "/" ||
+    chromeHiddenPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 
   if (hideChrome) {
     return <main className="relative z-10">{children}</main>;

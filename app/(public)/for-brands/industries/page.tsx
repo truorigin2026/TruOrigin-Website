@@ -1,5 +1,6 @@
+import type { Metadata } from "next";
 import Image from "next/image";
-import heroImage from "../../../../public/images/hero.webp";
+import heroImage from "../../../../public/images/icons/hero.webp";
 import skincareImage from "../../../../public/images/for-brands/industries/skincare.jpg";
 import foodImage from "../../../../public/images/for-brands/industries/food.jpg";
 import supplementsImage from "../../../../public/images/for-brands/industries/supplements.jpg";
@@ -10,6 +11,7 @@ import { BrandHero } from "@/components/brands/brand-hero";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { FadeIn } from "@/components/motion";
 import { PillButton, ArrowIcon } from "@/components/ui/pill-button";
+import { pageMetadata } from "@/lib/seo";
 
 const industryDetails = [
   {
@@ -61,6 +63,13 @@ const industryDetails = [
     evidenceTypes: ["Certification", "Sourcing Proof"],
   },
 ];
+
+export const metadata: Metadata = pageMetadata({
+  title: "Industries We Serve",
+  description:
+    "TruOrigin adapts to the verification needs of skincare, food and beverage, supplements, organic products, cosmetics, and luxury goods — with evidence types tailored to each category.",
+  path: "/for-brands/industries",
+});
 
 export default function ForBrandsIndustriesPage() {
   return (

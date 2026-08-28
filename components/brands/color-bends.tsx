@@ -247,9 +247,30 @@ export default function ColorBends({
       renderer.render(scene, camera);
       rafRef.current = requestAnimationFrame(loop);
     };
-    rafRef.current = requestAnimationFrame(loop);
+
+    // The shader keeps rendering every frame for as long as it's mounted,
+    // so without this it competes for main-thread/GPU time even while
+    // scrolled far below the hero. Pause the render loop while the canvas
+    // is off-screen and resume (resetting lastTime to avoid a dt spike)
+    // when it scrolls back into view.
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (rafRef.current === null) {
+            lastTime = performance.now();
+            rafRef.current = requestAnimationFrame(loop);
+          }
+        } else if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+      },
+      { threshold: 0 }
+    );
+    io.observe(container);
 
     return () => {
+      io.disconnect();
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       resizeObserverRef.current?.disconnect();
       geometry.dispose();

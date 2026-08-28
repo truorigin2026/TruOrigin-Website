@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { motion, useMotionValueEvent, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { AssetImage } from "@/components/brands/asset-image";
 import { FadeIn } from "@/components/motion";
@@ -68,14 +68,15 @@ function VerifyPhoto({
 
   return (
     <motion.div className="brands-verify-photo" style={{ scale, y, x, rotate, opacity, zIndex: total - index }}>
-      <AssetImage src={step.image} alt="" fill className="brands-verify-photo-img" />
+      <AssetImage src={step.image} alt="" fill className="brands-verify-photo-img" priority />
     </motion.div>
   );
 }
 
 export function BrandsQuickVerifySection({ steps }: { steps: readonly QuickStep[] }) {
   const pinRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const activeIndexRef = useRef(0);
   const transitions = Math.max(steps.length - 1, 1);
 
   const { scrollYProgress } = useScroll({
@@ -83,9 +84,17 @@ export function BrandsQuickVerifySection({ steps }: { steps: readonly QuickStep[
     offset: ["start start", "end end"],
   });
 
+  // Toggle the active step directly on the DOM via refs instead of React
+  // state — this callback fires on every scroll frame, and routing it
+  // through setState triggered a full re-render of this section (including
+  // re-running every VerifyPhoto's useTransform chain) on each index
+  // change, which is what caused the scroll jank.
   useMotionValueEvent(scrollYProgress, "change", (value) => {
     const next = Math.min(steps.length - 1, Math.max(0, Math.floor(value * transitions)));
-    setActiveIndex((current) => (current === next ? current : next));
+    if (activeIndexRef.current === next) return;
+    stepRefs.current[activeIndexRef.current]?.classList.remove("is-active");
+    stepRefs.current[next]?.classList.add("is-active");
+    activeIndexRef.current = next;
   });
 
   return (
@@ -107,7 +116,13 @@ export function BrandsQuickVerifySection({ steps }: { steps: readonly QuickStep[
           <div className="container-shell brands-verify-grid">
             <div className="brands-verify-steps">
               {steps.map((step, index) => (
-                <div key={step.title} className={`brands-verify-step${index === activeIndex ? " is-active" : ""}`}>
+                <div
+                  key={step.title}
+                  ref={(el) => {
+                    stepRefs.current[index] = el;
+                  }}
+                  className={`brands-verify-step${index === 0 ? " is-active" : ""}`}
+                >
                   <span className="brands-verify-step-tag">Step 0{index + 1}</span>
                   <h3>{step.title}</h3>
                   <p>{step.description}</p>

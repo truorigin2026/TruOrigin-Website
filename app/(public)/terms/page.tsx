@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Terms & Conditions",
+  description: "The terms and conditions that govern access to and use of the TruOrigin platform, website, and services.",
+  path: "/terms",
+});
+
 export default function TermsPage() {
   return (
     <div>
@@ -394,7 +403,7 @@ export default function TermsPage() {
         <h2>25. Contact Information</h2>
         <p>For questions regarding these Terms and Conditions, please contact:</p>
         <p>TruOrigin</p>
-        <p>Email: info@truorigin.com</p>
+        <p>Email: info@truorigin.in</p>
         <p>Website: www.truorigin.in</p>
 
         <h2>26. Acknowledgement</h2>

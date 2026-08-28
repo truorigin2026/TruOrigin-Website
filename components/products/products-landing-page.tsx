@@ -1,24 +1,11 @@
 import Link from "next/link";
-import {
-  Apple,
-  BadgeCheck,
-  Droplets,
-  Leaf,
-  PackageSearch,
-  Pill,
-  ShieldCheck,
-} from "lucide-react";
+import { BadgeCheck, Check, PackageSearch, ShieldCheck } from "lucide-react";
 import { FadeIn } from "@/components/motion";
 import { FaqAccordion } from "@/components/products/faq-accordion";
 import { ProductsHeroSection } from "@/components/products/products-hero-section";
 import { ProductCard } from "@/components/ui/product-card";
 import { getProducts } from "@/lib/data/repository";
 import { mapCategoryToFilter } from "@/lib/data/frontend-data";
-import skincareImg from "../../public/images/for-brands/industries/skincare.jpg";
-import foodImg from "../../public/images/for-brands/industries/food.jpg";
-import supplementsImg from "../../public/images/for-brands/industries/supplements.jpg";
-import organicImg from "../../public/images/for-brands/industries/organic.jpg";
-import beveragesImg from "../../public/images/catalog/hydration-drink-1.jpg";
 
 const faqItems = [
   {
@@ -43,14 +30,6 @@ const faqItems = [
   },
 ] as const;
 
-const categoryCards = [
-  { name: "All Products", icon: PackageSearch, image: organicImg },
-  { name: "Skincare", icon: Droplets, image: skincareImg },
-  { name: "Food", icon: Apple, image: foodImg },
-  { name: "Beverages", icon: Leaf, image: beveragesImg },
-  { name: "Supplements", icon: Pill, image: supplementsImg },
-] as const;
-
 const aboutFeatures = [
   { icon: ShieldCheck, title: "Product Information", description: "Information supplied by brands you trust." },
   { icon: BadgeCheck, title: "Structured Presentation", description: "Everything about your product, in one place." },
@@ -64,47 +43,20 @@ const informationSteps = [
   { number: "4", title: "View Supporting Files", description: "See certifications, documents, origin notes, and more." },
 ] as const;
 
+const whyUseItPoints = [
+  "Review organized product information",
+  "Access certifications and supporting documents",
+  "Know the origin and manufacturer",
+  "Shop with confidence",
+  "Reduce confusion before you buy",
+];
+
 export async function ProductsLandingPage() {
   const publicProductCollection = await getProducts();
 
   return (
     <div className="products-landing-page">
       <ProductsHeroSection />
-
-      <section className="products-section-shell">
-        <div className="container-shell">
-          <div className="products-category-header">
-            <h2>Browse by Category</h2>
-            <Link href="/for-products/products" className="products-view-all">
-              View all categories →
-            </Link>
-          </div>
-
-          <div className="products-category-grid">
-            {categoryCards.map((category) => {
-              const Icon = category.icon;
-              return (
-                <FadeIn key={category.name}>
-                  <Link
-                    href={
-                      category.name === "All Products"
-                        ? "/for-products/products"
-                        : `/for-products/products?category=${encodeURIComponent(category.name)}`
-                    }
-                    className="products-category-card"
-                    style={{ backgroundImage: `url('${category.image.src}')` }}
-                  >
-                    <span className="products-category-icon">
-                      <Icon size={34} aria-hidden="true" />
-                    </span>
-                    <span>{category.name}</span>
-                  </Link>
-                </FadeIn>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       <section className="products-section-shell">
         <div className="container-shell">
@@ -119,7 +71,7 @@ export async function ProductsLandingPage() {
             {publicProductCollection.slice(0, 6).map((product, index) => (
               <ProductCard
                 key={product.slug}
-                slug={product.slug}
+                code={product.scanCode}
                 name={product.name}
                 brand={product.brand}
                 brandLogoUrl={product.brandLogoUrl}
@@ -140,34 +92,20 @@ export async function ProductsLandingPage() {
 
       <section className="products-section-shell">
         <div className="container-shell">
-          <div className="products-how-wrapper">
-            <div className="products-how-content">
-              <h2>How Product Information Works</h2>
-              <div className="products-how-steps">
-                {informationSteps.map((step) => (
-                  <FadeIn key={step.number}>
-                    <div className="products-how-step">
-                      <div className="products-how-step-number">{step.number}</div>
-                      <h3>{step.title}</h3>
-                      <p>{step.description}</p>
-                    </div>
-                  </FadeIn>
-                ))}
-              </div>
-            </div>
+          <div className="products-how-intro">
+            <h2>How Product Information Works</h2>
+          </div>
 
-            <FadeIn delay={0.15}>
-              <div className="products-how-benefits">
-                <h3>Why Use It?</h3>
-                <ul className="products-benefits-list">
-                  <li>✓ Review organized product information</li>
-                  <li>✓ Access certifications and supporting documents</li>
-                  <li>✓ Know the origin and manufacturer</li>
-                  <li>✓ Shop with confidence</li>
-                  <li>✓ Reduce confusion before you buy</li>
-                </ul>
-              </div>
-            </FadeIn>
+          <div className="products-how-steps">
+            {informationSteps.map((step, index) => (
+              <FadeIn key={step.number} delay={index * 0.06}>
+                <div className="products-how-step">
+                  <div className="products-how-step-number">{step.number}</div>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+              </FadeIn>
+            ))}
           </div>
         </div>
       </section>
@@ -175,36 +113,54 @@ export async function ProductsLandingPage() {
       <section className="products-section-shell products-section-soft">
         <div className="container-shell">
           <div className="products-about-grid">
-            <FadeIn>
-              <div className="products-about-content">
-                <h2>About Product Information</h2>
-                <p>
-                  TruOrigin helps you make informed choices by giving you instant access to
-                  organized information about the products you love. Clarity you can use, anytime,
-                  anywhere.
-                </p>
-                <Link href="/for-products/products" className="brand-inline-link">
-                  Learn More
-                </Link>
+            <div className="products-about-left">
+              <FadeIn>
+                <div className="products-about-content">
+                  <h2>About Product Information</h2>
+                  <p>
+                    TruOrigin helps you make informed choices by giving you instant access to
+                    organized information about the products you love. Clarity you can use, anytime,
+                    anywhere.
+                  </p>
+                  <Link href="/for-products/products" className="brand-inline-link">
+                    Learn More
+                  </Link>
+                </div>
+              </FadeIn>
+
+              <div className="products-about-features">
+                {aboutFeatures.map((feature, index) => {
+                  const Icon = feature.icon;
+                  return (
+                    <FadeIn key={feature.title} delay={index * 0.06}>
+                      <div className="products-about-feature">
+                        <span className="products-about-feature-icon">
+                          <Icon size={20} aria-hidden="true" />
+                        </span>
+                        <h3>{feature.title}</h3>
+                        <p>{feature.description}</p>
+                      </div>
+                    </FadeIn>
+                  );
+                })}
+              </div>
+            </div>
+
+            <FadeIn delay={0.15}>
+              <div className="products-why-use-it">
+                <h3>Why Use It?</h3>
+                <ul className="products-benefits-list">
+                  {whyUseItPoints.map((point) => (
+                    <li key={point}>
+                      <span className="products-benefit-check">
+                        <Check size={12} strokeWidth={3} />
+                      </span>
+                      {point}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </FadeIn>
-
-            <div className="products-about-features">
-              {aboutFeatures.map((feature) => {
-                const Icon = feature.icon;
-                return (
-                  <FadeIn key={feature.title}>
-                    <div className="products-about-feature">
-                      <span className="products-about-feature-icon">
-                        <Icon size={22} aria-hidden="true" />
-                      </span>
-                      <h3>{feature.title}</h3>
-                      <p>{feature.description}</p>
-                    </div>
-                  </FadeIn>
-                );
-              })}
-            </div>
           </div>
         </div>
       </section>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 
 function RevealWord({
@@ -26,10 +26,27 @@ function RevealWord({
 
 export function ScrollRevealText({ text, className }: { text: string; className?: string }) {
   const containerRef = useRef<HTMLParagraphElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start 0.9", "start 0.35"],
-  });
+  const { scrollY } = useScroll();
+  const [inputRange, setInputRange] = useState<[number, number]>([0, 1]);
+
+  useEffect(() => {
+    // Measured against absolute document position (not the live rect) because this
+    // text lives inside a `position: sticky` ancestor: once it locks in place, its
+    // getBoundingClientRect() freezes, which would stall scrollYProgress mid-reveal.
+    function measure() {
+      const el = containerRef.current;
+      if (!el) return;
+      const viewportHeight = window.innerHeight;
+      const staticTop = el.getBoundingClientRect().top + window.scrollY;
+      setInputRange([staticTop - viewportHeight * 0.9, staticTop - viewportHeight * 0.3]);
+    }
+
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  const progress = useTransform(scrollY, inputRange, [0, 1]);
 
   const words = text.split(" ");
 
@@ -40,7 +57,7 @@ export function ScrollRevealText({ text, className }: { text: string; className?
         const end = start + 1 / words.length;
         return (
           <span key={`${word}-${index}`}>
-            <RevealWord progress={scrollYProgress} range={[start, end]}>
+            <RevealWord progress={progress} range={[start, end]}>
               {word}
             </RevealWord>
             {index < words.length - 1 ? " " : ""}

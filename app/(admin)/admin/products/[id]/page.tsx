@@ -5,6 +5,9 @@ import { Card, CardHeader, CardTitle, CardAction, CardContent } from "@/componen
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ProductActions } from "@/components/admin/product-actions";
+import { ProductDescriptionEdit } from "@/components/admin/product-description-edit";
+import { ProductIngredientsEdit } from "@/components/admin/product-ingredients-edit";
+import { CertificateReviewForm } from "@/components/admin/certificate-review-form";
 import { prisma } from "@/lib/prisma";
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
@@ -74,7 +77,21 @@ export default async function AdminProductDetailPage({ params }: { params: Promi
                 <InfoTile label="Serial" value={product.serialNumber ?? "Not assigned yet"} />
                 <InfoTile label="Visibility" value={visibilityLabel} />
               </div>
-              {product.description ? <p className="mt-5 text-sm leading-relaxed text-muted-foreground">{product.description}</p> : null}
+              <ProductDescriptionEdit product={{ id: product.id, description: product.description }} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Ingredients</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ProductIngredientsEdit
+                product={{
+                  id: product.id,
+                  ingredients: product.ingredients.map((i) => ({ id: i.id, name: i.name, note: i.note })),
+                }}
+              />
             </CardContent>
           </Card>
 
@@ -137,11 +154,27 @@ export default async function AdminProductDetailPage({ params }: { params: Promi
             </CardHeader>
             <CardContent className="grid gap-2.5">
               <InfoRow label="Images attached" value={product.images.length} />
-              <InfoRow label="Certificates attached" value={product.certificates.length} />
-              <InfoRow label="Ingredients listed" value={product.ingredients.length} />
               <Button variant="outline" className="justify-center" render={<Link href={`/admin/documents?productId=${product.id}`} />} nativeButton={false}>
                 View Documents
               </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Documents ({product.certificates.length})</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Documents stay confidential — only the plain-language note is ever shown to customers, on the
+                product&apos;s public Documents tab, in place of the file itself.
+              </p>
+              {product.certificates.map((certificate) => (
+                <CertificateReviewForm key={certificate.id} certificate={certificate} />
+              ))}
+              {product.certificates.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No documents submitted yet.</p>
+              ) : null}
             </CardContent>
           </Card>
         </div>

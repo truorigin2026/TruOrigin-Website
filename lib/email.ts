@@ -9,7 +9,7 @@
  */
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const EMAIL_FROM = process.env.EMAIL_FROM ?? "no-reply@truorigin.com";
+const EMAIL_FROM = process.env.EMAIL_FROM ?? "no-reply@truorigin.in";
 
 export type SendEmailResult = { sent: boolean; reason?: string };
 

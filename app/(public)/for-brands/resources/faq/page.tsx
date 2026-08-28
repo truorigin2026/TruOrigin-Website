@@ -1,7 +1,10 @@
-import { PageHero } from "@/components/sections/page-hero";
+import type { Metadata } from "next";
+import { PageIntro } from "@/components/sections/page-intro";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { FadeIn } from "@/components/motion";
 import { PillButton, ArrowIcon } from "@/components/ui/pill-button";
+import { JsonLd } from "@/components/seo/json-ld";
+import { faqPageJsonLd, pageMetadata } from "@/lib/seo";
 
 const resourceFaqs = [
   {
@@ -24,14 +27,20 @@ const resourceFaqs = [
   },
 ];
 
+export const metadata: Metadata = pageMetadata({
+  title: "FAQ",
+  description: "Questions about evidence, documents, and the review process, answered.",
+  path: "/for-brands/resources/faq",
+});
+
 export default function ForBrandsFaqPage() {
   return (
     <div className="saas-page">
-      <PageHero
+      <JsonLd data={faqPageJsonLd(resourceFaqs)} />
+      <PageIntro
         eyebrow="Resources"
         title="FAQ"
         description="Questions about evidence and documents, answered."
-        centered
       />
 
       <section className="saas-section">

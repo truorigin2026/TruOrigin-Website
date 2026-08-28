@@ -5,6 +5,7 @@ import facebookIcon from "../../public/images/icons/facebook.svg";
 import xIcon from "../../public/images/icons/x.svg";
 import instagramIcon from "../../public/images/icons/instagram.svg";
 import linkedinIcon from "../../public/images/icons/linkedin.svg";
+import trademarkLogo from "../../public/images/trademark-LOGO.png";
 
 const brandLinks = [
   ["Home", "/for-brands/home"],
@@ -20,6 +21,11 @@ const productLinks = [
   ["About Product Information", "/for-products/about-verification"],
 ] as const;
 
+const businessLinks = [
+  ["Brand Sign In", "/login"],
+  ["Brand Sign Up", "/for-brands/contact"],
+] as const;
+
 const legalLinks = [
   ["Terms & Conditions", "/terms"],
   ["Privacy Policy", "/privacy"],
@@ -27,14 +33,14 @@ const legalLinks = [
 ] as const;
 
 const socialLinks = [
-  { href: "https://x.com/truoriginindia?s=11", label: "X / Twitter", icon: xIcon },
+  { href: "https://x.com/truoriginco?s=11", label: "X / Twitter", icon: xIcon },
   { href: "https://www.linkedin.com/company/truorigin/", label: "LinkedIn", icon: linkedinIcon },
   {
-    href: "https://www.instagram.com/truorigin.in?igsh=MWF1ZTNyYW9kcDdkeQ%3D%3D&igsi=MWF1ZTNyYW9kcDdkeQ%3D%3D&utm_source=qr",
+    href: "https://www.instagram.com/truoriginco?igsi=MWF1ZTNyYW9kcDdkeQ%3D%3D&utm_source=qr",
     label: "Instagram",
     icon: instagramIcon,
   },
-  { href: "https://www.facebook.com/truoriginindia", label: "Facebook", icon: facebookIcon },
+  { href: "https://www.facebook.com/share/185ueh1f52/?mibextid=wwXIfr", label: "Facebook", icon: facebookIcon },
 ];
 
 export function SiteFooter() {
@@ -80,6 +86,17 @@ export function SiteFooter() {
               </ul>
             </div>
 
+            <div className="saas-footer-link-group">
+              <h3>Business</h3>
+              <ul>
+                {businessLinks.map(([label, href]) => (
+                  <li key={href}>
+                    <Link href={href}>{label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
           </div>
         </div>
 
@@ -88,7 +105,19 @@ export function SiteFooter() {
         </div>
 
         <div className="saas-footer-bottom">
-          <p>© 2026 TruOrigin. All rights reserved.</p>
+          <p className="saas-footer-credit">
+            © 2026 TruOrigin. All rights reserved.
+            <Link
+              href="https://github.com/darklord8515"
+              target="_blank"
+              rel="noreferrer"
+              className="saas-footer-credit-link"
+              aria-label="Designed by Mohamed Fayez — opens GitHub profile"
+            >
+              Designed by
+              <Image src={trademarkLogo} alt="" className="saas-footer-credit-logo" />
+            </Link>
+          </p>
           <nav className="saas-footer-legal" aria-label="Legal links">
             {legalLinks.map(([label, href]) => (
               <Link key={href} href={href}>{label}</Link>

@@ -1,10 +1,19 @@
-import { Check, X, Quote } from "lucide-react";
+import type { Metadata } from "next";
+import { Check, X } from "lucide-react";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { AssetImage } from "@/components/brands/asset-image";
 import { BenefitsSwitcher } from "@/components/brands/benefits-switcher";
 import { FadeIn, HeroReveal } from "@/components/motion";
 import { ArrowIcon, PillButton } from "@/components/ui/pill-button";
-import { brandBenefits, customerBenefits, trustStats, testimonials } from "@/lib/data/brands-landing-data";
+import { brandBenefits, customerBenefits, trustStats } from "@/lib/data/brands-landing-data";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Benefits",
+  description:
+    "See what changes when product claims become verifiable — for the brand shipping the product and for the customer deciding whether to trust it.",
+  path: "/for-brands/benefits",
+});
 
 const withoutTruOrigin = [
   "Claims live only in marketing copy, with no way for a customer to check them",
@@ -16,11 +25,9 @@ const withoutTruOrigin = [
 const withTruOrigin = [
   "Every claim carries a status — Evidence Available, Limited Evidence, or reviewed by a real person",
   "Each unit has a unique serial number and QR code tied to one verified record",
-  "Customers self-serve the answer by scanning, instead of contacting support",
+  "Customers self serve the answer by scanning, instead of contacting support",
   "Scan analytics show exactly which products and claims customers check most",
 ];
-
-const highlightedTestimonials = testimonials.slice(0, 3);
 
 export default function ForBrandsBenefitsPage() {
   return (
@@ -122,30 +129,8 @@ export default function ForBrandsBenefitsPage() {
         </div>
       </section>
 
-      <section className="bnf-testimonials-section">
-        <div className="container-shell">
-          <SectionHeading eyebrow="From Brands" title="What teams say after switching" centered />
-          <div className="bnf-testimonial-grid">
-            {highlightedTestimonials.map((testimonial, index) => (
-              <FadeIn key={testimonial.name} delay={index * 0.08}>
-                <div className="bnf-testimonial-card">
-                  <Quote size={26} aria-hidden="true" className="bnf-testimonial-quote-icon" />
-                  <p className="bnf-testimonial-quote">&ldquo;{testimonial.quote}&rdquo;</p>
-                  <div className="bnf-testimonial-author">
-                    <span className="bnf-testimonial-avatar">{testimonial.name.charAt(0)}</span>
-                    <div>
-                      <p className="bnf-testimonial-name">{testimonial.name}</p>
-                      <p className="bnf-testimonial-role">{testimonial.role}</p>
-                    </div>
-                  </div>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="bnf-cta-band">
+        <div className="bnf-cta-overlay" aria-hidden="true" />
         <div className="container-shell bnf-cta-inner">
           <FadeIn>
             <h2>Ready to give every product verifiable proof?</h2>

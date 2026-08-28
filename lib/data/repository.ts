@@ -82,6 +82,8 @@ function mapDbProduct(product: DbProduct): ProductRecord {
     issuer: certificate.issuer,
     fileUrl: certificate.fileUrl,
     docType: certificate.docType,
+    verified: certificate.verified,
+    reviewNote: certificate.reviewNote,
   }));
 
   const ingredients = (product.ingredients ?? []).map((ingredient) => ({

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireBrandSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
+import { isTrustedBlobUrl } from "@/lib/blob";
 
 type PatchBody = {
   name?: string;
@@ -10,6 +11,7 @@ type PatchBody = {
   description?: string;
   images?: { url: string; altText?: string }[];
   claims?: { label: string; evidence?: string }[];
+  ingredients?: { name: string; note?: string }[];
   certificates?: { title: string; docType: string; fileUrl: string; mimeType?: string }[];
 };
 
@@ -48,9 +50,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "At least one product photo is required" }, { status: 400 });
   }
   const claims = (body.claims ?? []).filter((claim) => claim.label?.trim());
+  const ingredients = (body.ingredients ?? []).filter((ingredient) => ingredient.name?.trim());
   const certificates = (body.certificates ?? []).filter(
     (cert) => cert.title?.trim() && cert.fileUrl?.trim() && DOC_TYPES.has(cert.docType),
   );
+  const untrustedCertificate = certificates.find((cert) => !isTrustedBlobUrl(cert.fileUrl));
+  if (untrustedCertificate) {
+    return NextResponse.json({ error: "fileUrl must point to an uploaded file" }, { status: 400 });
+  }
 
   const wasRejected = product.status === "REJECTED";
 
@@ -63,6 +70,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const updated = await prisma.$transaction(async (tx) => {
     await tx.productImage.deleteMany({ where: { productId: id } });
     await tx.claim.deleteMany({ where: { productId: id } });
+    await tx.ingredient.deleteMany({ where: { productId: id } });
     await tx.certificate.deleteMany({ where: { productId: id } });
 
     return tx.product.update({
@@ -86,6 +94,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           create: claims.map((claim) => ({
             label: claim.label.trim(),
             evidence: claim.evidence?.trim() || null,
+          })),
+        },
+        ingredients: {
+          create: ingredients.map((ingredient) => ({
+            name: ingredient.name.trim(),
+            note: ingredient.note?.trim() || null,
           })),
         },
         certificates: {

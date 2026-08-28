@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   }
 
   const brandSlug = await uniqueBrandSlug(slugify(brandName));
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = await bcrypt.hash(password, 12);
 
   const result = await prisma.$transaction(async (tx) => {
     const brand = await tx.brand.create({

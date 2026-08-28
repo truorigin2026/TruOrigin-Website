@@ -38,6 +38,8 @@ export type ProductCertificate = {
   issuer: string | null;
   fileUrl: string;
   docType: string;
+  verified: boolean;
+  reviewNote: string | null;
 };
 
 export const certificateDocTypeLabels: Record<string, string> = {
@@ -96,7 +98,7 @@ export type BrandRecord = {
 export const sampleProducts: ProductRecord[] = [
   {
     slug: "northstar-barrier-serum",
-    scanCode: "TO-NSTAR-SERUM-01",
+    scanCode: "TRU10001",
     imageGallery: [
       "/images/catalog/barrier-serum-1.jpg",
       "/images/catalog/barrier-serum-2.jpg",
@@ -138,7 +140,7 @@ export const sampleProducts: ProductRecord[] = [
   },
   {
     slug: "northstar-gentle-cleanser",
-    scanCode: "TO-NSTAR-CLEAN-02",
+    scanCode: "TRU10002",
     imageGallery: [
       "/images/catalog/gentle-cleanser-1.jpg",
       "/images/catalog/gentle-cleanser-2.jpg",
@@ -180,7 +182,7 @@ export const sampleProducts: ProductRecord[] = [
   },
   {
     slug: "northstar-daily-spf",
-    scanCode: "TO-NSTAR-SPF-03",
+    scanCode: "TRU10003",
     imageGallery: [
       "/images/catalog/daily-spf-1.jpg",
       "/images/catalog/daily-spf-2.jpg",
@@ -271,7 +273,7 @@ export const publicProductCollection: ProductRecord[] = [
   ...sampleProducts,
   {
     slug: "root-ritual-protein-oats",
-    scanCode: "TO-RR-OATS-04",
+    scanCode: "TRU10004",
     imageGallery: [
       "/images/catalog/protein-oats-1.jpg",
       "/images/catalog/protein-oats-2.jpg",
@@ -312,7 +314,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "verde-focus-hydration",
-    scanCode: "TO-VERDE-DRINK-05",
+    scanCode: "TRU10005",
     imageGallery: [
       "/images/catalog/hydration-drink-1.jpg",
       "/images/catalog/hydration-drink-2.jpg",
@@ -353,7 +355,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "lumera-night-repair-cream",
-    scanCode: "TO-LUM-NIGHT-06",
+    scanCode: "TRU10006",
     imageGallery: ["/images/catalog/night-repair-cream-1.jpg", "/images/catalog/night-repair-cream-2.jpg"],
     name: "Night Repair Cream",
     brand: "Lumera Skin",
@@ -371,7 +373,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "lumera-vitamin-c-mist",
-    scanCode: "TO-LUM-MIST-07",
+    scanCode: "TRU10007",
     imageGallery: ["/images/catalog/vitamin-c-mist-1.jpg", "/images/catalog/vitamin-c-mist-2.jpg"],
     name: "Vitamin C Face Mist",
     brand: "Lumera Skin",
@@ -389,7 +391,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "terra-crunch-seed-bars",
-    scanCode: "TO-TERRA-BARS-08",
+    scanCode: "TRU10008",
     imageGallery: ["/images/catalog/seed-bars-1.jpg", "/images/catalog/seed-bars-2.jpg"],
     name: "Seed Crunch Bars",
     brand: "Terra Pantry",
@@ -407,7 +409,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "terra-roasted-granola",
-    scanCode: "TO-TERRA-GRAN-09",
+    scanCode: "TRU10009",
     imageGallery: ["/images/catalog/granola-1.jpg", "/images/catalog/granola-2.jpg"],
     name: "Roasted Almond Granola",
     brand: "Terra Pantry",
@@ -425,7 +427,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "elevate-daily-greens",
-    scanCode: "TO-ELEV-GREEN-10",
+    scanCode: "TRU10010",
     imageGallery: ["/images/catalog/daily-greens-1.jpg", "/images/catalog/daily-greens-2.jpg"],
     name: "Daily Greens Blend",
     brand: "Elevate Nutrition",
@@ -443,7 +445,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "elevate-protein-vanilla",
-    scanCode: "TO-ELEV-PRO-11",
+    scanCode: "TRU10011",
     imageGallery: ["/images/catalog/protein-vanilla-1.jpg", "/images/catalog/protein-vanilla-2.jpg"],
     name: "Vanilla Plant Protein",
     brand: "Elevate Nutrition",
@@ -461,7 +463,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "botanica-calm-tea",
-    scanCode: "TO-BOT-TEA-12",
+    scanCode: "TRU10012",
     imageGallery: ["/images/catalog/calm-tea-1.jpg", "/images/catalog/calm-tea-2.jpg"],
     name: "Calm Herbal Tea",
     brand: "Botanica House",
@@ -479,7 +481,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "botanica-immunity-shot",
-    scanCode: "TO-BOT-SHOT-13",
+    scanCode: "TRU10013",
     imageGallery: ["/images/catalog/immunity-shot-1.jpg", "/images/catalog/immunity-shot-2.jpg"],
     name: "Daily Immunity Shot",
     brand: "Botanica House",
@@ -497,7 +499,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "solace-body-lotion",
-    scanCode: "TO-SOL-LOTION-14",
+    scanCode: "TRU10014",
     imageGallery: ["/images/catalog/body-lotion-1.jpg", "/images/catalog/body-lotion-2.jpg"],
     name: "Daily Body Lotion",
     brand: "Solace Care",
@@ -515,7 +517,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "solace-hand-cream",
-    scanCode: "TO-SOL-HAND-15",
+    scanCode: "TRU10015",
     imageGallery: ["/images/catalog/hand-cream-1.jpg", "/images/catalog/hand-cream-2.jpg"],
     name: "Repair Hand Cream",
     brand: "Solace Care",
@@ -533,7 +535,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "natura-sun-fluid",
-    scanCode: "TO-NAT-SUN-16",
+    scanCode: "TRU10016",
     imageGallery: ["/images/catalog/sun-fluid-1.jpg", "/images/catalog/sun-fluid-2.jpg"],
     name: "Sun Defense Fluid",
     brand: "Natura Shield",
@@ -551,7 +553,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "natura-after-sun-gel",
-    scanCode: "TO-NAT-AFTER-17",
+    scanCode: "TRU10017",
     imageGallery: ["/images/catalog/after-sun-1.jpg", "/images/catalog/after-sun-2.jpg"],
     name: "After Sun Cooling Gel",
     brand: "Natura Shield",
@@ -569,7 +571,7 @@ export const publicProductCollection: ProductRecord[] = [
   },
   {
     slug: "wellnest-sleep-gummies",
-    scanCode: "TO-WELL-SLEEP-18",
+    scanCode: "TRU10018",
     imageGallery: ["/images/catalog/sleep-gummies-1.jpg", "/images/catalog/sleep-gummies-2.jpg"],
     name: "Sleep Support Gummies",
     brand: "WellNest",

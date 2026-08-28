@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
 
-/** GET only — Documents/Certificates are view/download only from the admin panel, never edited. */
+/** GET only — streams the file for download. Review status/notes are set via the sibling PATCH .../review route. */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdminSession(request);
   if (!session) {

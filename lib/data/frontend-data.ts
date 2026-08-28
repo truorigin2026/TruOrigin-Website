@@ -41,7 +41,6 @@ export const landingNavGroups: readonly NavGroup[] = [
     items: [
       { href: "/for-brands/resources/blog", label: "Blogs" },
       { href: "/for-brands/resources/faq", label: "FAQ" },
-      { href: "/for-brands/resources/case-studies", label: "Case Studies" },
     ],
   },
 ] as const;

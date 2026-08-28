@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
     }
 
-    const adminPasswordHash = await bcrypt.hash(password, 10);
+    const adminPasswordHash = await bcrypt.hash(password, 12);
     const adminUser = await prisma.user.upsert({
       where: { email },
       update: {

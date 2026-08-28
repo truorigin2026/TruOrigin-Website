@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { ArrowRight, Lock, Mail } from "lucide-react";
-import { HeroReveal } from "@/components/motion";
+import { AssetImage } from "@/components/brands/asset-image";
 import { PasswordInput } from "@/components/ui/password-input";
-import { FlowingWaves } from "@/components/ui/flowing-waves";
 
 export function BrandLoginForm() {
   const router = useRouter();
@@ -46,82 +45,86 @@ export function BrandLoginForm() {
   return (
     <div className="page-shell overflow-hidden">
       <section className="container-shell page-section">
-        <HeroReveal>
-          <div className="login-card">
-            <div className="login-panel-art">
-              <FlowingWaves className="login-panel-waves" />
-              <Link href="/" className="login-back-link">
-                ← Back
-              </Link>
-              <p className="login-welcome-text">Welcome Back!</p>
+        <div className="login-card">
+          <div className="login-panel-art">
+            <AssetImage
+              src="/images/every-product-has-a-story-man-with-phone.jpeg"
+              alt=""
+              fill
+              priority
+              className="login-panel-image"
+            />
+            <div className="login-panel-scrim" />
+            <p className="login-welcome-text">Welcome Back!</p>
+          </div>
+
+          <form onSubmit={onSubmit} className="login-panel-form">
+            <h1 className="login-title">Log in</h1>
+
+            <label className="login-field">
+              <span className="login-field-icon">
+                <Mail size={16} />
+              </span>
+              <input
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                type="email"
+                autoComplete="email"
+                placeholder="Email"
+                required
+                className="login-input"
+              />
+            </label>
+
+            <div className="login-field">
+              <span className="login-field-icon">
+                <Lock size={16} />
+              </span>
+              <PasswordInput
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete="current-password"
+                placeholder="Password"
+                required
+                className="login-input"
+              />
             </div>
 
-            <form onSubmit={onSubmit} className="login-panel-form">
-              <h1 className="login-title">Log in</h1>
-
-              <label className="login-field">
-                <span className="login-field-icon">
-                  <Mail size={16} />
-                </span>
+            <div className="login-row">
+              <label className="login-remember">
                 <input
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  type="email"
-                  autoComplete="email"
-                  placeholder="Email"
-                  required
-                  className="login-input"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(event) => setRememberMe(event.target.checked)}
+                  className="h-4 w-4 rounded border-[color:var(--line)] accent-[color:var(--brand)]"
                 />
+                Remember Me
               </label>
-
-              <div className="login-field">
-                <span className="login-field-icon">
-                  <Lock size={16} />
-                </span>
-                <PasswordInput
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  autoComplete="current-password"
-                  placeholder="Password"
-                  required
-                  className="login-input"
-                />
-              </div>
-
-              <div className="login-row">
-                <label className="login-remember">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(event) => setRememberMe(event.target.checked)}
-                    className="h-4 w-4 rounded border-[color:var(--line)] accent-[color:var(--brand)]"
-                  />
-                  Remember Me
-                </label>
-                <Link href="/forgot-password" className="login-forgot">
-                  Forgot Password?
-                </Link>
-              </div>
-
-              {error ? (
-                <p className="login-error">{error}</p>
-              ) : null}
-
-              <button type="submit" disabled={loading} className="btn-primary login-submit-btn">
-                {loading ? "Signing in..." : "Log in"}
-                <ArrowRight className="h-4 w-4" />
-              </button>
-
-              <div className="login-divider">
-                <span>Or</span>
-              </div>
-
-              <Link href="/for-brands/contact" className="login-signup-btn">
-                Sign up
+              <Link href="/forgot-password" className="login-forgot">
+                Forgot Password?
               </Link>
-            </form>
-          </div>
-        </HeroReveal>
+            </div>
+
+            {error ? (
+              <p className="login-error">{error}</p>
+            ) : null}
+
+            <button type="submit" disabled={loading} className="btn-primary login-submit-btn">
+              <span className="login-submit-btn-label">{loading ? "Signing in..." : "Log in"}</span>
+              <span className="login-submit-btn-arrow">
+                <ArrowRight className="h-4 w-4" />
+              </span>
+            </button>
+
+            <div className="login-divider">
+              <span>Or</span>
+            </div>
+
+            <Link href="/for-brands/contact" className="login-signup-btn">
+              Sign up
+            </Link>
+          </form>
+        </div>
       </section>
     </div>
   );

@@ -66,8 +66,8 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  --font-heading: "Sora", "Segoe UI", system-ui, sans-serif;
-  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-heading: var(--ff-sora), "Segoe UI", system-ui, sans-serif;
+  --font-sans: var(--ff-inter), "Segoe UI", system-ui, sans-serif;
 
   --sidebar-width: 16rem;
   --sidebar-width-icon: 3rem;

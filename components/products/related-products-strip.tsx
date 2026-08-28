@@ -30,7 +30,10 @@ export function RelatedProductsStrip({ products }: RelatedProductsStripProps) {
           <h2 id="related-products-title">Products You May Like</h2>
         </div>
 
-        <div className="product-related-controls" aria-label="Related products navigation">
+        <div
+          className="product-related-controls product-related-controls-desktop"
+          aria-label="Related products navigation"
+        >
           <button
             type="button"
             className="product-related-control"
@@ -54,7 +57,7 @@ export function RelatedProductsStrip({ products }: RelatedProductsStripProps) {
         {products.map((product, index) => (
           <div key={product.slug} className="product-related-card">
             <ProductCard
-              slug={product.slug}
+              code={product.scanCode}
               name={product.name}
               brand={product.brand}
               brandLogoUrl={product.brandLogoUrl}
@@ -64,6 +67,28 @@ export function RelatedProductsStrip({ products }: RelatedProductsStripProps) {
             />
           </div>
         ))}
+      </div>
+
+      <div
+        className="product-related-controls product-related-controls-mobile"
+        aria-label="Related products navigation"
+      >
+        <button
+          type="button"
+          className="product-related-control"
+          onClick={() => scrollByCards("left")}
+          aria-label="Show previous products"
+        >
+          <span aria-hidden="true">&larr;</span>
+        </button>
+        <button
+          type="button"
+          className="product-related-control"
+          onClick={() => scrollByCards("right")}
+          aria-label="Show next products"
+        >
+          <span aria-hidden="true">&rarr;</span>
+        </button>
       </div>
     </section>
   );

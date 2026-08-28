@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils/cn";
 
 type ImageItem = { id: string; url: string; altText: string; uploading: boolean };
 type ClaimItem = { id: string; label: string; evidence: string };
+type IngredientItem = { id: string; name: string; note: string };
 type DocType = "CERTIFICATE" | "LAB_REPORT" | "INGREDIENT_LIST" | "SOURCING_PROOF" | "OTHER";
 type DocumentItem = { id: string; title: string; docType: DocType; fileUrl: string; mimeType: string; uploading: boolean };
 
@@ -23,7 +24,7 @@ const DOC_TYPE_OPTIONS: { value: DocType; label: string }[] = [
   { value: "OTHER", label: "Other" },
 ];
 
-const STEPS = ["Product Information", "Claims", "Documents", "Review"] as const;
+const STEPS = ["Product Information", "Claims", "Ingredients", "Documents", "Review"] as const;
 
 function newId() {
   return Math.random().toString(36).slice(2);
@@ -36,6 +37,7 @@ export type ProductWizardInitialValues = {
   description: string;
   images: { id: string; url: string; altText: string }[];
   claims: { id: string; label: string; evidence: string }[];
+  ingredients: { id: string; name: string; note: string }[];
   documents: { id: string; title: string; docType: DocType; fileUrl: string; mimeType: string }[];
 };
 
@@ -63,6 +65,7 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
   const [claims, setClaims] = useState<ClaimItem[]>(
     initialValues?.claims && initialValues.claims.length > 0 ? initialValues.claims : [{ id: newId(), label: "", evidence: "" }],
   );
+  const [ingredients, setIngredients] = useState<IngredientItem[]>(initialValues?.ingredients ?? []);
   const [documents, setDocuments] = useState<DocumentItem[]>(
     (initialValues?.documents ?? []).map((doc) => ({ ...doc, uploading: false })),
   );
@@ -106,7 +109,7 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
       if (images.some((img) => img.uploading)) return "Please wait for photo uploads to finish.";
       if (images.filter((img) => img.url).length === 0) return "At least one product photo is required.";
     }
-    if (index === 2) {
+    if (index === 3) {
       if (documents.some((doc) => doc.uploading)) return "Please wait for document uploads to finish.";
     }
     return null;
@@ -144,6 +147,7 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
       description,
       images: readyImages.map((img) => ({ url: img.url, altText: img.altText })),
       claims: claims.filter((claim) => claim.label.trim()).map((claim) => ({ label: claim.label, evidence: claim.evidence })),
+      ingredients: ingredients.filter((i) => i.name.trim()).map((i) => ({ name: i.name, note: i.note })),
       certificates: documents
         .filter((doc) => doc.fileUrl)
         .map((doc) => ({ title: doc.title || doc.docType, docType: doc.docType, fileUrl: doc.fileUrl, mimeType: doc.mimeType })),
@@ -327,6 +331,52 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
       {step === 2 ? (
         <Card className="p-6">
           <p className="text-sm leading-relaxed text-muted-foreground">
+            List the ingredients in this product. Add an optional note for context (e.g. sourcing, function, allergen
+            info) — an admin can review and refine this list before the product goes live.
+          </p>
+          <div className="mt-5 grid gap-3">
+            {ingredients.map((ingredient) => (
+              <div key={ingredient.id} className="grid gap-3 rounded-lg border border-border bg-muted/30 p-4 md:grid-cols-[1fr_1.4fr_auto]">
+                <input
+                  value={ingredient.name}
+                  onChange={(event) =>
+                    setIngredients((prev) => prev.map((i) => (i.id === ingredient.id ? { ...i, name: event.target.value } : i)))
+                  }
+                  placeholder="Ingredient name"
+                  className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+                />
+                <input
+                  value={ingredient.note}
+                  onChange={(event) =>
+                    setIngredients((prev) => prev.map((i) => (i.id === ingredient.id ? { ...i, note: event.target.value } : i)))
+                  }
+                  placeholder="Note (optional)"
+                  className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIngredients((prev) => prev.filter((i) => i.id !== ingredient.id))}
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-3"
+            onClick={() => setIngredients((prev) => [...prev, { id: newId(), name: "", note: "" }])}
+          >
+            Add Ingredient
+          </Button>
+        </Card>
+      ) : null}
+
+      {step === 3 ? (
+        <Card className="p-6">
+          <p className="text-sm leading-relaxed text-muted-foreground">
             Attach certificates, lab reports, or sourcing proof supporting your claims. Optional here — you can also
             upload documents later from the Documents page.
           </p>
@@ -375,7 +425,7 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
         </Card>
       ) : null}
 
-      {step === 3 ? (
+      {step === 4 ? (
         <Card className="p-6">
           <p className="text-sm font-semibold text-foreground">Review before submitting</p>
           <div className="mt-4 grid gap-4">
@@ -393,6 +443,12 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
                 ))}
                 {claims.filter((c) => c.label.trim()).length === 0 ? <p className="text-sm text-muted-foreground">No claims added.</p> : null}
               </div>
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Ingredients</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {ingredients.filter((i) => i.name.trim()).length} ingredient(s) listed
+              </p>
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Documents</p>

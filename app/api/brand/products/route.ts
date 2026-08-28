@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireBrandSession } from "@/lib/api-auth";
 import { slugify } from "@/lib/auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
+import { isTrustedBlobUrl } from "@/lib/blob";
 
 type SubmitBody = {
   name?: string;
@@ -11,6 +12,7 @@ type SubmitBody = {
   description?: string;
   images?: { url: string; altText?: string }[];
   claims?: { label: string; evidence?: string }[];
+  ingredients?: { name: string; note?: string }[];
   certificates?: { title: string; docType: string; fileUrl: string; mimeType?: string }[];
 };
 
@@ -45,9 +47,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "At least one product photo is required" }, { status: 400 });
   }
   const claims = (body.claims ?? []).filter((claim) => claim.label?.trim());
+  const ingredients = (body.ingredients ?? []).filter((ingredient) => ingredient.name?.trim());
   const certificates = (body.certificates ?? []).filter(
     (cert) => cert.title?.trim() && cert.fileUrl?.trim() && DOC_TYPES.has(cert.docType),
   );
+  const untrustedCertificate = certificates.find((cert) => !isTrustedBlobUrl(cert.fileUrl));
+  if (untrustedCertificate) {
+    return NextResponse.json({ error: "fileUrl must point to an uploaded file" }, { status: 400 });
+  }
 
   const slug = await uniqueProductSlug(slugify(body.name));
   const category = await prisma.category.upsert({
@@ -77,6 +84,12 @@ export async function POST(request: NextRequest) {
         create: claims.map((claim) => ({
           label: claim.label.trim(),
           evidence: claim.evidence?.trim() || null,
+        })),
+      },
+      ingredients: {
+        create: ingredients.map((ingredient) => ({
+          name: ingredient.name.trim(),
+          note: ingredient.note?.trim() || null,
         })),
       },
       certificates: {

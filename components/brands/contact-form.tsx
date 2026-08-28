@@ -7,12 +7,14 @@ type ContactFormProps = {
   title?: string;
   description?: string;
   submitLabel?: string;
+  className?: string;
 };
 
 export function ContactForm({
   title = "Get in touch",
   description = "Tell us about your brand and we'll schedule a personalized demo.",
   submitLabel = "Submit",
+  className,
 }: ContactFormProps) {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
@@ -46,7 +48,7 @@ export function ContactForm({
   }
 
   return (
-    <FadeIn>
+    <FadeIn className={className}>
       <form className="contact-form-card" onSubmit={handleSubmit}>
         <h2 className="contact-form-title">{title}</h2>
         {description ? <p className="contact-form-description">{description}</p> : null}
@@ -79,10 +81,10 @@ export function ContactForm({
           {status === "sending" ? "Sending..." : submitLabel}
         </button>
         {status === "sent" ? (
-          <p className="mt-3 text-sm font-semibold text-[color:var(--brand-accent)]">Thanks — we&apos;ll be in touch soon.</p>
+          <p className="contact-form-status contact-form-status-success">Thanks — we&apos;ll be in touch soon.</p>
         ) : null}
         {status === "error" ? (
-          <p className="mt-3 text-sm font-semibold text-[#ff9b9b]">Something went wrong. Please try again.</p>
+          <p className="contact-form-status contact-form-status-error">Something went wrong. Please try again.</p>
         ) : null}
       </form>
     </FadeIn>

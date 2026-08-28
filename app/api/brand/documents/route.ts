@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireBrandSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
+import { isTrustedBlobUrl } from "@/lib/blob";
 
 const DOC_TYPES = new Set(["CERTIFICATE", "LAB_REPORT", "INGREDIENT_LIST", "SOURCING_PROOF", "OTHER"]);
 
@@ -17,6 +18,10 @@ export async function POST(request: NextRequest) {
 
   if (!body?.productId || !body.title?.trim() || !body.fileUrl?.trim() || !body.docType || !DOC_TYPES.has(body.docType)) {
     return NextResponse.json({ error: "productId, title, docType, and an uploaded file are required" }, { status: 400 });
+  }
+
+  if (!isTrustedBlobUrl(body.fileUrl)) {
+    return NextResponse.json({ error: "fileUrl must point to an uploaded file" }, { status: 400 });
   }
 
   const product = await prisma.product.findUnique({ where: { id: body.productId } });

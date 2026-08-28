@@ -28,9 +28,13 @@ export const AUDIT_ACTIONS = {
   PRODUCT_SUBMIT: "product.submit",
   PRODUCT_EDIT: "product.edit",
   PRODUCT_RESUBMIT: "product.resubmit",
+  PRODUCT_DESCRIPTION_UPDATE: "product.description_update",
+  PRODUCT_INGREDIENTS_UPDATE: "product.ingredients_update",
 
   CLAIM_APPROVE: "claim.approve",
   CLAIM_DENY: "claim.deny",
+
+  CERTIFICATE_REVIEW_UPDATE: "certificate.review_update",
 
   DOCUMENT_UPLOAD: "document.upload",
   DOCUMENT_DELETE: "document.delete",

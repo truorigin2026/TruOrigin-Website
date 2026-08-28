@@ -13,7 +13,7 @@ export function PasswordInput({ className = "", ...props }: React.ComponentProps
   const [visible, setVisible] = useState(false);
 
   return (
-    <div className="relative">
+    <div className="relative flex-1">
       <input type={visible ? "text" : "password"} className={`${className} pr-11`.trim()} {...props} />
       <button
         type="button"

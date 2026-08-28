@@ -1,25 +1,68 @@
-import productsHero from "../../../../public/images/for-products/about-verification.webp";
-import howToFindImage from "../../../../public/images/for-brands/problem.png";
-import howToCheckImage from "../../../../public/images/for-brands/how-it-works.png";
-import howToReviewImage from "../../../../public/images/for-brands/why-it-works.png";
+import type { Metadata } from "next";
+import { Check, ShieldCheck } from "lucide-react";
+import verificationStep1 from "../../../../public/images/for-brands/how-it-works/verification-step1.webp";
+import verificationStep2 from "../../../../public/images/for-brands/how-it-works/verification-step2.webp";
+import verificationStep3 from "../../../../public/images/for-brands/how-it-works/verification-step3.webp";
 import Image from "next/image";
-import { BrandHero } from "@/components/brands/brand-hero";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { FadeIn } from "@/components/motion";
 import { verificationTopics } from "@/lib/data/frontend-data";
 import { PillButton, ArrowIcon } from "@/components/ui/pill-button";
 import Link from "next/link";
+import { pageMetadata } from "@/lib/seo";
 
-const processImages = [howToFindImage, howToCheckImage, howToReviewImage];
+const processSteps = [
+  {
+    step: 1,
+    title: "Spot the OriginCard",
+    text: "Every verified product carries a small OriginCard QR code on its packaging or label, easy to find before you buy.",
+    image: verificationStep1,
+  },
+  {
+    step: 2,
+    title: "Scan With Any Phone",
+    text: "No app to download. Point a camera at the code and the product's verification page opens instantly.",
+    image: verificationStep2,
+  },
+  {
+    step: 3,
+    title: "Review Every Claim",
+    text: "Origin, certifications, and test results appear clearly labeled, so you know exactly what's backed by evidence.",
+    image: verificationStep3,
+  },
+] as const;
+
+const consumerBenefits = [
+  "Instant product information access",
+  "Full origin and certification visibility",
+  "Evidence-backed claim review",
+  "Clearer product comparison",
+];
+
+const brandBenefits = [
+  "Organize product records",
+  "Present customer-facing product information",
+  "Premium structured page experience",
+  "Centralized supporting document management",
+];
+
+export const metadata: Metadata = pageMetadata({
+  title: "About Product Information",
+  description:
+    "Understand how TruOrigin organizes brand-supplied product details into a structured page — scan a QR code or enter a serial number to see origin, certifications, and evidence.",
+  path: "/for-products/about-verification",
+});
 
 export default function AboutVerificationPage() {
   return (
-    <div className="saas-page">
-      <BrandHero
-        image={productsHero}
-        headline="About Product Information"
-        subheadline="Understand how TruOrigin organizes brand-supplied product details into a structured page."
-      />
+    <div className="saas-page about-verification-page">
+      <header className="container-shell legal-page-header">
+        <p className="eyebrow">About</p>
+        <h1 className="legal-page-title">About Product Information</h1>
+        <p className="legal-page-meta">
+          Understand how TruOrigin organizes brand-supplied product details into a structured page.
+        </p>
+      </header>
 
       <section className="saas-section">
         <div className="container-shell">
@@ -34,9 +77,6 @@ export default function AboutVerificationPage() {
             {verificationTopics.map((topic, index) => (
               <FadeIn key={topic.title} delay={index * 0.06}>
                 <article className="verification-topic-card">
-                  <span className="verification-topic-icon">
-                    {topic.icon === "qr" ? "⬡" : topic.icon === "serial" ? "#" : "◈"}
-                  </span>
                   <h3>{topic.title}</h3>
                   <p>{topic.description}</p>
                 </article>
@@ -46,43 +86,35 @@ export default function AboutVerificationPage() {
         </div>
       </section>
 
-      <section className="saas-section saas-section-alt">
+      <section className="saas-section verification-process-section">
         <div className="container-shell">
           <SectionHeading
             eyebrow="Process"
-            title="How the product page works"
+            title="How the Product Page Works"
             description="Three simple steps from scan to full product information."
             centered
           />
 
           <div className="verification-process-grid">
-            {[
-              {
-                step: 1,
-                title: "Scan the QR Code",
-                text: "Use your phone camera to scan the QR on the product packaging.",
-              },
-              {
-                step: 2,
-                title: "Open Product Page",
-                text: "Access product information, origin, certifications, and supporting documents.",
-              },
-              {
-                step: 3,
-                title: "Review Details",
-                text: "Compare claims, documents, and product notes in one clean layout.",
-              },
-            ].map((item, index) => (
+            {processSteps.map((item, index) => (
               <FadeIn key={item.step} delay={index * 0.1}>
                 <article className="verification-process-card">
-                  <div className="verification-process-image">
-                    <Image
-                      src={processImages[index]}
-                      alt={item.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
+                  {item.image ? (
+                    <div className="verification-process-image">
+                      <Image src={item.image} alt={item.title} fill className="object-cover" />
+                    </div>
+                  ) : (
+                    <div className="verification-process-image verification-process-summary">
+                      <span className="verification-process-summary-icon">
+                        <ShieldCheck size={26} strokeWidth={2} aria-hidden="true" />
+                      </span>
+                      <div className="verification-process-summary-chips">
+                        {["Origin", "Certifications", "Test Reports", "Evidence"].map((chip) => (
+                          <span key={chip}>{chip}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <span className="verification-process-step">{item.step}</span>
                   <h3>{item.title}</h3>
                   <p>{item.text}</p>
@@ -99,11 +131,15 @@ export default function AboutVerificationPage() {
             <FadeIn>
               <div className="verification-benefit-card">
                 <h3>For Consumers</h3>
-                <ul>
-                  <li>Instant product information access</li>
-                  <li>Full origin and certification visibility</li>
-                  <li>Evidence-backed claim review</li>
-                  <li>Clearer product comparison</li>
+                <ul className="verification-benefit-list">
+                  {consumerBenefits.map((item) => (
+                    <li key={item}>
+                      <span className="verification-benefit-check">
+                        <Check size={12} strokeWidth={3} />
+                      </span>
+                      {item}
+                    </li>
+                  ))}
                 </ul>
                 <Link href="/for-products/products" className="verification-benefit-link">
                   Browse Products →
@@ -113,11 +149,15 @@ export default function AboutVerificationPage() {
             <FadeIn delay={0.1}>
               <div className="verification-benefit-card verification-benefit-card-brand">
                 <h3>For Brands</h3>
-                <ul>
-                  <li>Organize product records</li>
-                  <li>Present customer-facing product information</li>
-                  <li>Premium structured page experience</li>
-                  <li>Centralized supporting document management</li>
+                <ul className="verification-benefit-list">
+                  {brandBenefits.map((item) => (
+                    <li key={item}>
+                      <span className="verification-benefit-check verification-benefit-check-brand">
+                        <Check size={12} strokeWidth={3} />
+                      </span>
+                      {item}
+                    </li>
+                  ))}
                 </ul>
                 <PillButton href="/for-brands/contact" variant="primary" icon={<ArrowIcon />}>
                   Book Demo

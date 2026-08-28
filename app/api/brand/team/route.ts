@@ -6,6 +6,7 @@ import { requireBrandSession } from "@/lib/api-auth";
 import { createResetToken, normalizeEmail, RESET_TOKEN_TTL_MS } from "@/lib/auth";
 import { sendEmail } from "@/lib/email";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 const INVITABLE_ROLES = new Set(["ADMIN", "EDITOR", "VIEWER"]);
 
@@ -13,6 +14,11 @@ export async function POST(request: NextRequest) {
   const session = await requireBrandSession(request);
   if (!session || !session.brandId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rateLimit = checkRateLimit(`team-invite:${session.brandId}`, 10, 60 * 60 * 1000);
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit.retryAfterSeconds);
   }
 
   const actor = await prisma.user.findUnique({ where: { id: session.sub } });
@@ -33,7 +39,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "A user with this email already exists." }, { status: 409 });
   }
 
-  const passwordHash = await bcrypt.hash(randomBytes(24).toString("hex"), 10);
+  const passwordHash = await bcrypt.hash(randomBytes(24).toString("hex"), 12);
   const { token, tokenHash } = createResetToken();
 
   const brand = await prisma.brand.findUnique({ where: { id: session.brandId } });

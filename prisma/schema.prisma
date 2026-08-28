@@ -173,7 +173,7 @@ model Product {
   description    String?
 
   // Generated only after admin approval — see lib/serial.ts and lib/qr.ts
-  serialNumber   String?        @unique // e.g. "TO-2026-000001"
+  serialNumber   String?        @unique // e.g. "TRU10101"
   qrCodeUrl      String?
 
   status         ApprovalStatus @default(DRAFT)
@@ -224,16 +224,18 @@ model Claim {
 }
 
 model Certificate {
-  id        String             @id @default(cuid())
-  product   Product            @relation(fields: [productId], references: [id])
-  productId String
-  title     String
-  issuer    String?
-  fileUrl   String
-  docType   CertificateDocType @default(OTHER)
-  mimeType  String?
-  expiresAt DateTime?
-  createdAt DateTime           @default(now())
+  id         String             @id @default(cuid())
+  product    Product            @relation(fields: [productId], references: [id])
+  productId  String
+  title      String
+  issuer     String?
+  fileUrl    String
+  docType    CertificateDocType @default(OTHER)
+  mimeType   String?
+  expiresAt  DateTime?
+  verified   Boolean            @default(false)
+  reviewNote String?
+  createdAt  DateTime           @default(now())
 }
 
 model Ingredient {

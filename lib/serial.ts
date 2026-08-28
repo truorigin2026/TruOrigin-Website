@@ -1,27 +1,26 @@
 /**
  * Serial Number Generation
  * ----------------------------------------------------------------------
- * Format: TO-2026-000001
+ * Format: TRU + a running number, e.g. TRU101, TRU10101. Not zero-padded —
+ * the number just grows with each product, no fixed width.
  */
 
 import { prisma } from "./prisma";
 
-const PREFIX = "TO";
+const PREFIX = "TRU";
 
-export function previewSerialNumber(runningNumber: number, year = new Date().getFullYear()) {
-  return `${PREFIX}-${year}-${String(runningNumber).padStart(6, "0")}`;
+export function previewSerialNumber(runningNumber: number) {
+  return `${PREFIX}${runningNumber}`;
 }
 
 export async function nextSerialNumber(): Promise<string> {
-  const year = new Date().getFullYear();
-
   return prisma.$transaction(async (tx) => {
-    const countThisYear = await tx.product.count({
+    const count = await tx.product.count({
       where: {
-        serialNumber: { startsWith: `${PREFIX}-${year}-` },
+        serialNumber: { startsWith: PREFIX },
       },
     });
 
-    return previewSerialNumber(countThisYear + 1, year);
+    return previewSerialNumber(count + 1);
   });
 }

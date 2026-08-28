@@ -41,7 +41,13 @@ function PhoneCenterGlow() {
   );
 }
 
-function FeatureRowSet({ features, style }: { features: readonly Feature[]; style: { opacity: MotionValue<number> } }) {
+function FeatureRowSet({
+  features,
+  style,
+}: {
+  features: readonly Feature[];
+  style: { opacity: MotionValue<number>; y?: MotionValue<number> };
+}) {
   return (
     <motion.div className="brands-phone-cardset" style={style}>
       {features.map((feature) => (

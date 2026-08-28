@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Disclaimer",
+  description: "Important information about how TruOrigin content, claims, and evidence statuses should be interpreted.",
+  path: "/disclaimer",
+});
+
 export default function DisclaimerPage() {
   return (
     <div>
@@ -54,7 +63,7 @@ export default function DisclaimerPage() {
         <h2>Contact Us</h2>
         <p>If you have any questions about this Disclaimer, please contact us:</p>
         <p>TruOrigin</p>
-        <p>Email: info@truorigin.com</p>
+        <p>Email: info@truorigin.in</p>
         <p>Website: www.truorigin.in</p>
       </section>
     </div>

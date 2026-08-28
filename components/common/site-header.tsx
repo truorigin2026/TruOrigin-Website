@@ -9,6 +9,7 @@ import logo from "../../public/images/TruOrigin logo.png";
 import facebookIcon from "../../public/images/icons/facebook.svg";
 import instagramIcon from "../../public/images/icons/instagram.svg";
 import linkedinIcon from "../../public/images/icons/linkedin.svg";
+import xIcon from "../../public/images/icons/x.svg";
 import {
   brandNavItems,
   landingNavItems,
@@ -93,13 +94,13 @@ const audienceTabs = [
 
 const drawerSocialLinks = [
   { href: "https://facebook.com", label: "Facebook", icon: facebookIcon },
+  { href: "https://x.com", label: "X", icon: xIcon },
   { href: "https://linkedin.com", label: "LinkedIn", icon: linkedinIcon },
   { href: "https://instagram.com", label: "Instagram", icon: instagramIcon },
 ];
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const isProductsHeroPage = pathname === "/for-products/home";
   const [menuOpen, setMenuOpen] = useState(false);
   const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -109,9 +110,6 @@ export function SiteHeader() {
   const isProductsLandingPage = pathname === "/for-products" || pathname.startsWith("/for-products/");
   const navItems = isLandingPage ? landingNavItems : isProductsLandingPage ? productNavItems : audience === "brands" ? brandNavItems : productNavItems;
   const logoHref = isLandingPage ? "/for-brands/home" : isProductsLandingPage ? "/for-products/home" : audience === "brands" ? "/" : "/for-products";
-  const ctaHref = audience === "brands" ? "/login" : "/for-products/products";
-  const ctaLabel = "Get Started";
-  const showCta = audience === "brands";
 
   useEffect(() => {
     setMenuOpen(false);
@@ -119,7 +117,7 @@ export function SiteHeader() {
   }, [pathname]);
 
   useEffect(() => {
-    if (!onHeroPage || isProductsHeroPage) {
+    if (!onHeroPage) {
       setScrolled(true);
       return;
     }
@@ -147,7 +145,14 @@ export function SiteHeader() {
         ].join(" ")}
       >
         <div className="container-shell">
-          <div className={onHeroPage ? "hero-glass-header-inner" : "site-static-header-inner"}>
+          <div
+            className={onHeroPage ? "hero-glass-header-inner" : "site-static-header-inner"}
+            style={
+              menuOpen
+                ? { backdropFilter: "none", WebkitBackdropFilter: "none" }
+                : undefined
+            }
+          >
             <Link href={logoHref} className={`site-brand-link ${menuOpen ? "is-moving" : ""}`}>
               <Image src={logo} alt="TruOrigin" className="site-brand-logo" priority />
             </Link>
@@ -207,16 +212,6 @@ export function SiteHeader() {
                   </Link>
                   <Link href="/for-brands/contact" className="desktop-header-cta header-lets-talk-btn">
                     Let&apos;s Talk
-                  </Link>
-                </>
-              ) : showCta ? (
-                <>
-                  <Link href={ctaHref} className="mobile-header-cta">
-                    {ctaLabel}
-                  </Link>
-
-                  <Link href={ctaHref} className="desktop-header-cta">
-                    {ctaLabel}
                   </Link>
                 </>
               ) : null}
@@ -355,6 +350,14 @@ export function SiteHeader() {
               </div>
 
               <div className="mobile-drawer-footer">
+                <Link
+                  href="/for-brands/contact"
+                  className="mobile-drawer-cta"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Let&apos;s Talk
+                </Link>
+
                 <div className="mobile-drawer-socials">
                   {drawerSocialLinks.map((item) => (
                     <Link key={item.label} href={item.href} aria-label={item.label} className="mobile-drawer-social">

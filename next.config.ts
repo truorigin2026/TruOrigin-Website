@@ -8,7 +8,7 @@ const CSP = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
   "font-src 'self' data:",
-  "connect-src 'self'",
+  "connect-src 'self' https://ruucm.github.io",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -26,13 +26,31 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   images: {
-    unoptimized: true,
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
+    ],
   },
   async headers() {
+    const staticCacheHeaders = isDev
+      ? [{ key: "Cache-Control", value: "no-store" }]
+      : [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }];
+
     return [
       {
         source: "/:path*",
         headers: securityHeaders,
+      },
+      {
+        source: "/_next/static/:path*",
+        headers: staticCacheHeaders,
+      },
+      {
+        source: "/images/:path*",
+        headers: staticCacheHeaders,
       },
     ];
   },
