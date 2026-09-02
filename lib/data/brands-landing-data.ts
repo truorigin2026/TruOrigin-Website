@@ -48,7 +48,7 @@ export const whyTruOriginPoints = [
   {
     title: "Structured for Clarity",
     description:
-      "Raw product information rarely tells a clear story on its own. TruOrigin turns it into a consistent, organized format, so certifications, origin details, and specifications are presented the same way every time, for every product. Whatever the category, customers and brand teams both know exactly where to look and what they are looking at.",
+      "Raw product information rarely tells a clear story on its own. TruOrigin turns it into a consistent, organized format, so certifications, claims, ingredients, and specifications are presented the same way every time, for every product. Whatever the category, customers and brand teams both know exactly where to look and what they are looking at.",
   },
   {
     title: "Easy to Explore",
@@ -117,30 +117,30 @@ export const howItWorksSteps = [
   {
     step: 1,
     title: "Create Product",
-    description: "Register your product with details, images, certifications, and claims on the TruOrigin platform.",
+    description: "Add your product details, ingredients, specifications, documents, and other relevant information to TruOrigin.",
     icon: "/images/for-brands/how-it-works/step-1.svg",
   },
   {
     step: 2,
-    title: "Generate OriginCard",
-    description: "TruOrigin creates a unique digital identity and secure QR code linked to your product record.",
+    title: "Structure & Manage",
+    description: "TruOrigin organizes the information into a structured OriginCard that brands can manage and update.",
     icon: "/images/for-brands/how-it-works/step-2.svg",
   },
   {
     step: 3,
-    title: "Print & Attach",
-    description: "Embed the QR on packaging, labels, or include the OriginCard with every unit shipped.",
+    title: "Present Through OriginCard",
+    description: "The OriginCard presents the product information in a clear, customer-facing format that can be accessed through the product.",
     icon: "/images/for-brands/how-it-works/step-3.svg",
   },
   {
     step: 4,
-    title: "Customer Scans",
-    description: "Shoppers scan with any smartphone to instantly access verified product information.",
+    title: "Customer Access",
+    description: "Customers access the OriginCard through the product and explore its structured information.",
     icon: "/images/for-brands/how-it-works/step-4.svg",
   },
   {
     step: 5,
-    title: "Trust is Built",
+    title: "Product Insights",
     description: "Customers see authenticity status, origin, certifications, and full transparency in one view.",
     icon: "/images/for-brands/how-it-works/step-5.svg",
   },
@@ -222,21 +222,21 @@ export const servedIndustries = [
 ] as const;
 
 export const brandBenefits = [
-  "Protect brand reputation from counterfeits",
-  "Reduce returns caused by authenticity doubts",
-  "Increase customer lifetime value with verified trust",
-  "Streamline compliance and certification display",
-  "Gain real time product engagement insights",
-  "Differentiate on shelves with OriginCard",
+  "Organize Product Information in One Place",
+  "Keep Product Details Clear and Structured",
+  "Make Claims and Supporting Documents Easy to Access",
+  "Simplify Product Information Management",
+  "Understand How Customers Explore Products",
+  "Give Every Product a Dedicated OriginCard",
 ] as const;
 
 export const customerBenefits = [
-  "Instantly verify product authenticity before buying",
-  "Access origin, ingredients, and certifications in one scan",
-  "Make informed decisions with transparent product data",
-  "Report suspicious products directly to the brand",
-  "Build confidence in every purchase decision",
-  "Share verified products with friends and family",
+  "Find Product Information in One Place",
+  "Understand Product Claims More Easily",
+  "Access Supporting Documents in One Place",
+  "Explore Product Details More Easily",
+  "Get the Information You Need Before Buying",
+  "Explore the Full Story Behind a Product",
 ] as const;
 
 export const coreValues = [

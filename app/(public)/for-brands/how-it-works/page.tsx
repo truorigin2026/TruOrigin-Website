@@ -21,70 +21,76 @@ const systemLayers = [
   {
     icon: LayoutDashboard,
     title: "Brand Portal",
-    description: "Register products, upload evidence, and manage your verification portfolio from a single dashboard.",
-    points: ["Product intake & image upload", "Document management", "Review status tracking"],
+    subtitle: "Add and manage product information",
+    description:
+      "Brands register products, upload product details, images, supporting documents, certifications, and claim evidence — all managed from one place.",
+    points: ["Product details & image upload", "Document management", "Claim & evidence management"],
   },
   {
     icon: Cpu,
     title: "TruOrigin Engine",
-    description: "Our platform validates data, generates unique QR codes, and publishes verification pages.",
-    points: ["Evidence mapping", "QR code generation", "Authenticity validation"],
+    subtitle: "Structure, validate, and connect the information",
+    description:
+      "TruOrigin organises submitted product information, maps supporting evidence, and creates a unique digital identity for each product.",
+    points: ["Evidence mapping", "Product information structuring", "Unique QR & product identity", "Verification status"],
   },
   {
     icon: Users,
     title: "Consumer Experience",
-    description: "Shoppers can scan, verify, and access full product transparency in seconds.",
-    points: ["QR & serial verification", "Origin & certification view", "Downloadable documents"],
+    subtitle: "Explore product information with clarity",
+    description:
+      "Consumers access the product's information in one place, including origin, claims, certifications, supporting documents, and verification status.",
+    points: ["Product information access", "Origin & certification details", "Evidence-backed claims", "Supporting documents"],
   },
 ];
 
 const reviewChecklist = [
   {
     title: "Product Details",
-    description: "Name, category, and description are accurate and match the submitted images.",
+    description: "Product name, category, description, and other key product information.",
   },
   {
     title: "Product Photos",
-    description: "Clear, unaltered photos that represent the actual product being sold.",
+    description: "Clear product images that represent the product being presented.",
   },
   {
     title: "Claims",
-    description: 'Each claim is specific enough to evaluate — "USDA Organic Certified" rather than just "natural."',
+    description: "Product claims presented with their relevant supporting information.",
   },
   {
     title: "Certificates & Lab Reports",
-    description: "Uploaded documents are legible, current, and issued by a recognizable authority.",
+    description: "Certificates and laboratory reports provided as supporting product documentation.",
   },
   {
     title: "Ingredient Lists",
-    description: "Where applicable, ingredient documentation matches the claims being made.",
+    description: "Ingredient information and related product documentation where applicable.",
   },
   {
-    title: "Sourcing Proof",
-    description: "Invoices or sourcing documentation support origin and material claims.",
+    title: "Sourcing Information",
+    description: "Sourcing documents and invoices providing supporting information about the product's sourcing.",
   },
 ];
 
 const processFaqs = [
   {
-    question: "How long does review take?",
+    question: "How long does it take for product information to appear?",
     answer:
-      "Most submissions are reviewed within 2-3 business days. Products with more claims or documents to verify may take slightly longer.",
+      "Most submissions are processed within 2–3 business days. More detailed product information may take slightly longer.",
   },
   {
-    question: "What happens if a claim can't be verified?",
+    question: "What happens if information is incomplete?",
     answer:
-      'It\'s labeled "No Evidence Submitted" rather than rejected outright — you can add supporting documents later and resubmit that claim for review.',
+      "The submission may require additional information or supporting documents before the product information can be published.",
   },
   {
-    question: "Can I update a product after it's approved?",
+    question: "Can I update product information later?",
     answer:
-      "Yes. Updates go through the same review flow before they replace the live version, so your OriginCard always reflects reviewed information.",
+      "Yes. Brands can update product details, images, claims, and supporting documents when information changes.",
   },
   {
-    question: "Do I need a certificate for every claim?",
+    question: "Do I need supporting documents for every claim?",
     answer:
-      'Not necessarily, but claims backed by documentation are shown as "Evidence Available," which customers trust more than unsupported claims.',
+      "Supporting documents may be required where they are relevant to the specific claim being presented.",
   },
 ];
 
@@ -163,6 +169,7 @@ export default function ForBrandsHowItWorksPage() {
                       <Icon size={24} aria-hidden="true" />
                     </div>
                     <h3>{layer.title}</h3>
+                    <p className="hiw-system-subtitle">{layer.subtitle}</p>
                     <p>{layer.description}</p>
                     <ul>
                       {layer.points.map((point) => (
@@ -186,7 +193,7 @@ export default function ForBrandsHowItWorksPage() {
         <div className="container-shell">
           <SectionHeading
             eyebrow="Review Process"
-            title="What our review team checks"
+            title="What We Check Before It Goes Live"
             description="Every submission is reviewed by a person before it goes live — here's what they're looking for."
             centered
           />

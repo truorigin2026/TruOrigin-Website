@@ -16,17 +16,17 @@ export const metadata: Metadata = pageMetadata({
 });
 
 const withoutTruOrigin = [
-  "Claims live only in marketing copy, with no way for a customer to check them",
-  "Counterfeit or knockoff products erode trust in your real inventory",
-  "Support teams field the same authenticity questions over and over",
-  "No visibility into how often customers actually check your claims",
+  "Product information is scattered across packaging, websites, and documents",
+  "Claims can be difficult for customers to understand or explore",
+  "Supporting documents are not always easy to find",
+  "Brands have limited visibility into which product information customers access",
 ];
 
 const withTruOrigin = [
-  "Every claim carries a status — Evidence Available, Limited Evidence, or reviewed by a real person",
-  "Each unit has a unique serial number and QR code tied to one verified record",
-  "Customers self serve the answer by scanning, instead of contacting support",
-  "Scan analytics show exactly which products and claims customers check most",
+  "Product information is brought together in one structured product page",
+  "Claims are presented alongside their supporting information",
+  "Product documents are easier for customers to access",
+  "Brands gain visibility into which product information customers access",
 ];
 
 export default function ForBrandsBenefitsPage() {
@@ -41,13 +41,13 @@ export default function ForBrandsBenefitsPage() {
           </HeroReveal>
           <HeroReveal delay={0.15}>
             <h1 className="bnf-hero-title">
-              Why brands — and their <span className="brands-text-accent">customers</span> — choose TruOrigin.
+              Why brands — and their <span className="brands-text-accent">customers</span> — use TruOrigin.
             </h1>
           </HeroReveal>
           <HeroReveal delay={0.25}>
             <p className="bnf-hero-lead">
-              Real value for the teams shipping the product, and real clarity for the people buying it.
-              See how OriginCard changes the equation on both sides.
+              Real value for the teams behind the product, and real clarity for the people buying it.
+              See how OriginCard brings product information, claims, and supporting documents together.
             </p>
           </HeroReveal>
           <HeroReveal delay={0.35}>
@@ -65,7 +65,7 @@ export default function ForBrandsBenefitsPage() {
 
       <section className="bnf-stats-section">
         <div className="container-shell">
-          <SectionHeading eyebrow="Why It Matters" title="The transparency gap is measurable" centered />
+          <SectionHeading eyebrow="Why It Matters" title="Product information should be clear" centered />
           <div className="bnf-stats-grid">
             {trustStats.map((stat, index) => (
               <FadeIn key={stat.label} delay={index * 0.06}>
@@ -92,7 +92,7 @@ export default function ForBrandsBenefitsPage() {
 
       <section className="bnf-comparison-section">
         <div className="container-shell">
-          <SectionHeading eyebrow="Before & After" title="What changes once claims are verifiable" centered />
+          <SectionHeading eyebrow="Before & After" title="What Changes When Product Information Is Organized" centered />
           <div className="bnf-comparison-grid">
             <FadeIn className="bnf-comparison-column bnf-comparison-without">
               <p className="bnf-comparison-tag">Without TruOrigin</p>
@@ -133,8 +133,8 @@ export default function ForBrandsBenefitsPage() {
         <div className="bnf-cta-overlay" aria-hidden="true" />
         <div className="container-shell bnf-cta-inner">
           <FadeIn>
-            <h2>Ready to give every product verifiable proof?</h2>
-            <p>Join the brands already turning transparency into a competitive advantage.</p>
+            <h2>Ready to give every product a clearer story?</h2>
+            <p>Give customers one clear place to explore your product information, claims, and supporting documents.</p>
             <PillButton href="/for-brands/contact" variant="primary" icon={<ArrowIcon />}>
               Get Started Today
             </PillButton>

@@ -15146,6 +15146,14 @@ a.contact-method-value:hover {
   color: var(--muted);
 }
 
+.hiw-system-card .hiw-system-subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--foreground);
+}
+
 .hiw-system-card ul {
   margin: 18px 0 0;
   padding: 16px 0 0;
