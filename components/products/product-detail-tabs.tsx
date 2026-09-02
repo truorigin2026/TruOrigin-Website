@@ -23,7 +23,6 @@ const paneTransition = { duration: 0.3, ease: [0.16, 1, 0.3, 1] as const };
 
 function ClaimRow({ claim }: { claim: ProductClaim }) {
   const [isOpen, setIsOpen] = useState(false);
-  const status = statusConfig[claim.status];
 
   return (
     <TrackInView eventType="CLAIM_VIEW" targetId={claim.id}>
@@ -34,14 +33,11 @@ function ClaimRow({ claim }: { claim: ProductClaim }) {
           onClick={() => setIsOpen((current) => !current)}
           aria-expanded={isOpen}
         >
-          <span className="claim-row-icon" style={{ background: status.background, color: status.dot }}>
+          <span className="claim-row-icon">
             <ShieldCheck size={18} strokeWidth={2.2} aria-hidden="true" />
           </span>
           <span className="claim-row-copy">
             <span className="claim-row-title">{claim.text}</span>
-            <span className="claim-status-pill" style={{ background: status.background, color: status.text }}>
-              {claim.status}
-            </span>
           </span>
           <span className="claim-row-chevron" aria-hidden="true">
             <ChevronRight size={18} strokeWidth={2.2} />

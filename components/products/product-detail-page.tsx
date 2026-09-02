@@ -15,18 +15,10 @@ export function ProductDetailPage({
   product: ProductRecord;
   relatedProducts: ProductRecord[];
 }) {
-  const certificates = product.certificates ?? [];
-  const verifiedClaims = product.claims.filter((claim) => claim.status === "Evidence Available").length;
-  const totalClaims = product.claims.length;
-  const claimsVerifiedValue = totalClaims > 0 ? `${verifiedClaims}/${totalClaims}` : "—";
-
   const highlightCards = [
     { title: "Category", value: product.category },
-    { title: "Claims Verified", value: claimsVerifiedValue },
-    {
-      title: "Certificates",
-      value: certificates.length > 0 ? `${certificates.length} linked document${certificates.length === 1 ? "" : "s"}` : "No documents yet",
-    },
+    { title: "Product Information", value: "Submitted" },
+    { title: "Information Sources", value: "Brand-provided information" },
     { title: "Last Updated", value: product.lastUpdated },
   ];
 
@@ -61,7 +53,7 @@ export function ProductDetailPage({
               <HeroReveal delay={0.23} className="product-detail-status-wrap">
                 <p className="product-detail-status">
                   <span className="product-detail-status-dot" />
-                  Verified Authentic Product
+                  Product Information Submitted
                 </p>
               </HeroReveal>
               <HeroReveal delay={0.28} className="product-detail-summary-wrap">
@@ -93,9 +85,9 @@ export function ProductDetailPage({
                 </div>
                 <div className="origincard-banner-copy">
                   <p className="origincard-banner-eyebrow">OriginCard</p>
-                  <h2>{originCard.title ?? "Verified Origin Card"}</h2>
+                  <h2>{originCard.title ?? "Product OriginCard"}</h2>
                   <p>
-                    TruOrigin has verified and published this product&apos;s origin record.
+                    TruOrigin has published this product&apos;s information.
                     {originCard.publishedAt ? ` Published ${originCard.publishedAt}.` : ""}
                   </p>
                   {originCard.pngUrl || originCard.pdfUrl ? (
