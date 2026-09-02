@@ -10,10 +10,10 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { faqPageJsonLd, pageMetadata } from "@/lib/seo";
 
 const supportHelpPoints = [
-  "Verification troubleshooting",
-  "Counterfeit reporting",
-  "Brand contact routing",
-  "Platform guidance",
+  "OriginCard support",
+  "Product information guidance",
+  "Platform assistance",
+  "Brand & customer support",
 ] as const;
 
 export const metadata: Metadata = pageMetadata({
@@ -31,7 +31,8 @@ export default function ForProductsSupportPage() {
         <p className="eyebrow">Support</p>
         <h1 className="legal-page-title">How Can We Help?</h1>
         <p className="legal-page-meta">
-          Find answers to common verification questions or reach out to our support team.
+          Find answers to common questions or reach out to our support team for help with your
+          TruOrigin account, OriginCard, and product information.
         </p>
       </header>
 
@@ -40,7 +41,7 @@ export default function ForProductsSupportPage() {
           <SectionHeading
             eyebrow="FAQ"
             title="Common Questions"
-            description="Quick answers to help you verify products and understand the TruOrigin platform."
+            description="Quick answers to help you understand and use the TruOrigin platform."
             centered
           />
           <div className="support-faq-wrap">
@@ -59,8 +60,8 @@ export default function ForProductsSupportPage() {
                   <p className="support-contact-eyebrow">Support</p>
                   <h2>Still Need Help?</h2>
                   <p className="support-contact-lead">
-                    Our support team is here to assist with verification issues, product
-                    inquiries, and general questions about TruOrigin.
+                    Our support team is here to help with OriginCard, product information,
+                    platform usage, and general questions about TruOrigin.
                   </p>
                   <ul className="support-contact-checklist">
                     {supportHelpPoints.map((point) => (

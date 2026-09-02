@@ -34,7 +34,7 @@ export default async function ForProductsProductsPage({ searchParams }: Products
     <div className="saas-page">
       <header className="container-shell legal-page-header">
         <p className="eyebrow">Products</p>
-        <h1 className="legal-page-title">Discover Verified Products</h1>
+        <h1 className="legal-page-title">Discover Product Information</h1>
       </header>
 
       <ProductsContent

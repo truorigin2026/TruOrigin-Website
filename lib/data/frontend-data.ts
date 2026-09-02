@@ -122,7 +122,7 @@ export const verificationTopics = [
   {
     title: "How QR product pages work",
     description:
-      "Each product receives a unique QR code. When scanned, it opens a product page showing information, origin, certifications, and supporting documents.",
+      "Each product receives a unique QR code. When scanned, it opens a product page showing information, claims, certifications, and supporting documents.",
     icon: "qr",
   },
   {
@@ -140,13 +140,13 @@ export const verificationTopics = [
   {
     title: "Benefits for consumers",
     description:
-      "Instant access to product information, origin details, certifications, and supporting documents - right at the point of purchase or unboxing.",
+      "Instant access to product information, claims, ingredients, certifications, and supporting documents - right at the point of purchase or unboxing.",
     icon: "consumer",
   },
   {
     title: "Benefits for brands",
     description:
-      "Protect brand reputation, reduce confusion, and demonstrate commitment to transparency with a premium product information experience.",
+      "Manage product information in one place, keep it organized, and make it easier for customers to discover the details that matter.",
     icon: "brand",
   },
 ] as const;

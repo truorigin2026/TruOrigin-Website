@@ -33,17 +33,16 @@ const processSteps = [
 ] as const;
 
 const consumerBenefits = [
-  "Instant product information access",
-  "Full origin and certification visibility",
-  "Evidence-backed claim review",
-  "Clearer product comparison",
+  "Explore product details in one place",
+  "Understand claims, ingredients, documents & specifications",
+  "Discover information before making a choice",
 ];
 
 const brandBenefits = [
-  "Organize product records",
-  "Present customer-facing product information",
-  "Premium structured page experience",
-  "Centralized supporting document management",
+  "Organize product information",
+  "Manage information through OriginCard",
+  "Present structured product information",
+  "Simplify product information management",
 ];
 
 export const metadata: Metadata = pageMetadata({
@@ -130,7 +129,7 @@ export default function AboutVerificationPage() {
           <div className="verification-benefits-grid">
             <FadeIn>
               <div className="verification-benefit-card">
-                <h3>For Consumers</h3>
+                <h3>Access product information instantly</h3>
                 <ul className="verification-benefit-list">
                   {consumerBenefits.map((item) => (
                     <li key={item}>
