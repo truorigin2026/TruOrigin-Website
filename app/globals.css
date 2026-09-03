@@ -4163,6 +4163,63 @@ a.contact-method-value:hover {
   z-index: 1;
 }
 
+/* Fingerprint-icon loading indicator — light fill rises and sinks inside
+   the dark outline, looping while a page's data fetch is in flight. */
+.logo-fill-loader {
+  position: relative;
+  display: inline-block;
+}
+
+.logo-fill-loader-base,
+.logo-fill-loader-fill {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: url("/images/print.svg");
+  mask-image: url("/images/print.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.logo-fill-loader-base {
+  background: var(--brand-dark);
+  opacity: 0.22;
+}
+
+.logo-fill-loader-fill {
+  background: var(--brand-accent);
+  animation: logo-fill-sweep 1.8s ease-in-out infinite;
+}
+
+@keyframes logo-fill-sweep {
+  0% {
+    clip-path: inset(100% 0 0 0);
+  }
+  50% {
+    clip-path: inset(0% 0 0 0);
+  }
+  100% {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-fill-loader-fill {
+    animation: none;
+    clip-path: inset(35% 0 0 0);
+  }
+}
+
+.route-loading-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+}
+
 .contact-form-tagline {
   width: 100%;
   margin: 28px 0 0;
