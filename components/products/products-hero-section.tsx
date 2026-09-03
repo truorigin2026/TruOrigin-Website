@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { MoltenMetal } from "@/components/brands/molten-metal";
@@ -56,22 +55,11 @@ export function ProductsHeroSection() {
           </span>
         ))}
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="products-hero-title"
-        >
+        <h1 className="products-hero-title">
           Product Claims, <span className="products-hero-title-accent">Made Clear</span>
-        </motion.h1>
+        </h1>
 
-        <motion.form
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-          onSubmit={handleSubmit}
-          className="products-hero-search"
-        >
+        <form onSubmit={handleSubmit} className="products-hero-search">
           <label htmlFor="products-hero-search-input" className="sr-only">
             Search product claims
           </label>
@@ -89,7 +77,7 @@ export function ProductsHeroSection() {
               Explore claims
             </button>
           </div>
-        </motion.form>
+        </form>
       </div>
     </section>
   );

@@ -7,8 +7,6 @@ const revealEase = [0.16, 1, 0.3, 1] as const;
 
 export function HeroReveal({
   children,
-  delay = 0,
-  y = 24,
   className,
 }: {
   children: ReactNode;
@@ -16,16 +14,12 @@ export function HeroReveal({
   y?: number;
   className?: string;
 }) {
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y, scale: 0.985 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.7, delay, ease: revealEase }}
-    >
-      {children}
-    </motion.div>
-  );
+  // Renders immediately, no entrance animation — hero content used to be
+  // opacity:0 until client JS hydrated and this animation finished, which
+  // could take over a second across staggered delays. That left hero
+  // sections looking blank/missing while the rest of the page (e.g. the
+  // footer, which has no such animation) was already fully visible.
+  return <div className={className}>{children}</div>;
 }
 
 export function FadeIn({
