@@ -49,7 +49,7 @@ export const blogPosts: BlogPost[] = [
       "clinically tested meaning",
       "paraben free claims",
       "product label transparency",
-      "skincare claim verification",
+      "skincare claim documentation",
       "what does dermatologically tested mean",
     ],
     content: [
@@ -108,7 +108,7 @@ export const blogPosts: BlogPost[] = [
             text: "The Claims on the Pack: What Should You Actually Look For",
             href: "/for-brands/resources/blog/claims-on-the-pack-what-to-look-for",
           },
-          ", which walks through the specific questions worth asking before trusting any label claim.",
+          ", which walks through the specific questions worth asking before relying on any label claim.",
         ],
       },
       {
@@ -142,7 +142,7 @@ export const blogPosts: BlogPost[] = [
     keywords: [
       "product transparency",
       "brand documentation",
-      "customer trust evidence",
+      "product evidence for customers",
       "product information gap",
       "sourcing and testing documentation",
     ],
@@ -180,13 +180,13 @@ export const blogPosts: BlogPost[] = [
       {
         type: "paragraph",
         segments: [
-          "This isn’t just an inconvenience. For a brand that has genuinely done the work (sourced responsibly, tested rigorously, documented thoroughly), an inaccessible information trail means that work isn’t doing anything for them commercially. A customer who can’t easily find the evidence behind a product has no reason to trust it more than a competitor’s product that made similar claims with less behind them.",
+          "This isn’t just an inconvenience. For a brand that has genuinely done the work (sourced responsibly, tested rigorously, documented thoroughly), an inaccessible information trail means that work isn’t doing anything for them commercially. A customer who can’t easily find the evidence behind a product has no reason to choose it over a competitor’s product that made similar claims with less behind them.",
         ],
       },
       {
         type: "paragraph",
         segments: [
-          "In categories like supplements, skincare, and wellness, where trust is often the actual purchase driver, that’s a real cost, not a minor one. It’s the same dynamic we map out in ",
+          "In categories like supplements, skincare, and wellness, where confidence is often the actual purchase driver, that’s a real cost, not a minor one. It’s the same dynamic we map out in ",
           {
             text: "Where Does All Your Product Documentation Actually Go?",
             href: "/for-brands/resources/blog/where-does-all-your-product-documentation-go",
@@ -205,7 +205,7 @@ export const blogPosts: BlogPost[] = [
         type: "paragraph",
         segments: [
           "This is the core of what TruOrigin does. It doesn’t replace your packaging, your website, or your existing documentation. It organizes what already exists into a format customers can actually navigate: Claim → Evidence → Summary → Understanding. To see the customer-facing side of that structure, ",
-          { text: "About Product Information", href: "/for-products/about-verification" },
+          { text: "About Product Information", href: "/for-products/how-it-works" },
           " walks through exactly what a shopper sees the moment they scan.",
         ],
       },
@@ -231,7 +231,7 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "Having product information isn't the same as having it be findable. The difference matters more than most brands realize.",
     metaDescription:
-      "Product information that exists but can't be found isn't really accessible. Learn the difference between existing and findable, and why it matters for customer trust.",
+      "Product information that exists but can't be found isn't really accessible. Learn the difference between existing and findable, and why it matters for the customer experience.",
     date: "Aug 6, 2026",
     isoDate: "2026-08-06",
     readTime: "6 min read",
@@ -240,7 +240,7 @@ export const blogPosts: BlogPost[] = [
     keywords: [
       "product information findability",
       "brand transparency",
-      "customer trust",
+      "customer confidence",
       "structured product data",
       "accessible product documentation",
     ],
@@ -254,7 +254,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "paragraph",
         segments: [
-          'But "technically possible to find" and "actually findable" are very different standards, and the gap between them is where a lot of customer trust quietly leaks away.',
+          'But "technically possible to find" and "actually findable" are very different standards, and the gap between them is where a lot of customer confidence quietly leaks away.',
         ],
       },
       { type: "heading", text: "The Difference Between Existing and Findable" },
@@ -284,7 +284,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "paragraph",
         segments: [
-          "Customers increasingly research before they buy, especially in categories like supplements, skincare, and wellness, where a product’s claims directly affect whether someone trusts it enough to put it on their skin or in their body. A brand that has done real work but makes that work hard to find is, in practice, competing on equal footing with a brand that’s done far less. That’s not a fair outcome for the brands that have actually invested in testing, sourcing, and documentation. It’s exactly the gap we dig into further in ",
+          "Customers increasingly research before they buy, especially in categories like supplements, skincare, and wellness, where a product’s claims directly affect whether someone feels confident enough to put it on their skin or in their body. A brand that has done real work but makes that work hard to find is, in practice, competing on equal footing with a brand that’s done far less. That’s not a fair outcome for the brands that have actually invested in testing, sourcing, and documentation. It’s exactly the gap we dig into further in ",
           {
             text: "Why Findability Matters Most in Skincare and Supplements",
             href: "/for-brands/resources/blog/why-findability-matters-in-skincare-and-supplements",
@@ -325,7 +325,7 @@ export const blogPosts: BlogPost[] = [
     title: "What If the Product Came With Its Own Information Card?",
     excerpt: "Introducing the idea behind OriginCard, a structured, explorable information layer attached to every product claim.",
     metaDescription:
-      "OriginCard turns every product claim into an explorable path to its supporting evidence. Learn how a structured information card builds customer trust.",
+      "OriginCard turns every product claim into an explorable path to its supporting evidence. Learn how a structured information card builds customer confidence.",
     date: "Jul 30, 2026",
     isoDate: "2026-07-30",
     readTime: "6 min read",
@@ -387,9 +387,9 @@ export const blogPosts: BlogPost[] = [
       {
         type: "paragraph",
         segments: [
-          "For brands that have already done the work (real testing, real sourcing, real certifications), an information card gives that work somewhere to actually live and be seen. It turns documentation that currently sits in a folder somewhere into something that actively builds customer confidence at the exact moment a customer is deciding whether to trust the product. To see how this plays out in practice, take a look at ",
+          "For brands that have already done the work (real testing, real sourcing, real certifications), an information card gives that work somewhere to actually live and be seen. It turns documentation that currently sits in a folder somewhere into something that actively builds customer confidence at the exact moment a customer is deciding whether to choose the product. To see how this plays out in practice, take a look at ",
           {
-            text: "How OriginCard Turns Product Documentation Into a Trust Tool",
+            text: "How OriginCard Turns Product Documentation Into a Customer-Facing Asset",
             href: "/for-brands/resources/blog/how-origincard-turns-documentation-into-trust",
           },
           ".",
@@ -415,9 +415,9 @@ export const blogPosts: BlogPost[] = [
     category: "Claims & Labels",
     title: "The Claims on the Pack: What Should You Actually Look For?",
     excerpt:
-      "Not all product claims carry the same weight. Here's what's worth paying attention to, and what questions are worth asking before you trust a claim.",
+      "Not all product claims carry the same weight. Here's what's worth paying attention to, and what questions are worth asking before you rely on a claim.",
     metaDescription:
-      "Learn the three questions worth asking before trusting any product claim, from Non-Comedogenic to Third-Party Tested, and why most claims fail the third one.",
+      "Learn the three questions worth asking before relying on any product claim, from Non-Comedogenic to Third-Party Tested, and why most claims fail the third one.",
     date: "Jul 23, 2026",
     isoDate: "2026-07-23",
     readTime: "6 min read",
@@ -425,7 +425,7 @@ export const blogPosts: BlogPost[] = [
     imageAlt: "Close-up of skincare and supplement packaging showing common marketing claims",
     keywords: [
       "how to evaluate product claims",
-      "trustworthy label claims",
+      "well-supported label claims",
       "third party tested meaning",
       "clinically tested vs certified",
       "consumer label literacy",
@@ -454,7 +454,7 @@ export const blogPosts: BlogPost[] = [
         type: "list",
         items: [
           [
-            'What specifically was tested or verified? "Clinically Tested" for what: irritation, efficacy, allergic reaction? A claim that’s specific ("Tested for skin irritation on 50 participants over 4 weeks") tells you more than one that isn’t.',
+            'What specifically was tested or documented? "Clinically Tested" for what: irritation, efficacy, allergic reaction? A claim that’s specific ("Tested for skin irritation on 50 participants over 4 weeks") tells you more than one that isn’t.',
           ],
           [
             "Who is the information coming from? Was the underlying documentation something the brand generated internally, or is it a third-party certification with its own standards, like the ones tracked by ",
@@ -476,7 +476,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "paragraph",
         segments: [
-          "That friction pushes most people toward one of two extremes: blind trust in the label, or blanket skepticism toward all claims. Neither is a great outcome, for customers or for the brands making legitimate, well-documented claims that simply aren’t easy to find. Brands should hold their own claims to this same standard before printing them, a process we cover in ",
+          "That friction pushes most people toward one of two extremes: blind acceptance of the label, or blanket skepticism toward all claims. Neither is a great outcome, for customers or for the brands making legitimate, well-documented claims that simply aren’t easy to find. Brands should hold their own claims to this same standard before printing them, a process we cover in ",
           {
             text: "A Brand's Guide to Making Claims That Actually Hold Up",
             href: "/for-brands/resources/blog/a-brands-guide-to-claims-that-hold-up",
@@ -536,7 +536,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "paragraph",
         segments: [
-          "What did you do? For most people, the honest answer is: nothing. You either trusted the label claim, ignored it, or moved on to a different product entirely, not necessarily because the first one was worse, but because it was the only one you couldn’t quickly get an answer about.",
+          "What did you do? For most people, the honest answer is: nothing. You either accepted the label claim, ignored it, or moved on to a different product entirely, not necessarily because the first one was worse, but because it was the only one you couldn’t quickly get an answer about.",
         ],
       },
       { type: "heading", text: "The Product as a Dead End" },
@@ -688,9 +688,9 @@ export const blogPosts: BlogPost[] = [
     category: "Claims & Labels",
     title: "The Hidden Cost of Vague Label Claims",
     excerpt:
-      "A vague product claim doesn't just under-deliver on trust. It carries a commercial and regulatory cost that rarely shows up on a spreadsheet.",
+      "A vague product claim doesn't just under-deliver on confidence. It carries a commercial and regulatory cost that rarely shows up on a spreadsheet.",
     metaDescription:
-      "Vague product claims carry a hidden trust cost and regulatory risk. Learn why technically true isn't the same as defensible, and how to fix it.",
+      "Vague product claims carry a hidden confidence cost and regulatory risk. Learn why technically true isn't the same as defensible, and how to fix it.",
     date: "Jul 2, 2026",
     isoDate: "2026-07-02",
     readTime: "5 min read",
@@ -699,7 +699,7 @@ export const blogPosts: BlogPost[] = [
     keywords: [
       "vague product claims risk",
       "label claim substantiation",
-      "brand trust cost",
+      "brand confidence cost",
       "greenwashing risk",
       "FTC substantiation claims",
     ],
@@ -714,7 +714,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "paragraph",
         segments: [
-          "First, there’s the trust cost. A customer who can’t verify what a claim actually means doesn’t automatically give the brand the benefit of the doubt. Increasingly, they just move on to a product that makes the same claim more convincingly, even if the underlying work is identical or weaker.",
+          "First, there’s the confidence cost. A customer who can’t confirm what a claim actually means doesn’t automatically give the brand the benefit of the doubt. Increasingly, they just move on to a product that makes the same claim more convincingly, even if the underlying work is identical or weaker.",
         ],
       },
       {
@@ -747,7 +747,7 @@ export const blogPosts: BlogPost[] = [
           ", but from the buyer’s side. Brands benefit from asking themselves the same three questions customers should be asking.",
         ],
       },
-      { type: "heading", text: "Turning Vague Into Verifiable" },
+      { type: "heading", text: "Turning Vague Into Specific" },
       {
         type: "paragraph",
         segments: [
@@ -784,9 +784,9 @@ export const blogPosts: BlogPost[] = [
     imageAlt: "Skincare and supplement products lined up, representing categories where claim findability matters most",
     keywords: [
       "skincare product transparency",
-      "supplement label trust",
+      "supplement label claims",
       "ingestible and topical product claims",
-      "wellness brand trust",
+      "wellness brand information",
       "supplement testing documentation",
     ],
     content: [
@@ -852,7 +852,7 @@ export const blogPosts: BlogPost[] = [
     category: "Claims & Labels",
     title: "A Brand's Guide to Making Claims That Actually Hold Up",
     excerpt:
-      "A practical checklist for brands: how to test your own claims before you print them, and why documentation is a trust asset, not just a compliance file.",
+      "A practical checklist for brands: how to test your own claims before you print them, and why documentation is a credibility asset, not just a compliance file.",
     metaDescription:
       "Learn how to build product claims backward from evidence, not the other way around, with a practical checklist for making claims that hold up to scrutiny.",
     date: "Jun 18, 2026",
@@ -865,7 +865,7 @@ export const blogPosts: BlogPost[] = [
       "brand claim strategy",
       "defensible marketing claims",
       "product claim documentation checklist",
-      "trustworthy branding",
+      "credible branding",
     ],
     content: [
       {
@@ -884,7 +884,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "list",
         items: [
-          ["Can we say exactly what was tested, verified, or sourced, not just the headline version?"],
+          ["Can we say exactly what was tested, documented, or sourced, not just the headline version?"],
           ["Do we know, and can we show, whether this came from internal testing or independent certification?"],
           ["If a customer clicked on this claim right now, would we have something real to show them, or would they hit a dead end?"],
         ],
@@ -899,7 +899,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "paragraph",
         segments: [
-          "Many brands treat testing summaries, sourcing records, and certifications purely as compliance artifacts: things that exist to satisfy a regulator or an auditor, then get filed away. That’s a missed opportunity. The same documentation that protects a brand legally is exactly what builds trust commercially, if it’s made visible instead of archived. We cover the commercial side of this gap in ",
+          "Many brands treat testing summaries, sourcing records, and certifications purely as compliance artifacts: things that exist to satisfy a regulator or an auditor, then get filed away. That’s a missed opportunity. The same documentation that protects a brand legally is exactly what builds confidence commercially, if it’s made visible instead of archived. We cover the commercial side of this gap in ",
           { text: "Your Product Has 20 Things to Say", href: "/for-brands/resources/blog/product-has-20-things-to-say" },
           ".",
         ],
@@ -908,7 +908,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "paragraph",
         segments: [
-          "The most defensible approach isn’t writing a claim and then hunting for evidence to support it. It’s the reverse: starting from what the brand can actually document, and writing claims that match exactly what that documentation shows. It’s a smaller shift than it sounds, and it tends to produce claims that are both more specific and more trustworthy, because they were never stretched past what the evidence actually says.",
+          "The most defensible approach isn’t writing a claim and then hunting for evidence to support it. It’s the reverse: starting from what the brand can actually document, and writing claims that match exactly what that documentation shows. It’s a smaller shift than it sounds, and it tends to produce claims that are both more specific and more credible, because they were never stretched past what the evidence actually says.",
         ],
       },
       {
@@ -929,11 +929,11 @@ export const blogPosts: BlogPost[] = [
     slug: "how-origincard-turns-documentation-into-trust",
     cluster: "origincard",
     category: "OriginCard",
-    title: "How OriginCard Turns Product Documentation Into a Trust Tool",
+    title: "How OriginCard Turns Product Documentation Into a Customer-Facing Asset",
     excerpt:
-      "Most brands already have the raw material for customer trust; it's just sitting in the wrong format. Here's how OriginCard changes that.",
+      "Most brands already have the raw material for customer confidence; it's just sitting in the wrong format. Here's how OriginCard changes that.",
     metaDescription:
-      "See how OriginCard turns existing compliance documentation into a customer-facing trust tool, without requiring brands to rebuild their records from scratch.",
+      "See how OriginCard turns existing compliance documentation into a customer-facing information tool, without requiring brands to rebuild their records from scratch.",
     date: "Jun 11, 2026",
     isoDate: "2026-06-11",
     readTime: "6 min read",
@@ -942,15 +942,15 @@ export const blogPosts: BlogPost[] = [
     keywords: [
       "OriginCard ROI",
       "product documentation as marketing asset",
-      "customer trust technology",
-      "QR code product verification tool",
-      "brand trust building tools",
+      "customer-facing documentation technology",
+      "QR code product information tool",
+      "brand credibility tools",
     ],
     content: [
       {
         type: "paragraph",
         segments: [
-          "Most brands already have the raw material for customer trust; it’s just sitting in the wrong format. A certificate of analysis convinces an auditor. It doesn’t, on its own, convince a shopper standing in an aisle with thirty seconds to decide. OriginCard exists to close that specific gap: turning documentation that was built for compliance into something that actually does commercial work.",
+          "Most brands already have the raw material for customer confidence; it’s just sitting in the wrong format. A certificate of analysis convinces an auditor. It doesn’t, on its own, convince a shopper standing in an aisle with thirty seconds to decide. OriginCard exists to close that specific gap: turning documentation that was built for compliance into something that actually does commercial work.",
         ],
       },
       { type: "heading", text: "From Filed Away to Front and Center" },
@@ -961,11 +961,11 @@ export const blogPosts: BlogPost[] = [
         ],
       },
       { type: "paragraph", segments: ["Nothing about the underlying document changes. What changes is who can see it, and how easily."] },
-      { type: "heading", text: 'What "Trust Tool" Actually Means Here' },
+      { type: "heading", text: "What This Actually Means for Customers" },
       {
         type: "paragraph",
         segments: [
-          "A trust tool isn’t just a nicer way to display information. It changes the decision customers make in the moment. When someone can verify a claim in a few taps instead of taking it on faith, three things tend to happen: they spend less time hesitating, they’re more likely to complete the purchase, and they’re more likely to come back, because the brand proved itself trustworthy once already. This is the practical version of the concept we introduce in ",
+          "This isn’t just a nicer way to display information. It changes the decision customers make in the moment. When someone can check a claim in a few taps instead of taking it on faith, three things tend to happen: they spend less time hesitating, they’re more likely to complete the purchase, and they’re more likely to come back, because the brand made itself easy to understand once already. This is the practical version of the concept we introduce in ",
           {
             text: "What If the Product Came With Its Own Information Card?",
             href: "/for-brands/resources/blog/what-if-product-had-its-own-information-card",
@@ -1038,7 +1038,7 @@ export const blogPosts: BlogPost[] = [
       {
         type: "paragraph",
         segments: [
-          "Some customers want reassurance in five seconds: a green checkmark, a certification badge, a one-line summary. Others want to actually read the ingredient sourcing notes or the full testing methodology before they trust a product enough to buy it. A self-explaining page has to serve both without forcing either one through the other’s path.",
+          "Some customers want reassurance in five seconds: a green checkmark, a certification badge, a one-line summary. Others want to actually read the ingredient sourcing notes or the full testing methodology before they feel confident enough to buy it. A self-explaining page has to serve both without forcing either one through the other’s path.",
         ],
       },
       {

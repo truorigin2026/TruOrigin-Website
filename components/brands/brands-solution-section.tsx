@@ -42,7 +42,7 @@ export function BrandsSolutionSection() {
             <div className="brands-solution-image">
               <AssetImage
                 src="/images/truorigin%20hero%20image.jpg"
-                alt="Customer viewing verified product details through OriginCard on their phone"
+                alt="Customer viewing product details through OriginCard on their phone"
                 fill
               />
             </div>

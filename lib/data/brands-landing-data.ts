@@ -27,9 +27,9 @@ export const whatIsFeatures = [
   },
   {
     icon: "qr-code",
-    title: "Every Unit, Individually Verified",
+    title: "Every Unit, Individually Identified",
     description:
-      "Each unit carries its own secure QR code, so authenticity is confirmed down to the individual item, not just the product line.",
+      "Each unit carries its own secure QR code, so each item has its own identity, not just the product line.",
   },
   {
     icon: "smartphone",
@@ -43,7 +43,7 @@ export const whyTruOriginPoints = [
   {
     title: "All Your Product Information, In One Place",
     description:
-      "Every product gets its own OriginCard, a structured record bringing together details, documents, certifications, test reports, ingredients, and sourcing information. Instead of proof being scattered across PDFs, emails, and disconnected pages, brands maintain one authoritative record, giving everyone a clear, complete, and up-to-date view of the product.",
+      "Every product gets its own OriginCard, a structured record bringing together details, documents, certifications, test reports, ingredients, and sourcing information. Instead of documentation being scattered across PDFs, emails, and disconnected pages, brands maintain one authoritative record, giving everyone a clear, complete, and up-to-date view of the product.",
   },
   {
     title: "Structured for Clarity",
@@ -66,19 +66,19 @@ export const quickVerifySteps = [
   {
     title: "Spot The OriginCard",
     description:
-      "Every verified product carries a small OriginCard QR on its packaging or label, easy to find before you buy.",
+      "Every product carries a small OriginCard QR on its packaging or label, easy to find before you buy.",
     icon: "qrcode",
     image: "/images/for-brands/how-it-works/verification-step1.webp",
   },
   {
     title: "Scan With Any Phone",
     description:
-      "No app to download. Point a camera at the code and the product's verification page opens instantly.",
+      "No app to download. Point a camera at the code and the product's information page opens instantly.",
     icon: "scan",
     image: "/images/for-brands/how-it-works/verification-step2.webp",
   },
   {
-    title: "See Every Claim, Verified",
+    title: "See Every Claim, Documented",
     description:
       "Origin, certifications, and test results appear clearly labeled, so you know exactly what's backed by evidence.",
     icon: "check",
@@ -90,7 +90,7 @@ export const brandAdvantages = [
   {
     title: "Real Engagement Insights                  ",
     description:
-      "See exactly how customers interact with every product across every market you sell in. Track scan volumes, geography, and repeat verifications from one dashboard. Spot which claims get checked most often and where trust questions still linger. Compare performance across SKUs, batches, and regions over time. Decisions are backed by real behavior, not guesswork.",
+      "See exactly how customers interact with every product across every market you sell in. Track scan volumes, geography, and repeat verifications from one dashboard. Spot which claims get checked most often and where questions still linger. Compare performance across SKUs, batches, and regions over time. Decisions are backed by real behavior, not guesswork.",
     icon: "chart",
   },
   {
@@ -102,13 +102,13 @@ export const brandAdvantages = [
   {
     title: "One Place For Every Record",
     description:
-      "Specs, certifications, lab reports, and claims live in a single structured OriginCard instead of scattered files and inboxes. Every document is versioned, dated, and tied directly to the product it belongs to. When formulas change or certifications renew, the record updates instead of multiplying. Your team always knows exactly where the current truth lives. Auditors, partners, and customers all see the same trusted source.",
+      "Specs, certifications, lab reports, and claims live in a single structured OriginCard instead of scattered files and inboxes. Every document is versioned, dated, and tied directly to the product it belongs to. When formulas change or certifications renew, the record updates instead of multiplying. Your team always knows exactly where the current truth lives. Auditors, partners, and customers all see the same shared source.",
     icon: "database",
   },
   {
     title: "Defend Claims, Decide Faster",
     description:
-      "When a claim is challenged, the proof is already attached, dated, and ready to show. There is no scramble through email threads or shared drives to find the right document. That same structured data reveals patterns across products, batches, and markets. Your team can spot what is working and what needs attention sooner. Faster answers mean faster, more confident decisions.",
+      "When a claim is challenged, the documentation is already attached, dated, and ready to show. There is no scramble through email threads or shared drives to find the right document. That same structured data reveals patterns across products, batches, and markets. Your team can spot what is working and what needs attention sooner. Faster answers mean faster, more confident decisions.",
     icon: "scale",
   },
 ] as const;
@@ -141,7 +141,7 @@ export const howItWorksSteps = [
   {
     step: 5,
     title: "Product Insights",
-    description: "Customers see authenticity status, origin, certifications, and full transparency in one view.",
+    description: "Customers see product status, origin, certifications, and full transparency in one view.",
     icon: "/images/for-brands/how-it-works/step-5.svg",
   },
 ] as const;
@@ -159,12 +159,12 @@ export const trustStats = [
   },
   {
     value: "70%",
-    label: "Higher trust when brands provide verifiable proof",
+    label: "Higher confidence when brands provide clear documentation",
     icon: "/images/for-brands/stats/icon-trust.svg",
   },
   {
     value: "2.5x",
-    label: "Increase in repeat purchases with verified products",
+    label: "Increase in repeat purchases with well-documented products",
     icon: "/images/for-brands/stats/icon-conversion.svg",
   },
 ] as const;
@@ -177,7 +177,7 @@ export const originCardFeatures = [
   },
   {
     title: "QR Authentication",
-    description: "Secure, tamper resistant codes that open a verified product page instantly.",
+    description: "Secure, tamper resistant codes that open a product's information page instantly.",
     icon: "/images/for-brands/features/feature-qr.webp",
   },
   {
@@ -187,7 +187,7 @@ export const originCardFeatures = [
   },
   {
     title: "Certifications",
-    description: "Display organic, cruelty free, and regulatory certifications with proof.",
+    description: "Display organic, cruelty free, and regulatory certifications with documentation.",
     icon: "/images/for-brands/features/feature-certifications.webp",
   },
   {
@@ -202,12 +202,12 @@ export const originCardFeatures = [
   },
   {
     title: "Brand Story",
-    description: "Tell your brand's story and values to build trust and connection with customers.",
+    description: "Tell your brand's story and values to build connection with customers.",
     icon: "/images/for-brands/features/feature-story.webp",
   },
   {
     title: "Analytics Dashboard",
-    description: "Track scans, engagement, and verification trends across your product line.",
+    description: "Track scans, engagement, and review trends across your product line.",
     icon: "/images/for-brands/features/feature-analytics.webp",
   },
 ] as const;
@@ -242,7 +242,7 @@ export const customerBenefits = [
 export const coreValues = [
   {
     title: "Enterprise Security",
-    description: "Bank grade encryption and tamper proof QR technology protect every product record.",
+    description: "Bank grade encryption and tamper resistant QR technology protect every product record.",
     icon: "/images/for-brands/values/security.svg",
   },
   {
@@ -252,7 +252,7 @@ export const coreValues = [
   },
   {
     title: "Global Reach",
-    description: "Verify the claims of products across 40+ countries with localized verification pages.",
+    description: "Review the claims of products across 40+ countries with localized product information pages.",
     icon: "/images/for-brands/values/global.svg",
   },
   {
@@ -262,7 +262,7 @@ export const coreValues = [
   },
   {
     title: "Dedicated Support",
-    description: "A specialist team helps you onboard, launch, and scale your verification program.",
+    description: "A specialist team helps you onboard, launch, and scale your product information program.",
     icon: "/images/for-brands/values/support.svg",
   },
 ] as const;

@@ -18,7 +18,7 @@ const productLinks = [
   ["Home", "/for-products/home"],
   ["Products", "/for-products/products"],
   ["Support", "/for-products/support"],
-  ["About Product Information", "/for-products/about-verification"],
+  ["About Product Information", "/for-products/how-it-works"],
 ] as const;
 
 const businessLinks = [
@@ -51,7 +51,7 @@ export function SiteFooter() {
           <div className="saas-footer-brand">
             <Image src={logo} alt="TruOrigin" className="h-10 w-auto" />
             <p>
-              Product transparency, structured claims, and verification pages that help brands and
+              Product transparency, structured claims, and product information pages that help brands and
               consumers meet in a clearer place.
             </p>
             <div className="saas-footer-socials">

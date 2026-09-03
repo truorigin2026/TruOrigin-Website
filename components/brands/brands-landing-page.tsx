@@ -51,9 +51,9 @@ export function BrandsLandingPage() {
                   Why Brands Need OriginCard
                 </span>
                 <h2 className="brand-proof-title">
-                  The <span className="brand-proof-accent">trust</span> your brand deserves.
+                  The <span className="brand-proof-accent">clarity</span> your brand deserves.
                   <br />
-                  The <span className="brand-proof-accent">proof</span> your customers demand.
+                  The <span className="brand-proof-accent">information</span> your customers want.
                 </h2>
                 <p className="brand-proof-lead">
                   Every OriginCard turns customer skepticism into confidence, backed by data your brand can point to.

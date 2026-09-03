@@ -28,13 +28,13 @@ const industryDetails = [
     description:
       "Nutrition accuracy, allergen disclosure, and sourcing transparency matter most when customers are deciding what to eat.",
     commonClaims: ["Non-GMO", "Locally Sourced", "Allergen-Free"],
-    evidenceTypes: ["Lab Report", "Sourcing Proof"],
+    evidenceTypes: ["Lab Report", "Sourcing Documentation"],
   },
   {
     name: "Supplements & Wellness",
     image: supplementsImage,
     description:
-      "Potency testing and manufacturing standards are the difference between a trusted supplement brand and a skipped-over one.",
+      "Potency testing and manufacturing standards are the difference between a credible supplement brand and a skipped-over one.",
     commonClaims: ["Third-Party Tested", "GMP Certified", "Clinically Studied"],
     evidenceTypes: ["Lab Report", "Certification"],
   },
@@ -44,13 +44,13 @@ const industryDetails = [
     description:
       "Organic claims carry regulatory weight — customers expect to see the certifying body, not just the word on the label.",
     commonClaims: ["USDA Organic", "EU Organic", "Non-Toxic"],
-    evidenceTypes: ["Certification", "Sourcing Proof"],
+    evidenceTypes: ["Certification", "Sourcing Documentation"],
   },
   {
     name: "Cosmetics",
     image: cosmeticsImage,
     description:
-      "Formula disclosure and cruelty-free status are the top trust signals for cosmetics shoppers comparing similar products.",
+      "Formula disclosure and cruelty-free status are what cosmetics shoppers look for most when comparing similar products.",
     commonClaims: ["Vegan Formula", "Cruelty-Free", "Reef-Safe"],
     evidenceTypes: ["Ingredient List", "Certification"],
   },
@@ -59,8 +59,8 @@ const industryDetails = [
     image: luxuryImage,
     description:
       "Provenance and anti-counterfeit protection are what luxury buyers pay a premium for — TruOrigin makes that provable, not just promised.",
-    commonClaims: ["Authentic Materials", "Limited Batch", "Handmade"],
-    evidenceTypes: ["Certification", "Sourcing Proof"],
+    commonClaims: ["Documented Materials", "Limited Batch", "Handmade"],
+    evidenceTypes: ["Certification", "Sourcing Documentation"],
   },
 ];
 
@@ -77,7 +77,7 @@ export default function ForBrandsIndustriesPage() {
       <BrandHero
         image={heroImage}
         headline="Industries We Serve"
-        subheadline="TruOrigin adapts to the unique verification and transparency needs of every product category."
+        subheadline="TruOrigin adapts to the unique product information needs of every category."
         primaryCta={{ label: "Book Demo", href: "/for-brands/contact" }}
       />
 

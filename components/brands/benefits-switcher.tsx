@@ -67,7 +67,7 @@ export function BenefitsSwitcher({
         </AnimatePresence>
 
         <div className="bnf-switcher-chart">
-          <AssetImage src={brandAssets.benefitsChart} alt="Growth chart showing verification impact" />
+          <AssetImage src={brandAssets.benefitsChart} alt="Growth chart showing product information engagement impact" />
         </div>
       </div>
     </div>

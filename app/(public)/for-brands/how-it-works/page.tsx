@@ -32,14 +32,14 @@ const systemLayers = [
     subtitle: "Structure, validate, and connect the information",
     description:
       "TruOrigin organises submitted product information, maps supporting evidence, and creates a unique digital identity for each product.",
-    points: ["Evidence mapping", "Product information structuring", "Unique QR & product identity", "Verification status"],
+    points: ["Evidence mapping", "Product information structuring", "Unique QR & product identity", "Review status"],
   },
   {
     icon: Users,
     title: "Consumer Experience",
     subtitle: "Explore product information with clarity",
     description:
-      "Consumers access the product's information in one place, including origin, claims, certifications, supporting documents, and verification status.",
+      "Consumers access the product's information in one place, including origin, claims, certifications, supporting documents, and review status.",
     points: ["Product information access", "Origin & certification details", "Evidence-backed claims", "Supporting documents"],
   },
 ];
@@ -107,12 +107,12 @@ export default function ForBrandsHowItWorksPage() {
           </HeroReveal>
           <HeroReveal delay={0.15}>
             <h1 className="hiw-hero-title">
-              From product to <span className="brands-text-accent">verified proof</span>, in five steps.
+              From product to <span className="brands-text-accent">clear information</span>, in five steps.
             </h1>
           </HeroReveal>
           <HeroReveal delay={0.25}>
             <p className="hiw-hero-lead">
-              A streamlined workflow from product registration to consumer verification — built for
+              A streamlined workflow from product registration to a customer-ready page — built for
               clarity at every step, and reviewed by a real person before it goes live.
             </p>
           </HeroReveal>
@@ -144,8 +144,8 @@ export default function ForBrandsHowItWorksPage() {
         <div className="container-shell">
           <SectionHeading
             eyebrow="The Workflow"
-            title="From product to proof in five steps"
-            description="A simple, repeatable process that connects every physical unit to verified digital proof."
+            title="From product to information in five steps"
+            description="A simple, repeatable process that connects every physical unit to a structured digital record."
             centered
           />
           <HowItWorksTimeline steps={howItWorksSteps} />

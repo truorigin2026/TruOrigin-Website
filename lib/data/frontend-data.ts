@@ -8,7 +8,7 @@ export const productNavItems = [
   { href: "/for-products/home", label: "Home" },
   { href: "/for-products/products", label: "Products" },
   { href: "/for-products/support", label: "Support" },
-  { href: "/for-products/about-verification", label: "About Product Information" },
+  { href: "/for-products/how-it-works", label: "About Product Information" },
 ] as const;
 
 export const landingNavItems = [

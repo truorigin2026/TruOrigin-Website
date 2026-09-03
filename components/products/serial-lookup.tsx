@@ -58,7 +58,7 @@ export function SerialLookup({ codes, slugByCode }: SerialLookupProps) {
 
       <div className="serial-lookup-meta">
         <p className="serial-lookup-helper">
-          Use the code printed on the product to open its verification page instantly.
+          Use the code printed on the product to open its product information page instantly.
         </p>
         <div className="serial-lookup-chips">
           {codes.slice(0, 4).map((code) => (

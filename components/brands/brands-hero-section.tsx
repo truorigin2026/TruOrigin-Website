@@ -37,7 +37,7 @@ export function BrandsHeroSection() {
 
                 <HeroReveal delay={0.2}>
                   <h1 className="brands-display-title brands-hero-title">
-                    Every Product, Backed by <span className="brands-text-accent">Verifiable Proof.</span>
+                    Every Product, Backed by <span className="brands-text-accent">Structured Documentation.</span>
                   </h1>
                 </HeroReveal>
 

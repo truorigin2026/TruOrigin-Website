@@ -7,13 +7,13 @@ import { useRouter } from "next/navigation";
 import { MoltenMetal } from "@/components/brands/molten-metal";
 
 const scatterTags = [
-  { text: "Backed by proof", className: "products-hero-tag products-hero-tag-1" },
+  { text: "Backed by documentation", className: "products-hero-tag products-hero-tag-1" },
   { text: "Look beyond the label", className: "products-hero-tag products-hero-tag-2" },
   { text: "Evidence, not guesswork", className: "products-hero-tag products-hero-tag-3" },
-  { text: "Verified before it ships", className: "products-hero-tag products-hero-tag-4" },
+  { text: "Reviewed before it ships", className: "products-hero-tag products-hero-tag-4" },
   { text: "Claims you can check", className: "products-hero-tag products-hero-tag-5" },
-  { text: "Proof over promises", className: "products-hero-tag products-hero-tag-6" },
-  { text: "No blind trust needed", className: "products-hero-tag products-hero-tag-7" },
+  { text: "Information over promises", className: "products-hero-tag products-hero-tag-6" },
+  { text: "Nothing hidden", className: "products-hero-tag products-hero-tag-7" },
 ];
 
 export function ProductsHeroSection() {

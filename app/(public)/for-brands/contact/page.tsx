@@ -22,8 +22,8 @@ export default function ForBrandsContactPage() {
               <p className="contact-hero-eyebrow">Contact</p>
               <h1 className="contact-hero-title">Let&apos;s get in touch</h1>
               <p className="contact-hero-description">
-                Schedule a demo or reach out to learn how TruOrigin can transform your product
-                verification experience.
+                Schedule a demo or reach out to learn how TruOrigin can help present your product
+                information.
               </p>
               <p className="contact-hero-description">
                 Once we&apos;re in touch, we&apos;ll set up your brand&apos;s sign-in account so your
@@ -36,12 +36,12 @@ export default function ForBrandsContactPage() {
               <div className="contact-info-card">
                 <ul className="contact-info-list">
                   <li>Reduce counterfeiting with unique product identities</li>
-                  <li>Build consumer trust through verified transparency</li>
+                  <li>Present clear, structured product information</li>
                   <li>Streamline evidence management and QR publishing</li>
-                  <li>Premium verification experience at point of purchase</li>
+                  <li>Premium product information experience at point of purchase</li>
                 </ul>
                 <p className="contact-info-description">
-                  Questions about onboarding, pricing, or how the verification workflow fits your
+                  Questions about onboarding, pricing, or how the review workflow fits your
                   catalog? Our team replies within one business day.
                 </p>
                 <div className="contact-method-row">

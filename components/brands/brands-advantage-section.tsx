@@ -64,7 +64,7 @@ export function BrandsAdvantageSection({ items }: { items: readonly AdvantageIte
                 <p className="brands-eyebrow brands-text-accent">The Brand Advantage</p>
                 <h2 className="brands-display-title">Turn Every Scan Into Business Intelligence</h2>
                 <p className="brands-section-lead brands-section-lead-centered">
-                  OriginCard does more than prove authenticity. It becomes a growing source of insight, trust, and speed for your brand.
+                  OriginCard does more than organize product information. It becomes a growing source of insight, clarity, and speed for your brand.
                 </p>
               </div>
             </FadeIn>

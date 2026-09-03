@@ -15,13 +15,13 @@ const processSteps = [
   {
     step: 1,
     title: "Spot the OriginCard",
-    text: "Every verified product carries a small OriginCard QR code on its packaging or label, easy to find before you buy.",
+    text: "Every product carries a small OriginCard QR code on its packaging or label, easy to find before you buy.",
     image: verificationStep1,
   },
   {
     step: 2,
     title: "Scan With Any Phone",
-    text: "No app to download. Point a camera at the code and the product's verification page opens instantly.",
+    text: "No app to download. Point a camera at the code and the product's information page opens instantly.",
     image: verificationStep2,
   },
   {
@@ -49,12 +49,12 @@ export const metadata: Metadata = pageMetadata({
   title: "About Product Information",
   description:
     "Understand how TruOrigin organizes brand-supplied product details into a structured page — scan a QR code or enter a serial number to see origin, certifications, and evidence.",
-  path: "/for-products/about-verification",
+  path: "/for-products/how-it-works",
 });
 
 export default function AboutVerificationPage() {
   return (
-    <div className="saas-page about-verification-page">
+    <div className="saas-page product-how-it-works-page">
       <header className="container-shell legal-page-header">
         <p className="eyebrow">About</p>
         <h1 className="legal-page-title">About Product Information</h1>

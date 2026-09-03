@@ -18,7 +18,7 @@ const resourceFaqs = [
   {
     question: "What's the difference between a claim and a document?",
     answer:
-      "A claim is the statement you're making about your product. Documents — certificates, lab reports, ingredient lists — are the proof that backs it up.",
+      "A claim is the statement you're making about your product. Documents — certificates, lab reports, ingredient lists — are the supporting documentation that backs it up.",
   },
   {
     question: "Where can I see which products need more evidence?",

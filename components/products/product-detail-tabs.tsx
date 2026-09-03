@@ -167,16 +167,12 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
               {certificates.length > 0 ? (
                 <ul className="detail-cert-summary-list">
                   {certificates.map((certificate) => {
-                    const status = statusConfig[certificate.verified ? "Evidence Available" : "Limited Evidence"];
                     return (
                       <li key={certificate.id} className="detail-cert-summary-row">
                         <span className="detail-cert-summary-type">
                           {certificateDocTypeLabels[certificate.docType] ?? certificate.docType}
                         </span>
                         <span className="detail-cert-summary-title">{certificate.title}</span>
-                        <span className="claim-status-pill" style={{ background: status.background, color: status.text }}>
-                          {certificate.verified ? "Verified" : "Submitted"}
-                        </span>
                         {certificate.reviewNote ? (
                           <p className="detail-muted detail-cert-summary-note">{certificate.reviewNote}</p>
                         ) : null}

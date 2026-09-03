@@ -46,7 +46,7 @@ export const certificateDocTypeLabels: Record<string, string> = {
   CERTIFICATE: "Certificate",
   LAB_REPORT: "Lab Report",
   INGREDIENT_LIST: "Ingredient List",
-  SOURCING_PROOF: "Sourcing Proof",
+  SOURCING_PROOF: "Sourcing Documentation",
   OTHER: "Document",
 };
 

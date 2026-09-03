@@ -23,7 +23,7 @@ const staticRoutes: StaticRoute[] = [
   { path: "/for-products/home", changeFrequency: "weekly", priority: 0.9 },
   { path: "/for-products/products", changeFrequency: "weekly", priority: 0.8 },
   { path: "/for-products/support", changeFrequency: "monthly", priority: 0.5 },
-  { path: "/for-products/about-verification", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/for-products/how-it-works", changeFrequency: "monthly", priority: 0.5 },
   { path: "/terms", changeFrequency: "yearly", priority: 0.2 },
   { path: "/privacy", changeFrequency: "yearly", priority: 0.2 },
   { path: "/disclaimer", changeFrequency: "yearly", priority: 0.2 },

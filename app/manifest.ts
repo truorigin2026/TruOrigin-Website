@@ -3,7 +3,7 @@ import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${SITE_NAME} | Product Authenticity & Transparency Platform`,
+    name: `${SITE_NAME} | Product Information Platform`,
     short_name: SITE_NAME,
     description: SITE_DESCRIPTION,
     start_url: "/",
