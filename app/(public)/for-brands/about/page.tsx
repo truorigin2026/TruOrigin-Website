@@ -22,9 +22,10 @@ export default function ForBrandsAboutPage() {
           </FadeIn>
           <FadeIn delay={0.16}>
             <p className="about-intro-text">
-              Every product carries a story — what it contains, how it&apos;s made, the claims it
-              holds, and the certifications behind it. But that story is usually scattered across
-              packaging, labels, PDFs, and websites. We built TruOrigin to bring it{" "}
+              Product information is often scattered across packaging, documents, labels, 
+              and digital channels. TruOrigin brings it together through OriginCard, 
+              helping brands organize, manage, and present structured product information 
+              in one clear place.{" "}
               <span className="about-highlight">all together</span> — helping brands organise and
               present their product information through OriginCards, so customers have{" "}
               <span className="about-highlight">one clear place</span> to explore it.
@@ -52,10 +53,11 @@ export default function ForBrandsAboutPage() {
             <h2 className="about-vm-heading">Our Vision</h2>
             <p className="about-vm-text">
               To make product information{" "}
-              <span className="about-highlight">clear, accessible, and easy to explore</span> for
-              everyone. We imagine a future where customers don&apos;t have to search across
-              packaging, websites, and documents — where every product connects its story directly
-              to the people who want to explore it.
+              <span className="about-highlight">clear, accessible, and easy to explore</span> We 
+              envision a future where product information is no longer scattered 
+              across packaging, documents, websites, and other channels. TruOrigin 
+              brings it together through OriginCard, giving customers one clear place 
+              to explore it.
             </p>
           </FadeIn>
 
@@ -66,10 +68,9 @@ export default function ForBrandsAboutPage() {
           <FadeIn className="about-vm-col is-mission" delay={0.16}>
             <h2 className="about-vm-heading">Our Mission</h2>
             <p className="about-vm-text">
-              To help brands manage, organise, and present product information in a clearer,
-              more meaningful way. Through{" "}
-              <span className="about-highlight">OriginCards, QR codes, and customer interaction insights</span>,
-              we give brands the tools to manage it, and customers a simpler way to explore it.
+              To Help brands organize, manage, and present product information through OriginCard. We give brands the tools to{" "}
+              <span className="about-highlight">structure product information and give customers a simpler way</span>,
+              we to access and explore it.
             </p>
           </FadeIn>
         </div>

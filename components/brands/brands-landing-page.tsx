@@ -93,7 +93,7 @@ export function BrandsLandingPage() {
         <div className="container-shell brands-footer-cta-content">
           <FadeIn>
             <BookOpen size={22} aria-hidden="true" className="brands-footer-cta-icon" />
-            <h2>Every Product Has a Story. Let Customers Verify It.</h2>
+            <h2>Every Product Has Information.Give It One Place.</h2>
             <div className="brands-footer-cta-actions">
               <Link href="/login" className="brands-hero-btn-primary">
                 Get Started Today

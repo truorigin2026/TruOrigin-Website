@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { servedIndustries } from "@/lib/data/brands-landing-data";
 
-const industriesTagline = "Built For Every Industry That Demands Proof";
+const industriesTagline = "Built For Every Industry That Manages Product Information";
 const taglineRepeats = Array.from({ length: 4 }, (_, index) => index);
 
 function MarqueeGroup({ children, hidden }: { children: ReactNode; hidden?: boolean }) {

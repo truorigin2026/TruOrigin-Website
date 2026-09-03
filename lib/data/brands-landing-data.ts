@@ -2,7 +2,6 @@
 export const brandAssets = {
   logo: "/images/for-brands/logos/truorigin-logo.svg",
   logoFooter: "/images/for-brands/logos/truorigin-logo.svg",
-  heroBackground: "/images/for-brands/hero/hero-bg.png",
   heroMockup: "/images/for-brands/hero/hero-mockup-composite.png",
   checkmark: "/images/for-brands/icons/checkmark.svg",
   flowDiagram: "/images/for-brands/what-is/flow-diagram.png",

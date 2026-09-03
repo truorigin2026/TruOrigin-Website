@@ -9,46 +9,46 @@ import { mapCategoryToFilter } from "@/lib/data/frontend-data";
 
 const faqItems = [
   {
-    question: "How do I open a product on TruOrigin?",
+    question: "How do I access a product’s OriginCard?",
     answer:
-      "Enter the serial number from the product or scan the code on pack. TruOrigin opens the matching product page so you can review claims, supporting documents, and product basics in one place.",
+      "Scan the product’s QR code or use the available product link to open its OriginCard and explore the information provided by the brand.",
   },
   {
-    question: "What if a claim has limited evidence?",
+    question: "What information can I find on an OriginCard?",
     answer:
-      "That means some support was provided, but it still leaves gaps in specificity, freshness, or direct product-level relevance. The page helps you see that difference clearly.",
+      "An OriginCard can bring together product details, ingredients, specifications, claims, documents, and other relevant product information in one structured experience.",
   },
   {
-    question: "Do I need an app to use it?",
+    question: "How does TruOrigin help brands manage product information?",
     answer:
-      "No. The experience is designed to open directly in the browser from a QR scan or serial-number check.",
+      "TruOrigin gives brands a structured way to organize, manage, and present product information through OriginCard.",
   },
   {
-    question: "Can I compare different products?",
+    question: "Can product information be updated?",
     answer:
-      "Yes. The catalog and detail pages are structured consistently, which makes it easier to compare claim language, support status, and key product information.",
+      "Yes. Brands can manage the information associated with their products and update the relevant content through the platform.",
   },
 ] as const;
 
 const aboutFeatures = [
-  { icon: ShieldCheck, title: "Product Information", description: "Information supplied by brands you trust." },
-  { icon: BadgeCheck, title: "Structured Presentation", description: "Everything about your product, in one place." },
-  { icon: PackageSearch, title: "Clearer Reading", description: "Helping you avoid confusion and mixed messages." },
+  { icon: ShieldCheck, title: "Product Information", description: "Product details and supporting information organized for each product" },
+  { icon: BadgeCheck, title: "Structured Presentation", description: "Product information arranged into a clear, consistent OriginCard experience." },
+  { icon: PackageSearch, title: "Clearer Reading", description: "Customers can easily find and explore the product information they need." },
 ] as const;
 
 const informationSteps = [
   { number: "1", title: "Find QR Code", description: "Locate the QR code on the product packaging." },
   { number: "2", title: "Scan or Enter", description: "Scan the QR code or enter the serial number." },
   { number: "3", title: "Open Product Page", description: "Get instant access to product information and details." },
-  { number: "4", title: "View Supporting Files", description: "See certifications, documents, origin notes, and more." },
+  { number: "4", title: "4. View Supporting Information", description: "Access product documents, ingredients, specifications, and other information" },
 ] as const;
 
 const whyUseItPoints = [
-  "Review organized product information",
-  "Access certifications and supporting documents",
-  "Know the origin and manufacturer",
-  "Shop with confidence",
-  "Reduce confusion before you buy",
+  "Explore structured product information",
+  "Access product details in one place",
+  "Understand ingredients, specifications & documents",
+  "Explore information before you buy",
+  "Find what matters, without the clutter",
 ];
 
 export async function ProductsLandingPage() {
@@ -116,11 +116,10 @@ export async function ProductsLandingPage() {
             <div className="products-about-left">
               <FadeIn>
                 <div className="products-about-content">
-                  <h2>About Product Information</h2>
+                  <h2>Product Information, Made Clear</h2>
                   <p>
-                    TruOrigin helps you make informed choices by giving you instant access to
-                    organized information about the products you love. Clarity you can use, anytime,
-                    anywhere.
+                    TruOrigin helps consumers access and explore structured product information through 
+                    an OriginCard, bringing relevant product details together in one clear experience.
                   </p>
                   <Link href="/for-products/products" className="brand-inline-link">
                     Learn More
