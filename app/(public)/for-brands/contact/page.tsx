@@ -8,7 +8,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Contact",
   description:
-    "Schedule a demo or reach out to learn how TruOrigin can transform your product verification experience. Our team replies within one business day.",
+    "Schedule a demo or reach out to learn how TruOrigin can help present your product information. Our team replies within one business day.",
   path: "/for-brands/contact",
 });
 

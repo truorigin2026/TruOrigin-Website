@@ -68,7 +68,7 @@ function VerifyPhoto({
 
   return (
     <motion.div className="brands-verify-photo" style={{ scale, y, x, rotate, opacity, zIndex: total - index }}>
-      <AssetImage src={step.image} alt="" fill className="brands-verify-photo-img" priority />
+      <AssetImage src={step.image} alt={step.title} fill className="brands-verify-photo-img" priority />
     </motion.div>
   );
 }

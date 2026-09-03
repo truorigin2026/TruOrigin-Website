@@ -5,7 +5,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "For Consumers",
   description:
-    "Scan a QR code or enter a serial number to see a product's origin, certifications, claims, and supporting documents — clear, structured, and verified.",
+    "Scan a QR code or enter a serial number to see a product's origin, certifications, claims, and supporting documents — clear and structured.",
   path: "/for-products/home",
 });
 

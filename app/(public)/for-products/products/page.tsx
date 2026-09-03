@@ -4,9 +4,9 @@ import { getProducts } from "@/lib/data/repository";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Verified Products",
+  title: "Product Information",
   description:
-    "Search verified products by name, brand, or category and review their origin, certifications, and supporting evidence.",
+    "Search products by name, brand, or category and review their claims, certifications, and supporting documents.",
   path: "/for-products/products",
 });
 

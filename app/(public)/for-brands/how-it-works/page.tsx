@@ -13,7 +13,7 @@ import { faqPageJsonLd, pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "How It Works",
   description:
-    "From product registration to a live OriginCard: how TruOrigin reviews evidence, generates QR codes, and publishes a verified product page in five steps.",
+    "From product registration to a live OriginCard: how TruOrigin reviews evidence, generates QR codes, and publishes a product information page in five steps.",
   path: "/for-brands/how-it-works",
 });
 

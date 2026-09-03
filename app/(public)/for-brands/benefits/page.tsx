@@ -11,7 +11,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Benefits",
   description:
-    "See what changes when product claims become verifiable — for the brand shipping the product and for the customer deciding whether to trust it.",
+    "See what changes when product claims are backed by information — for the brand presenting the product and for the customer reviewing it before they buy.",
   path: "/for-brands/benefits",
 });
 

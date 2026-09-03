@@ -27,11 +27,11 @@ export function SiteGateway() {
         </HeroReveal>
 
         <HeroReveal delay={0.1}>
-          <p className="gateway-subtitle">
+          <h1 className="gateway-subtitle">
             TruOrigin is a product information platform. Brands submit claims, supporting
             documents, and product details, and TruOrigin organizes them into a structured
             product page that people can read quickly.
-          </p>
+          </h1>
         </HeroReveal>
 
         <div className="gateway-choice-grid">

@@ -53,18 +53,17 @@ const fontVariables = [
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "TruOrigin | Product Authenticity & Transparency Platform",
+    default: "TruOrigin | Product Information Platform",
     template: "%s | TruOrigin",
   },
   description: SITE_DESCRIPTION,
   keywords: [
     "product transparency",
-    "product authenticity verification",
-    "QR code product verification",
+    "product information platform",
+    "QR code product page",
     "OriginCard",
-    "counterfeit protection",
-    "product claim verification",
-    "brand trust platform",
+    "product claim documentation",
+    "brand product information",
   ],
   applicationName: SITE_NAME,
   alternates: {
@@ -78,13 +77,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
-    title: "TruOrigin | Product Authenticity & Transparency Platform",
+    title: "TruOrigin | Product Information Platform",
     description: SITE_DESCRIPTION,
     url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "TruOrigin | Product Authenticity & Transparency Platform",
+    title: "TruOrigin | Product Information Platform",
     description: SITE_DESCRIPTION,
   },
   robots: {

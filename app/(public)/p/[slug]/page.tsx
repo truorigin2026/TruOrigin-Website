@@ -28,7 +28,7 @@ export async function generateMetadata({
 
   const title = `${product.name} by ${product.brand}`;
   const description =
-    product.summary || `Verified origin, claims, and supporting evidence for ${product.name} by ${product.brand} on TruOrigin.`;
+    product.summary || `Product information, claims, and supporting evidence for ${product.name} by ${product.brand} on TruOrigin.`;
   const image = product.imageGallery?.[0];
 
   return {

@@ -19,7 +19,7 @@ const supportHelpPoints = [
 export const metadata: Metadata = pageMetadata({
   title: "Support",
   description:
-    "Find answers to common verification questions or reach out to the TruOrigin support team for help with a scanned product, a serial number, or a brand inquiry.",
+    "Find answers to common questions or reach out to the TruOrigin support team for help with a scanned product, a serial number, or a brand inquiry.",
   path: "/for-products/support",
 });
 

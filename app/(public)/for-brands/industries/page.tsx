@@ -67,7 +67,7 @@ const industryDetails = [
 export const metadata: Metadata = pageMetadata({
   title: "Industries We Serve",
   description:
-    "TruOrigin adapts to the verification needs of skincare, food and beverage, supplements, organic products, cosmetics, and luxury goods — with evidence types tailored to each category.",
+    "TruOrigin adapts to the product information needs of skincare, food and beverage, supplements, organic products, cosmetics, and luxury goods — with evidence types tailored to each category.",
   path: "/for-brands/industries",
 });
 
@@ -85,8 +85,8 @@ export default function ForBrandsIndustriesPage() {
         <div className="container-shell">
           <SectionHeading
             eyebrow="Sectors"
-            title="Trusted across product categories"
-            description="From skincare to luxury goods, brands use TruOrigin to protect authenticity and build consumer confidence — with evidence types tailored to what each category's customers actually check."
+            title="Built for every product category"
+            description="From skincare to luxury goods, brands use TruOrigin to organize product information and build consumer confidence — with evidence types tailored to what each category's customers actually check."
             centered
           />
 
@@ -95,7 +95,7 @@ export default function ForBrandsIndustriesPage() {
               <FadeIn key={industry.name} delay={index * 0.06}>
                 <article className="industry-page-card">
                   <div className="industry-page-card-visual">
-                    <Image src={industry.image} alt={`${industry.name} products verified on TruOrigin`} fill className="object-cover" />
+                    <Image src={industry.image} alt={`${industry.name} products on TruOrigin`} fill className="object-cover" />
                   </div>
                   <div className="industry-page-card-body">
                     <h3>{industry.name}</h3>
