@@ -48,7 +48,7 @@ const brandBenefits = [
 export const metadata: Metadata = pageMetadata({
   title: "About Product Information",
   description:
-    "Understand how TruOrigin organizes brand-supplied product details into a structured page — scan a QR code or enter a serial number to see origin, certifications, and evidence.",
+    "Understand how TruOrigin organizes brand-supplied product details into a structured page — scan a QR code or enter a serial number to see it.",
   path: "/for-products/how-it-works",
 });
 

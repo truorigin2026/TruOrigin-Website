@@ -1476,6 +1476,19 @@ select {
   text-align: center;
 }
 
+.not-found-page {
+  padding-top: 120px;
+  padding-bottom: 140px;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 28px;
+}
+
 .legal-page-title {
   margin: 16px 0 0;
   font-size: clamp(2.25rem, 4.2vw, 3.25rem);

@@ -67,7 +67,7 @@ const industryDetails = [
 export const metadata: Metadata = pageMetadata({
   title: "Industries We Serve",
   description:
-    "TruOrigin adapts to the product information needs of skincare, food and beverage, supplements, organic products, cosmetics, and luxury goods — with evidence types tailored to each category.",
+    "TruOrigin adapts to the product information needs of skincare, food, supplements, cosmetics, and luxury goods — with evidence tailored to each category.",
   path: "/for-brands/industries",
 });
 

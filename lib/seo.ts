@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://truorigin.in").replace(/\/$/, "");
 export const SITE_NAME = "TruOrigin";
 export const SITE_DESCRIPTION =
-  "TruOrigin is a product information platform. Brands publish claims, certifications, and supporting evidence through QR-powered OriginCard pages so customers can explore what they're buying in seconds.";
+  "TruOrigin is a product information platform. Brands submit claims and supporting documents, organized into a structured page customers can read quickly.";
 export const ORGANIZATION_EMAIL = "info@truorigin.in";
 export const ORGANIZATION_LOGO_PATH = "/images/TruOrigin logo.png";
 

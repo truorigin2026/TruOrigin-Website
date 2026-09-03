@@ -5,7 +5,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "About Us",
   description:
-    "TruOrigin turns scattered claims, certificates, and sourcing documents into one structured OriginCard page — so customers can explore a product's information in seconds.",
+    "TruOrigin turns scattered claims, certificates, and sourcing documents into one structured OriginCard page customers can explore in seconds.",
   path: "/for-brands/about",
 });
 
