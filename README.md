@@ -164,7 +164,7 @@ All images are now served from the `public/images/` directory. When referencing 
 
 ```tsx
 // ✅ Correct
-<img src="/images/catalog/product-name.jpg" alt="Product" />
+<img src="/images/products/product-name.jpg" alt="Product" />
 <Image src="/images/logos/truorigin-logo.png" alt="Logo" />
 
 // ❌ Avoid
@@ -195,7 +195,7 @@ The following items were removed during the cleanup process:
 
 All images from the root `assets/` folder and `public/assets/` folder have been consolidated into `public/images/` with the following structure:
 
-- Catalog images → `public/images/catalog/`
+- Product images → `public/images/products/`
 - Brand-related images → `public/images/for-brands/`
 - Logos → `public/images/logos/`
 - Icons and SVGs → `public/images/icons/`

@@ -45,39 +45,6 @@ export const landingNavGroups: readonly NavGroup[] = [
   },
 ] as const;
 
-export const brandFeatures = [
-  {
-    title: "QR Review",
-    description: "Instant product information access through secure, unique QR codes on every unit.",
-    icon: "qr",
-  },
-  {
-    title: "Unique Product Identity",
-    description: "Every product receives a distinct digital identity tied to its batch and origin.",
-    icon: "identity",
-  },
-  {
-    title: "Evidence Repository",
-    description: "Centralized storage for supporting documents, notes, and product files.",
-    icon: "evidence",
-  },
-  {
-    title: "Consumer Clarity",
-    description: "Build confidence with transparent, structured product information at point of purchase.",
-    icon: "trust",
-  },
-  {
-    title: "Information Structure",
-    description: "Real-time organization against registered product records and serial numbers.",
-    icon: "validate",
-  },
-  {
-    title: "Brand Presentation",
-    description: "Showcase sourcing, manufacturing, and claims with a premium brand experience.",
-    icon: "transparency",
-  },
-] as const;
-
 export const productFilterCategories = [
   "All Products",
   "Skincare",
@@ -86,14 +53,13 @@ export const productFilterCategories = [
   "Supplements",
   "Cosmetics",
   "Organic Products",
-  "Electronics",
 ] as const;
 
 export const supportFaqs = [
   {
-    question: "How do I open a product page?",
+    question: "How do I access a product’s OriginCard?",
     answer:
-      "Scan the QR code on the product packaging with your smartphone camera, or enter the serial number on the product page. You'll be taken to the product information page with full details.",
+      "Scan the product’s QR code or use the available product link to open its OriginCard and explore the information provided by the brand.",
   },
   {
     question: "What if my serial number is invalid?",
@@ -132,9 +98,9 @@ export const verificationTopics = [
     icon: "serial",
   },
   {
-    title: "Why transparency matters",
+    title: "Product information, structured",
     description:
-      "Informed consumers make better decisions. Clear product information reduces confusion, builds brand loyalty, and creates accountability across supply chains.",
+      "TruOrigin brings product details, documents, and supporting information together in one organized OriginCard.",
     icon: "transparency",
   },
   {
@@ -169,10 +135,6 @@ export function isGatewayPage(pathname: string): boolean {
   return pathname === "/";
 }
 
-export function isBrandsLandingPage(pathname: string): boolean {
-  return pathname === "/for-brands";
-}
-
 export function mapCategoryToFilter(category: string, subcategory?: string): string {
   const normalized = category.toLowerCase();
   if (normalized.includes("skincare") || normalized.includes("sun care") || normalized.includes("personal care")) return "Skincare";
@@ -181,7 +143,6 @@ export function mapCategoryToFilter(category: string, subcategory?: string): str
   if (normalized.includes("supplement") || normalized.includes("wellness")) return "Supplements";
   if (normalized.includes("cosmetic")) return "Cosmetics";
   if (normalized.includes("organic")) return "Organic Products";
-  if (normalized.includes("electronic")) return "Electronics";
   if (subcategory?.toLowerCase().includes("organic")) return "Organic Products";
   return category;
 }

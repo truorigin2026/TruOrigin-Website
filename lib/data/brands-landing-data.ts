@@ -18,27 +18,6 @@ export const brandHeroNavItems = [
   { href: "#benefits-for", label: "Benefits" },
 ] as const;
 
-export const whatIsFeatures = [
-  {
-    icon: "layers",
-    title: "One OriginCard Per Product",
-    description:
-      "Each product gets a dedicated OriginCard containing its relevant information in one place.",
-  },
-  {
-    icon: "qr-code",
-    title: "Every Unit, Individually Identified",
-    description:
-      "Each unit carries its own secure QR code, so each item has its own identity, not just the product line.",
-  },
-  {
-    icon: "smartphone",
-    title: "Made for Customers",
-    description:
-      "Customers can scan a QR code to explore the product's information through a simple digital experience.",
-  },
-] as const;
-
 export const whyTruOriginPoints = [
   {
     title: "All Your Product Information, In One Place",
@@ -237,78 +216,5 @@ export const customerBenefits = [
   "Explore Product Details More Easily",
   "Get the Information You Need Before Buying",
   "Explore the Full Story Behind a Product",
-] as const;
-
-export const coreValues = [
-  {
-    title: "Enterprise Security",
-    description: "Bank grade encryption and tamper resistant QR technology protect every product record.",
-    icon: "/images/for-brands/values/security.svg",
-  },
-  {
-    title: "Easy Integration",
-    description: "Connect with your existing ERP, packaging, and e-commerce workflows in days.",
-    icon: "/images/for-brands/values/integration.svg",
-  },
-  {
-    title: "Global Reach",
-    description: "Review the claims of products across 40+ countries with localized product information pages.",
-    icon: "/images/for-brands/values/global.svg",
-  },
-  {
-    title: "Real-time Analytics",
-    description: "Monitor scan volumes, geographic trends, and customer engagement live from your dashboard.",
-    icon: "/images/for-brands/values/analytics.svg",
-  },
-  {
-    title: "Dedicated Support",
-    description: "A specialist team helps you onboard, launch, and scale your product information program.",
-    icon: "/images/for-brands/values/support.svg",
-  },
-] as const;
-
-export const testimonials = [
-  {
-    quote:
-      "OriginCard transformed how our customers interact with our products. Scan rates doubled within the first month.",
-    name: "Wasim",
-    role: "CEO, Xllon",
-    avatar: "public/images/for-brands/testimonials/person-1.jpeg",
-  },
-  {
-    quote:
-      "We finally have a way to prove our organic certifications at the point of purchase. Counterfeit concerns dropped significantly.",
-    name: "Marcus Rivera",
-    role: "Founder, Terra Foods",
-    avatar: "",
-  },
-  {
-    quote:
-      "The analytics alone paid for the platform. We now know exactly which products customers verify most.",
-    name: "Priya Sharma",
-    role: "Head of Brand, Elevate Wellness",
-    avatar: "",
-  },
-  {
-    quote:
-      "Our QR verification campaign boosted shopper confidence and repeat purchase by 38% in the first quarter.",
-    name: "Aaliyah Mendoza",
-    role: "CMO, Verdant Labs",
-    avatar: "",
-  },
-  {
-    quote:
-      "OriginCard made our supply chain story visible across retail shelves and online, and customers love the transparency.",
-    name: "Ethan Wells",
-    role: "Operations Director, PureLeaf Naturals",
-    avatar: "",
-  },
-  {
-    quote:
-      "The simple verification experience turned curious buyers into loyal customers with a stronger brand connection.",
-    name: "Nia Patel",
-    role: "Founder, Bloom Botanica",
-    avatar: "",
-  },
 ] as const;
 
