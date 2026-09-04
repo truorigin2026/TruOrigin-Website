@@ -21,44 +21,44 @@ export const whyTruOriginPoints = [
   {
     title: "All Your Product Information, In One Place",
     description:
-      "Every product gets its own OriginCard, a structured record bringing together details, documents, certifications, test reports, ingredients, and sourcing information. Instead of documentation being scattered across PDFs, emails, and disconnected pages, brands maintain one authoritative record, giving everyone a clear, complete, and up-to-date view of the product.",
+      "Every product gets its own OriginCard bringing together product details, claims, ingredients, certifications, supporting documents, test reports and in one structured place. Brands can manage and update their product information in one place, and customers can explore it all in one clear experience.",
   },
   {
     title: "Structured for Clarity",
     description:
-      "Raw product information rarely tells a clear story on its own. TruOrigin turns it into a consistent, organized format, so certifications, claims, ingredients, and specifications are presented the same way every time, for every product. Whatever the category, customers and brand teams both know exactly where to look and what they are looking at.",
+      "TruOrigin brings claims, ingredients, certifications, supporting documents, specifications and product details into a structured OriginCard giving brands one organised place to manage product information and customers a clearer way to explore it. ",
   },
   {
     title: "Easy to Explore",
     description:
-      "A single scan is all it takes for a customer to open a product's OriginCard and explore what matters to them, whether that's origin, ingredients, certifications, or test results, through a simple, guided digital experience. There is no app to download and no digging through packaging, just clear information a tap away.",
+      "A single scan is all it takes for a customer to open a product's OriginCard and explore what matters to them, whether that's claims, ingredients, certifications, or test results, through a simple, guided experience. There is no app to download and no digging through packaging, just clear information a tap away.",
   },
   {
     title: "Built to Evolve",
     description:
-      "Products don’t stay the same forever. Formulas evolve, certifications are renewed, and new test reports become available. Brands can update a product’s OriginCard whenever its documents, specifications, or details change, ensuring customers always see the most current information, not just a snapshot from launch day.",
+      "Products don’t stay the same forever. Formulas evolve, certifications are renewed, and new test reports become available. Brands can update a product’s OriginCard whenever its documents, specifications, or details change, ensuring customers always ensuring customers always access the latest information,, not just a snapshot from launch day.",
   },
 ] as const;
 
 export const quickVerifySteps = [
   {
-    title: "Spot The OriginCard",
+    title: "Find the OriginCard",
     description:
-      "Every product carries a small OriginCard QR on its packaging or label, easy to find before you buy.",
+      "Every product can carry an OriginCard QR on its packaging or label, making its product information easy to access.",
     icon: "qrcode",
     image: "/images/for-brands/how-it-works/verification-step1.webp",
   },
   {
     title: "Scan With Any Phone",
     description:
-      "No app to download. Point a camera at the code and the product's information page opens instantly.",
+      "No app to download. Scan the QR code with your phone camera to open the product's OriginCard.",
     icon: "scan",
     image: "/images/for-brands/how-it-works/verification-step2.webp",
   },
   {
-    title: "See Every Claim, Documented",
+    title: "Explore the Product Information",
     description:
-      "Origin, certifications, and test results appear clearly labeled, so you know exactly what's backed by evidence.",
+      "Access product details, ingredients, certifications, supporting documents, test reports, and other information in one structured place.",
     icon: "check",
     image: "/images/for-brands/how-it-works/verification-step3.webp",
   },
@@ -126,23 +126,23 @@ export const howItWorksSteps = [
 
 export const trustStats = [
   {
-    value: "$1.8 Trillion",
-    label: "Lost annually to counterfeit goods globally",
+    value: "75%",
+    label: "Of consumers scan QR codes to get more information",
     icon: "/images/for-brands/stats/icon-counterfeit.svg",
   },
   {
-    value: "85%",
-    label: "Of consumers want product transparency before purchase",
+    value: "57%",
+    label: "Of consumers have scanned a food QR code to get specific product information",
     icon: "/images/for-brands/stats/icon-transparency.svg",
   },
   {
-    value: "70%",
-    label: "Higher confidence when brands provide clear documentation",
+    value: "71%",
+    label: "Of consumers say QR codes are at least somewhat helpful in their daily lives",
     icon: "/images/for-brands/stats/icon-trust.svg",
   },
   {
-    value: "2.5x",
-    label: "Increase in repeat purchases with well-documented products",
+    value: "2.7x",
+    label: "QR scan volume in 2025 compared with the 2018-2019 pre-pandemic average",
     icon: "/images/for-brands/stats/icon-conversion.svg",
   },
 ] as const;
@@ -150,22 +150,22 @@ export const trustStats = [
 export const originCardFeatures = [
   {
     title: "Product Identity",
-    description: "A unique digital fingerprint for every SKU, batch, and unit you ship.",
+    description: "OriginCard gives each product a structured identity, connecting its SKU and batch details.",
     icon: "/images/for-brands/features/feature-identity.webp",
   },
   {
-    title: "QR Authentication",
-    description: "Secure, tamper resistant codes that open a product's information page instantly.",
+    title: "QR Access",
+    description: "A scannable QR code that opens the product's OriginCard instantly.",
     icon: "/images/for-brands/features/feature-qr.webp",
   },
   {
-    title: "Origin Tracking",
-    description: "Show customers exactly where and how your product was made.",
+    title: "Product Information",
+    description: "Explore product details, origin, ingredients, and supporting information in one place.",
     icon: "/images/for-brands/features/feature-origin.webp",
   },
   {
     title: "Certifications",
-    description: "Display organic, cruelty free, and regulatory certifications with documentation.",
+    description: "View certifications and supporting documents linked to the product.",
     icon: "/images/for-brands/features/feature-certifications.webp",
   },
   {
@@ -174,8 +174,8 @@ export const originCardFeatures = [
     icon: "/images/for-brands/features/feature-lab-reports.webp",
   },
   {
-    title: "Batch History",
-    description: "Full traceability of every batch, from production to distribution, for complete transparency.",
+    title: "Product Updates",
+    description: "Keep product details current as formulations, certifications, and documents change.",
     icon: "/images/for-brands/features/feature-batch.webp",
   },
   {

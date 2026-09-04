@@ -51,12 +51,10 @@ export function BrandsLandingPage() {
                   Why Brands Need OriginCard
                 </span>
                 <h2 className="brand-proof-title">
-                  The <span className="brand-proof-accent">clarity</span> your brand deserves.
-                  <br />
                   The <span className="brand-proof-accent">information</span> your customers want.
                 </h2>
                 <p className="brand-proof-lead">
-                  Every OriginCard turns customer skepticism into confidence, backed by data your brand can point to.
+                  QR codes are becoming a familiar way for consumers to access information. For brands, they create a simple path from a physical product to detailed digital product information.
                 </p>
                 <PillButton href="/for-brands/contact" variant="white" icon={<ArrowIcon inverted />}>
                   Book a Demo
@@ -93,7 +91,7 @@ export function BrandsLandingPage() {
         <div className="container-shell brands-footer-cta-content">
           <FadeIn>
             <BookOpen size={22} aria-hidden="true" className="brands-footer-cta-icon" />
-            <h2>Every Product Has Information.Give It One Place.</h2>
+            <h2>Every Product Has Information. Give It One Place.</h2>
             <div className="brands-footer-cta-actions">
               <Link href="/login" className="brands-hero-btn-primary">
                 Get Started Today

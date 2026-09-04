@@ -20,8 +20,8 @@ export function BrandsSolutionSection() {
               <p className="brands-section-lead brands-solution-lead">
                 TruOrigin gives brands a structured way to organize, manage, and present product information
                 through a dedicated OriginCard. It brings product details, claims, supporting documents,
-                certifications, and test reports into one accessible layer, making product information easier
-                for brands to manage and customers to explore.
+                certifications, and test reports into one structured product record, making
+                product information easier for brands to manage and customers to explore.
               </p>
             </FadeIn>
 

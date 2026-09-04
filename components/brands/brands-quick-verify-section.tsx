@@ -105,9 +105,9 @@ export function BrandsQuickVerifySection({ steps }: { steps: readonly QuickStep[
             <FadeIn>
               <div className="brands-section-intro centered brands-verify-intro">
                 <p className="brands-eyebrow">For Your Customers</p>
-                <h2 className="brands-display-title">Verification Takes Three Taps</h2>
+                <h2 className="brands-display-title">Product Information in Three Simple Steps</h2>
                 <p className="brands-section-lead brands-section-lead-centered">
-                  No accounts, no apps. Just a quick scan between a curious customer and the truth about your product.
+                  Scan, explore, and access the information behind the product.
                 </p>
               </div>
             </FadeIn>

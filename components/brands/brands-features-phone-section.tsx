@@ -86,9 +86,9 @@ export function BrandsFeaturesPhoneSection({ features }: { features: readonly Fe
         <FadeIn>
           <div className="brands-section-intro centered brands-features-intro">
             <p className="brands-eyebrow brands-text-accent">Everything Inside OriginCard</p>
-            <h2 className="brands-display-title">Every proof point, anchored to one trusted experience</h2>
+            <h2 className="brands-display-title">All Your Product Information, In One Place</h2>
             <p className="brands-section-lead brands-section-lead-centered">
-              OriginCard becomes the product layer customers interact with, while every feature points back to the proof behind it.
+              OriginCard brings together the information behind every product, including claims, ingredients, certifications, supporting documents, test reports, and product details, in one structured place.
             </p>
           </div>
         </FadeIn>

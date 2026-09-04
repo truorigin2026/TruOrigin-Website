@@ -30,7 +30,7 @@ export function SiteGateway() {
           <h1 className="gateway-subtitle">
             TruOrigin is a product information platform. Brands submit claims, supporting
             documents, and product details, and TruOrigin organizes them into a structured
-            product page that people can read quickly.
+            product page that people can access and explore.
           </h1>
         </HeroReveal>
 
@@ -38,10 +38,10 @@ export function SiteGateway() {
           <FadeIn delay={0.18}>
             <Link href="/for-products" className="gateway-choice-card">
               <p className="gateway-choice-eyebrow">For Consumers</p>
-              <h2 className="gateway-choice-title">Review a Product</h2>
+              <h2 className="gateway-choice-title">Explore a Product</h2>
               <p className="gateway-choice-copy">
                 Scan a QR code or enter a serial number to see a product&apos;s information,
-                claims, supporting documents, and origin - clear, structured, and easy to read.
+                claims, supporting documents, and product details, clear, structured, and easy to read.
               </p>
               <span className="gateway-choice-cta">Open product information</span>
             </Link>
@@ -53,7 +53,7 @@ export function SiteGateway() {
               <h2 className="gateway-choice-title">Organize Your Product</h2>
               <p className="gateway-choice-copy">
                 Manufacturers and brand teams: submit documents, structure product details, and
-                publish a clean OriginCard page your customers can read.
+                publish a clear OriginCard page your customers can read.
               </p>
               <span className="gateway-choice-cta">Explore the workspace</span>
             </Link>
