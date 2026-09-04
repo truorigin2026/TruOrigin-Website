@@ -5669,6 +5669,8 @@ a.contact-method-value:hover {
 }
 
 .saas-footer-wordmark-wrap {
+  display: flex;
+  justify-content: center;
   overflow: hidden;
   height: clamp(78px, 12vw, 190px);
   margin-top: 8px;
