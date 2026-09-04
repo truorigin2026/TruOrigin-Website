@@ -37,15 +37,15 @@ export function BrandsHeroSection() {
 
                 <HeroReveal delay={0.2}>
                   <h1 className="brands-display-title brands-hero-title">
-                    Every Product, Backed by <span className="brands-text-accent">Structured Documentation.</span>
+                    Your Product Claims. <span className="brands-text-accent">Clearly Structured.</span>
                   </h1>
                 </HeroReveal>
 
                 <HeroReveal delay={0.3}>
                   <p className="brands-section-lead brands-section-lead-hero">
-                    OriginCard turns every unit you ship into a scannable, evidence backed record
-                    origin, certifications, and lab results customers can check in seconds, not take
-                    on faith.
+                    Bring claims, supporting evidence, ingredients, certifications, and product
+                    documentation together with OriginCard, all organized around the product they
+                    belong to.
                   </p>
                 </HeroReveal>
 
