@@ -34,8 +34,8 @@ export function BrandsSolutionSection() {
 
           <motion.div
             className="brands-solution-visual"
-            initial={{ opacity: 0, x: 120 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2, margin: "0px 0px -40px 0px" }}
             transition={{ duration: 0.7, delay: 0.2, ease: revealEase }}
           >

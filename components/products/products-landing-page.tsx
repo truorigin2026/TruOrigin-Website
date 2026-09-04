@@ -40,7 +40,7 @@ const informationSteps = [
   { number: "1", title: "Find QR Code", description: "Locate the QR code on the product packaging." },
   { number: "2", title: "Scan or Enter", description: "Scan the QR code or enter the serial number." },
   { number: "3", title: "Open Product Page", description: "Get instant access to product information and details." },
-  { number: "4", title: "4. View Supporting Information", description: "Access product documents, ingredients, specifications, and other information" },
+  { number: "4", title: "View Supporting Information", description: "Access product documents, ingredients, specifications, and other information" },
 ] as const;
 
 const whyUseItPoints = [

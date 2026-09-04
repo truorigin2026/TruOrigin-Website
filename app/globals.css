@@ -3975,7 +3975,7 @@ select {
 .support-contact-grid {
   display: grid;
   gap: 28px;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   align-items: stretch;
 }
 
@@ -4144,7 +4144,7 @@ a.contact-method-value:hover {
   position: relative;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 40px;
   border-radius: 28px;
   padding: 40px 28px;
@@ -4388,10 +4388,14 @@ a.contact-method-value:hover {
 
   .contact-hero-block {
     order: 1;
+    width: 100%;
+    min-width: 0;
   }
 
   .contact-form-order {
     order: 2;
+    width: 100%;
+    min-width: 0;
   }
 
   .contact-form-tagline {
@@ -8520,8 +8524,8 @@ a.contact-method-value:hover {
 .brands-why-card p {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 6;
-  line-clamp: 6;
+  -webkit-line-clamp: 10;
+  line-clamp: 10;
   overflow: hidden;
   margin: 0;
   width: min(100%, 760px);
@@ -9482,9 +9486,13 @@ a.contact-method-value:hover {
   color: #ffffff;
 }
 
-.brands-hero-btn-primary:hover,
+.brands-hero-btn-primary:hover {
+  transform: translateY(-2px);
+}
+
 .brands-hero-btn-secondary:hover {
   transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .brands-hero-mobile-overlay {

@@ -29,11 +29,16 @@ function AdvantageCard({
     [sliceStart + pad, sliceEnd - pad],
     ["100%", "0%"]
   );
+  const opacity = useTransform(
+    scrollYProgress,
+    [sliceStart + pad, sliceEnd - pad],
+    [0, 1]
+  );
 
   return (
     <motion.article
       className="brands-advantage-card"
-      style={index === 0 ? { zIndex: 1 } : { x, zIndex: index + 1 }}
+      style={index === 0 ? { zIndex: 1 } : { x, opacity, zIndex: index + 1 }}
     >
       <h3>{item.title}</h3>
       <p>{item.description}</p>
@@ -62,9 +67,9 @@ export function BrandsAdvantageSection({ items }: { items: readonly AdvantageIte
             <FadeIn>
               <div className="brands-section-intro centered brands-advantage-intro">
                 <p className="brands-eyebrow brands-text-accent">The Brand Advantage</p>
-                <h2 className="brands-display-title">Turn Every Scan Into Business Intelligence</h2>
+                <h2 className="brands-display-title">Make Every Product Easier to Understand</h2>
                 <p className="brands-section-lead brands-section-lead-centered">
-                  OriginCard does more than organize product information. It becomes a growing source of insight, clarity, and speed for your brand.
+                  OriginCard brings your product information together in one structured place — making it easier for brands to manage and easier for customers to explore.
                 </p>
               </div>
             </FadeIn>

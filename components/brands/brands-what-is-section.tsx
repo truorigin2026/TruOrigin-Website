@@ -15,7 +15,7 @@ export function BrandsWhatIsSection() {
 
           <ScrollRevealText
             className="brands-whatis-lead"
-            text="TruOrigin is a product information platform that gives every product a structured digital identity through an OriginCard. Brands can organize product information while customers can access and explore that information through a simple digital experience."
+            text="TruOrigin is a structured product information platform that gives every product an OriginCard. Brands can organize product claims, ingredients, certifications, supporting evidence, and product documentation in one place, while customers can easily access and understand that information."
           />
         </div>
       </div>

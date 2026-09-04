@@ -36,7 +36,7 @@ export const whyTruOriginPoints = [
   {
     title: "Built to Evolve",
     description:
-      "Products don’t stay the same forever. Formulas evolve, certifications are renewed, and new test reports become available. Brands can update a product’s OriginCard whenever its documents, specifications, or details change, ensuring customers always ensuring customers always access the latest information,, not just a snapshot from launch day.",
+      "Products don’t stay the same forever. Formulas evolve, certifications are renewed, and new test reports become available. Brands can update a product’s OriginCard whenever its documents, specifications, or details change, ensuring customers always access the latest information, not just a snapshot from launch day.",
   },
 ] as const;
 
