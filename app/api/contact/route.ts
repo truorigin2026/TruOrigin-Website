@@ -20,15 +20,28 @@ export async function POST(request: NextRequest) {
     .filter(Boolean)
     .join("\n");
 
-  await prisma.supportTicket.create({
-    data: {
-      source: "CONTACT_MESSAGE",
-      subject: `Website contact form — ${body.name?.trim() || body.email.trim()}`,
-      message: details ? `${details}\n\n${body.message.trim()}` : body.message.trim(),
-      name: body.name?.trim() || null,
-      email: body.email.trim(),
-    },
-  });
+  const ticketData = {
+    source: "CONTACT_MESSAGE" as const,
+    subject: `Website contact form — ${body.name?.trim() || body.email.trim()}`,
+    message: details ? `${details}\n\n${body.message.trim()}` : body.message.trim(),
+    name: body.name?.trim() || null,
+    email: body.email.trim(),
+  };
+
+  try {
+    await prisma.supportTicket.create({ data: ticketData });
+  } catch (err) {
+    console.error("[/api/contact] first attempt failed, retrying once:", err);
+    // A brief pooler/connection hiccup is the most likely transient cause here —
+    // one short-delayed retry before giving up and surfacing an error to the user.
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      await prisma.supportTicket.create({ data: ticketData });
+    } catch (retryErr) {
+      console.error("[/api/contact] retry also failed:", retryErr);
+      return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
+    }
+  }
 
   return NextResponse.json({ ok: true });
 }
