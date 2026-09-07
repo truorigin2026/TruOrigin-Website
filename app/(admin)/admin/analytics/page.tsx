@@ -51,8 +51,8 @@ export default async function AdminAnalyticsPage() {
     <>
       <PageHeader
         eyebrow="Admin Analytics"
-        title="How consumers are scanning and verifying products."
-        description="Total scans, geography, and device breakdowns are live from every /product verification lookup. Claim/certificate view time requires product-page instrumentation and shows an honest empty state until that ships."
+        title="How consumers are scanning and exploring products."
+        description="Total scans, geography, and device breakdowns are live from product-page lookups and QR scans. Claim/certificate view time requires product-page instrumentation and shows an honest empty state until that ships."
       />
 
       <StatGrid>

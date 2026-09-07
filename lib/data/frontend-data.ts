@@ -67,7 +67,7 @@ export const supportFaqs = [
       "An invalid serial number may indicate a data entry error or a product record that has not been published. Contact the brand directly through the support form and report the product details.",
   },
   {
-    question: "What does Supporting Evidence Provided mean?",
+    question: "What does Supporting Information Provided mean?",
     answer:
       "It means the product page includes supporting documents or notes supplied by the brand, organized into a clearer presentation for customers.",
   },
@@ -82,19 +82,19 @@ export const verificationTopics = [
   {
     title: "What is TruOrigin?",
     description:
-      "TruOrigin is a product information platform that connects brands with consumers through structured product pages, QR codes, and supporting documents.",
+      "TruOrigin organizes brand-supplied product information into structured product pages, accessible through OriginCard QR codes.",
     icon: "platform",
   },
   {
     title: "How QR product pages work",
     description:
-      "Each product receives a unique QR code. When scanned, it opens a product page showing information, claims, certifications, and supporting documents.",
+      "Each product can have an OriginCard QR code. When scanned, it opens a structured product page with product information, claims, certifications, ingredients, and supporting documents.",
     icon: "qr",
   },
   {
     title: "How serial number lookup works",
     description:
-      "Enter the product serial number on TruOrigin to cross-reference it against the brand's registered inventory and open the matching product page.",
+      "Enter the product serial number on TruOrigin to find the corresponding product information page.",
     icon: "serial",
   },
   {

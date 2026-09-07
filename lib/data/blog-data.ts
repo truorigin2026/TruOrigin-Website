@@ -128,7 +128,7 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "product-has-20-things-to-say",
     cluster: "information-gap",
-    category: "Transparency",
+    category: "Product Information",
     title: "Your Product Has 20 Things to Say. Why Can't Customers See Them?",
     excerpt:
       "Most brands have far more product information than makes it to the customer. Here's why that gap exists, and what it costs.",
@@ -599,7 +599,7 @@ export const blogPosts: BlogPost[] = [
   {
     slug: "where-does-all-your-product-documentation-go",
     cluster: "information-gap",
-    category: "Transparency",
+    category: "Product Information",
     title: "Where Does All Your Product Documentation Actually Go?",
     excerpt:
       "Most brands have never mapped where their own product documentation actually lives. Here's what that sprawl looks like, and how to centralize it.",

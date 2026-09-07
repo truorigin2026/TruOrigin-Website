@@ -27,7 +27,7 @@ const processSteps = [
   {
     step: 3,
     title: "Review Every Claim",
-    text: "Origin, certifications, and test results appear clearly labeled, so you know exactly what's backed by evidence.",
+    text: "Product claims, certifications, and supporting information are clearly presented so you can understand the information provided.",
     image: verificationStep3,
   },
 ] as const;
@@ -68,7 +68,7 @@ export default function AboutVerificationPage() {
           <SectionHeading
             eyebrow="Platform"
             title="What is TruOrigin?"
-            description="A product information platform connecting brands with consumers through structured pages."
+            description="A product information platform that organizes brand-supplied product details into structured product pages."
             centered
           />
 

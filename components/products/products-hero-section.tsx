@@ -9,7 +9,7 @@ const scatterTags = [
   { text: "Backed by documentation", className: "products-hero-tag products-hero-tag-1" },
   { text: "Look beyond the label", className: "products-hero-tag products-hero-tag-2" },
   { text: "Evidence, not guesswork", className: "products-hero-tag products-hero-tag-3" },
-  { text: "Reviewed before it ships", className: "products-hero-tag products-hero-tag-4" },
+  { text: "Product information before you buy", className: "products-hero-tag products-hero-tag-4" },
   { text: "Claims you can check", className: "products-hero-tag products-hero-tag-5" },
   { text: "Information over promises", className: "products-hero-tag products-hero-tag-6" },
   { text: "Nothing hidden", className: "products-hero-tag products-hero-tag-7" },

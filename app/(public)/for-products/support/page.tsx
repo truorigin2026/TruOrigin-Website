@@ -32,7 +32,7 @@ export default function ForProductsSupportPage() {
         <h1 className="legal-page-title">How Can We Help?</h1>
         <p className="legal-page-meta">
           Find answers to common questions or reach out to our support team for help with your
-          TruOrigin account, OriginCard, and product information.
+          OriginCard and product information.
         </p>
       </header>
 

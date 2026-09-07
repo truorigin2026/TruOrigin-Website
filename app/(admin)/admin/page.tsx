@@ -58,7 +58,7 @@ export default async function AdminDashboardPage() {
     <>
       <PageHeader
         eyebrow="Admin Dashboard"
-        title="Review products, approve evidence, and issue QR-ready records."
+        title="Review product submissions, approve products, and issue QR-ready records."
         description="A live view of submissions, approvals, and what's ready to publish."
       />
 

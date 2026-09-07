@@ -53,10 +53,10 @@ export default async function ReviewPage() {
     <>
       <PageHeader
         eyebrow="Admin Review"
-        title="Review submitted products one by one."
-        description="This queue shows every product waiting for admin attention. Open a row for the full product review page with claim-by-claim actions."
+        title="Review product submissions one by one."
+        description="This queue shows every product submission waiting for admin attention. Open a submission to review its product information, claims, and supporting documents before publication."
       />
-      <DataTable headers={TABLE_HEADERS} rows={rows} emptyMessage="There are no products waiting for review right now." />
+      <DataTable headers={TABLE_HEADERS} rows={rows} emptyMessage="There are no product submissions waiting for review right now." />
     </>
   );
 }
