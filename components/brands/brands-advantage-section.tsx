@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { FadeIn } from "@/components/motion";
 
@@ -8,6 +8,24 @@ type AdvantageItem = {
   title: string;
   description: string;
 };
+
+// Local to this section: the pinned crossfade below forces ~4 screens of
+// scroll just to see every card, which is a bad tradeoff on small screens.
+// Below this breakpoint (matches this section's own mobile card styles)
+// we swap to a plain swipeable row instead of scroll-jacking.
+function useIsMobileAdvantage() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsMobile(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, []);
+
+  return isMobile;
+}
 
 function AdvantageCard({
   item,
@@ -49,6 +67,7 @@ function AdvantageCard({
 export function BrandsAdvantageSection({ items }: { items: readonly AdvantageItem[] }) {
   const pinRef = useRef<HTMLDivElement>(null);
   const transitions = Math.max(items.length - 1, 1);
+  const isMobile = useIsMobileAdvantage();
 
   const { scrollYProgress } = useScroll({
     target: pinRef,
@@ -60,7 +79,7 @@ export function BrandsAdvantageSection({ items }: { items: readonly AdvantageIte
       <div
         className="brands-advantage-pin"
         ref={pinRef}
-        style={{ height: `${items.length * 100}vh` }}
+        style={isMobile ? undefined : { height: `${items.length * 100}vh` }}
       >
         <div className="brands-advantage-sticky">
           <div className="container-shell">
@@ -75,17 +94,28 @@ export function BrandsAdvantageSection({ items }: { items: readonly AdvantageIte
             </FadeIn>
           </div>
 
-          <div className="brands-advantage-track">
-            {items.map((item, index) => (
-              <AdvantageCard
-                key={item.title}
-                item={item}
-                index={index}
-                transitions={transitions}
-                scrollYProgress={scrollYProgress}
-              />
-            ))}
-          </div>
+          {isMobile ? (
+            <div className="brands-advantage-carousel">
+              {items.map((item) => (
+                <article key={item.title} className="brands-advantage-card brands-advantage-card-carousel">
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="brands-advantage-track">
+              {items.map((item, index) => (
+                <AdvantageCard
+                  key={item.title}
+                  item={item}
+                  index={index}
+                  transitions={transitions}
+                  scrollYProgress={scrollYProgress}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

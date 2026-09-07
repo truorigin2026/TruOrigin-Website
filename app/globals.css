@@ -8683,10 +8683,45 @@ a.contact-method-value:hover {
 }
 
 @media (max-width: 640px) {
+  .brands-advantage-pin {
+    min-height: auto;
+  }
+
+  .brands-advantage-sticky {
+    position: static;
+    height: auto;
+    overflow: visible;
+    padding-top: 0;
+  }
+
+  .brands-advantage-carousel {
+    display: flex;
+    width: 100%;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .brands-advantage-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
   .brands-advantage-card {
     justify-content: flex-start;
     align-items: center;
     padding: clamp(28px, 6vh, 44px) 24px;
+  }
+
+  .brands-advantage-card-carousel {
+    position: static;
+    inset: auto;
+    flex: 0 0 calc(100vw - 64px);
+    max-width: 420px;
+    height: auto;
+    min-height: 320px;
+    scroll-snap-align: center;
   }
 
   .brands-advantage-card h3 {
