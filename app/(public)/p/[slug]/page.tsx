@@ -23,7 +23,7 @@ export async function generateMetadata({
   const product = await resolveProduct(slug);
 
   if (!product) {
-    return { title: "Product Not Found" };
+    return { title: "Product Not Found", robots: { index: false, follow: true } };
   }
 
   const title = `${product.name} by ${product.brand}`;
@@ -35,6 +35,7 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: `/p/${product.scanCode}` },
+    robots: { index: false, follow: true },
     openGraph: {
       type: "website",
       title,

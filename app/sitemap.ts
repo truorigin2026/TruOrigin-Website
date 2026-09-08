@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/seo";
-import { getProducts } from "@/lib/data/repository";
 import { getBlogPosts } from "@/lib/data/blog-data";
 
 type StaticRoute = {
@@ -38,15 +37,6 @@ function parseLastModified(value: string | undefined): Date {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const products = await getProducts();
-
-  const productEntries: MetadataRoute.Sitemap = products.map((product) => ({
-    url: `${SITE_URL}/p/${product.scanCode}`,
-    lastModified: parseLastModified(product.lastUpdated),
-    changeFrequency: "weekly",
-    priority: 0.8,
-  }));
-
   const staticEntries: MetadataRoute.Sitemap = staticRoutes.map((route) => ({
     url: `${SITE_URL}${route.path}`,
     lastModified: new Date(),
@@ -61,5 +51,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticEntries, ...productEntries, ...blogEntries];
+  return [...staticEntries, ...blogEntries];
 }
