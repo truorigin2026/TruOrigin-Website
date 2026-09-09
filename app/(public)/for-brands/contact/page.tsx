@@ -8,7 +8,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Contact",
   description:
-    "Schedule a demo or reach out to learn how TruOrigin can help present your product information. Our team replies within one business day.",
+    "Schedule a demo or reach out to learn how TruOrigin helps brands organize and present their product information. Our team replies within one business day.",
   path: "/for-brands/contact",
 });
 
@@ -22,23 +22,22 @@ export default function ForBrandsContactPage() {
               <p className="contact-hero-eyebrow">Contact</p>
               <h1 className="contact-hero-title">Let&apos;s get in touch</h1>
               <p className="contact-hero-description">
-                Schedule a demo or reach out to learn how TruOrigin can help present your product
-                information.
+                Schedule a demo or reach out to learn how TruOrigin helps brands organize and
+                present their product information.
               </p>
               <p className="contact-hero-description">
-                Once we&apos;re in touch, we&apos;ll set up your brand&apos;s sign-in account so your
-                team can log in, manage your product catalog, and publish OriginCards straight from
-                your dashboard.
+                Once we&apos;re in touch, we&apos;ll set up your brand&apos;s account so your team
+                can manage your product catalog and publish OriginCards from your dashboard.
               </p>
             </FadeIn>
 
             <FadeIn delay={0.1} className="contact-info-block">
               <div className="contact-info-card">
                 <ul className="contact-info-list">
-                  <li>Reduce counterfeiting with unique product identities</li>
-                  <li>Present clear, structured product information</li>
-                  <li>Streamline evidence management and QR publishing</li>
-                  <li>Premium product information experience at point of purchase</li>
+                  <li>Give every product a structured digital identity</li>
+                  <li>Organize and present product information clearly</li>
+                  <li>Manage supporting information and product documentation</li>
+                  <li>Give customers a clear way to explore product information</li>
                 </ul>
                 <p className="contact-info-description">
                   Questions about onboarding, pricing, or how the review workflow fits your

@@ -13,7 +13,7 @@ export function BrandTagPreview({
 }) {
   return (
     <div className="overflow-hidden rounded-[32px] border border-[color:var(--line)] bg-white shadow-[0_20px_80px_rgba(13,43,29,0.12)]">
-      <div className="relative aspect-[4/5] w-full bg-[#eef3ee]">
+      <div className="relative aspect-[2399/2298] w-full bg-[#eef3ee]">
         <Image
           src="/images/for-brands/tag/truorigin-tag.png"
           alt="TruOrigin tag preview"
@@ -23,11 +23,11 @@ export function BrandTagPreview({
           className="object-contain"
         />
 
-        <div className="absolute left-[11%] top-[10%] rounded-3xl border border-white/70 bg-white/95 p-2 shadow-[0_16px_30px_rgba(0,0,0,0.18)] md:left-[10%] md:top-[11%] md:p-3">
+        <div className="absolute left-[33.26%] top-[29.11%] h-[34.6%] w-[33.06%] rounded-3xl border border-white/70 bg-white/95 p-2 shadow-[0_16px_30px_rgba(0,0,0,0.18)] md:p-3">
           <img
             src={qrDataUrl}
             alt={`${productName} QR code`}
-            className="h-24 w-24 object-contain md:h-32 md:w-32"
+            className="h-full w-full object-contain"
           />
         </div>
 
