@@ -8697,9 +8697,11 @@ a.contact-method-value:hover {
   .brands-advantage-carousel {
     display: flex;
     width: 100%;
-    gap: 16px;
+    gap: 14px;
+    padding: 4px 24px 12px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    scroll-padding-left: 24px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
@@ -8711,29 +8713,66 @@ a.contact-method-value:hover {
   .brands-advantage-card {
     justify-content: flex-start;
     align-items: center;
-    padding: clamp(28px, 6vh, 44px) 24px;
+    padding: 28px 22px;
   }
 
   .brands-advantage-card-carousel {
     position: static;
     inset: auto;
-    flex: 0 0 calc(100vw - 64px);
-    max-width: 420px;
-    height: auto;
-    min-height: 320px;
-    scroll-snap-align: center;
+    flex: 0 0 82%;
+    max-width: 360px;
+    height: 340px;
+    scroll-snap-align: start;
   }
 
   .brands-advantage-card h3 {
-    font-size: clamp(1.5rem, 7vw, 2.25rem);
-    margin-bottom: 12px;
+    font-size: clamp(1.2rem, 5.4vw, 1.6rem);
+    line-height: 1.25;
+    margin-bottom: 10px;
     text-align: center;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .brands-advantage-card p {
+    display: -webkit-box;
     -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
     font-size: 15px;
     line-height: 1.55;
+  }
+
+  .brands-advantage-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .brands-advantage-dot {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.24);
+    transition: background-color 0.2s ease, transform 0.2s ease, width 0.2s ease;
+  }
+
+  .brands-advantage-dot.is-active {
+    width: 20px;
+    border-radius: 999px;
+    background: #c8f542;
+  }
+}
+
+@media (min-width: 641px) {
+  .brands-advantage-dots {
+    display: none;
   }
 }
 

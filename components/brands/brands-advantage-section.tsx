@@ -66,13 +66,46 @@ function AdvantageCard({
 
 export function BrandsAdvantageSection({ items }: { items: readonly AdvantageItem[] }) {
   const pinRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const transitions = Math.max(items.length - 1, 1);
   const isMobile = useIsMobileAdvantage();
+  const [activeCard, setActiveCard] = useState(0);
 
   const { scrollYProgress } = useScroll({
     target: pinRef,
     offset: ["start start", "end end"],
   });
+
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!isMobile || !el) return;
+
+    const onScroll = () => {
+      const cards = Array.from(el.children) as HTMLElement[];
+      let closest = 0;
+      let smallestDelta = Infinity;
+      cards.forEach((card, index) => {
+        const delta = Math.abs(card.offsetLeft - el.scrollLeft);
+        if (delta < smallestDelta) {
+          smallestDelta = delta;
+          closest = index;
+        }
+      });
+      setActiveCard(closest);
+    };
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [isMobile]);
+
+  const scrollToCard = (index: number) => {
+    const el = carouselRef.current;
+    const card = el?.children[index] as HTMLElement | undefined;
+    if (el && card) {
+      el.scrollTo({ left: card.offsetLeft, behavior: "smooth" });
+    }
+  };
 
   return (
     <section id="brand-advantage" className="brands-section brands-advantage-shell">
@@ -95,14 +128,29 @@ export function BrandsAdvantageSection({ items }: { items: readonly AdvantageIte
           </div>
 
           {isMobile ? (
-            <div className="brands-advantage-carousel">
-              {items.map((item) => (
-                <article key={item.title} className="brands-advantage-card brands-advantage-card-carousel">
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                </article>
-              ))}
-            </div>
+            <>
+              <div className="brands-advantage-carousel" ref={carouselRef}>
+                {items.map((item) => (
+                  <article key={item.title} className="brands-advantage-card brands-advantage-card-carousel">
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                  </article>
+                ))}
+              </div>
+              <div className="brands-advantage-dots" role="tablist" aria-label="Brand advantage cards">
+                {items.map((item, index) => (
+                  <button
+                    key={item.title}
+                    type="button"
+                    role="tab"
+                    aria-selected={index === activeCard}
+                    aria-label={`Show card ${index + 1} of ${items.length}`}
+                    className={`brands-advantage-dot${index === activeCard ? " is-active" : ""}`}
+                    onClick={() => scrollToCard(index)}
+                  />
+                ))}
+              </div>
+            </>
           ) : (
             <div className="brands-advantage-track">
               {items.map((item, index) => (
