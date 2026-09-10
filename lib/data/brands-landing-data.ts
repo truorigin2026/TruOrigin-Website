@@ -60,7 +60,7 @@ export const quickVerifySteps = [
     description:
       "Access product details, ingredients, certifications, supporting documents, test reports, and other information in one structured place.",
     icon: "check",
-    image: "/images/for-brands/how-it-works/verification-step3.webp",
+    image: "/images/for-brands/how-it-works/verification-step3-updated.webp",
   },
 ] as const;
 

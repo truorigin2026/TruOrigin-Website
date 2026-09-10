@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Check, ShieldCheck } from "lucide-react";
 import verificationStep1 from "../../../../public/images/for-brands/how-it-works/verification-step1.webp";
 import verificationStep2 from "../../../../public/images/for-brands/how-it-works/verification-step2.webp";
-import verificationStep3 from "../../../../public/images/for-brands/how-it-works/verification-step3.webp";
+import verificationStep3 from "../../../../public/images/for-brands/how-it-works/verification-step3-updated.webp";
 import Image from "next/image";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { FadeIn } from "@/components/motion";
