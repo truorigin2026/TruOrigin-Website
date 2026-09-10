@@ -52,6 +52,7 @@ export default function ForBrandsContactPage() {
 
           <div className="contact-page-col">
             <ContactForm
+              formSource="brand"
               className="contact-form-order"
               title="Book a Demo"
               description="Fill out the form below and our team will reach out to schedule a personalized walkthrough."

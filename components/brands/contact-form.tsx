@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { FadeIn } from "@/components/motion";
 
 type ContactFormProps = {
+  formSource: "brand" | "product";
   title?: string;
   description?: string;
   submitLabel?: string;
@@ -11,6 +12,7 @@ type ContactFormProps = {
 };
 
 export function ContactForm({
+  formSource,
   title = "Get in touch",
   description = "Tell us about your brand and we'll schedule a personalized demo.",
   submitLabel = "Submit",
@@ -40,6 +42,7 @@ export function ContactForm({
           subject: form.get("subject"),
           message: form.get("message"),
           website: form.get("website"),
+          formSource,
         }),
       });
 

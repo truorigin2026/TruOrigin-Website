@@ -88,6 +88,8 @@ enum SupportTicketSource {
   BRAND_TICKET
   CUSTOMER_REPORT
   CONTACT_MESSAGE
+  BRAND_CONTACT_MESSAGE
+  CUSTOMER_CONTACT_MESSAGE
 }
 
 enum SupportTicketStatus {

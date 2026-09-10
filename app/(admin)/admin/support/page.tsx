@@ -19,6 +19,8 @@ const SOURCE_TABS = [
   ["BRAND_TICKET", "Brand Tickets"],
   ["CUSTOMER_REPORT", "Customer Reports"],
   ["CONTACT_MESSAGE", "Contact Messages"],
+  ["BRAND_CONTACT_MESSAGE", "Brand Contact Messages"],
+  ["CUSTOMER_CONTACT_MESSAGE", "Customer Contact Messages"],
 ] as const;
 
 const STATUS_TABS = ["ALL", "NEW", "READ", "IN_PROGRESS", "REPLIED", "CLOSED"] as const;

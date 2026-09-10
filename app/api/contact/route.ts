@@ -10,6 +10,15 @@ function clamp(value: string, maxLength: number) {
   return value.trim().slice(0, maxLength);
 }
 
+// Never trust the client's formSource as a raw enum value — map through
+// an explicit allow-list. Anything unrecognized falls back to the
+// generic CONTACT_MESSAGE source rather than rejecting the submission.
+function resolveSource(formSource: unknown): "BRAND_CONTACT_MESSAGE" | "CUSTOMER_CONTACT_MESSAGE" | "CONTACT_MESSAGE" {
+  if (formSource === "brand") return "BRAND_CONTACT_MESSAGE";
+  if (formSource === "product") return "CUSTOMER_CONTACT_MESSAGE";
+  return "CONTACT_MESSAGE";
+}
+
 export async function POST(request: NextRequest) {
   const rateLimit = checkRateLimit(`contact:${getClientIp(request)}`, 5, 60 * 60 * 1000);
   if (!rateLimit.allowed) {
@@ -25,6 +34,7 @@ export async function POST(request: NextRequest) {
         subject?: string;
         message?: string;
         website?: string; // honeypot — real visitors never fill this in
+        formSource?: string;
       }
     | null;
 
@@ -57,7 +67,7 @@ export async function POST(request: NextRequest) {
   const subject = body.subject ? clamp(body.subject, 200) : `Website contact form — ${name || email}`;
 
   const ticketData = {
-    source: "CONTACT_MESSAGE" as const,
+    source: resolveSource(body.formSource),
     subject,
     message: company ? `Company: ${company}\n\n${message}` : message,
     name,
