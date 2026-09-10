@@ -91,9 +91,10 @@ enum SupportTicketSource {
 }
 
 enum SupportTicketStatus {
-  OPEN
+  NEW
+  READ
   IN_PROGRESS
-  RESOLVED
+  REPLIED
   CLOSED
 }
 
@@ -370,17 +371,19 @@ model Invoice {
 model SupportTicket {
   id             String                 @id @default(cuid())
   source         SupportTicketSource
-  status         SupportTicketStatus    @default(OPEN)
+  status         SupportTicketStatus    @default(NEW)
   priority       SupportTicketPriority  @default(MEDIUM)
   subject        String
   message        String
   name           String?
   email          String?
+  phone          String?
   brand          Brand?                 @relation(fields: [brandId], references: [id])
   brandId        String?
   productId      String?
   assignedToId   String?
   resolvedAt     DateTime?
+  repliedAt      DateTime?
   resolutionNote String?
   createdAt      DateTime               @default(now())
   updatedAt      DateTime               @updatedAt

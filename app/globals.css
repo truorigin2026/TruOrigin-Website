@@ -4115,6 +4115,14 @@ a.contact-method-value:hover {
   margin-top: 16px;
 }
 
+.contact-form-honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  left: -9999px;
+}
+
 .contact-form-submit {
   margin-top: 24px;
   width: 100%;
@@ -5377,6 +5385,8 @@ a.contact-method-value:hover {
   padding: 36px 32px;
   box-shadow: var(--shadow);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .verification-topic-card:hover {
@@ -5418,6 +5428,8 @@ a.contact-method-value:hover {
   background: #f7f4ec;
   box-shadow: var(--shadow);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .verification-process-card:hover {

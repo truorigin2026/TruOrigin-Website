@@ -1,29 +1,43 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { useApiAction } from "@/components/dashboard/use-api-action";
 
 type TicketActionsProps = {
   ticket: {
     id: string;
-    status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+    status: "NEW" | "READ" | "IN_PROGRESS" | "REPLIED" | "CLOSED";
     priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   };
 };
 
-const STATUS_OPTIONS = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"] as const;
+const STATUS_OPTIONS = ["NEW", "READ", "IN_PROGRESS", "REPLIED", "CLOSED"] as const;
 const PRIORITY_OPTIONS = ["LOW", "MEDIUM", "HIGH", "URGENT"] as const;
 
 export function TicketActions({ ticket }: TicketActionsProps) {
-  const { run, busy } = useApiAction();
+  const router = useRouter();
+  const { run, busy, isBusy } = useApiAction();
   const [status, setStatus] = useState(ticket.status);
   const [priority, setPriority] = useState(ticket.priority);
   const [note, setNote] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   function submit() {
     run("save", `/api/admin/support/${ticket.id}`, { status, priority, resolutionNote: note || undefined }, { method: "PATCH", successMessage: "Ticket updated." });
+  }
+
+  async function confirmDeleteTicket() {
+    const ok = await run(
+      "delete",
+      `/api/admin/support/${ticket.id}`,
+      {},
+      { method: "DELETE", successMessage: "Message deleted.", skipRefresh: true, onSuccess: () => router.push("/admin/support") },
+    );
+    if (ok) setConfirmDelete(false);
   }
 
   return (
@@ -65,10 +79,27 @@ export function TicketActions({ ticket }: TicketActionsProps) {
           className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:border-ring"
         />
       </label>
-      <Button type="button" className="w-fit" disabled={busy !== null} onClick={submit}>
-        {busy !== null ? <Loader2 size={15} className="animate-spin" /> : null}
-        Save Changes
-      </Button>
+      <div className="flex flex-wrap gap-3">
+        <Button type="button" className="w-fit" disabled={busy !== null} onClick={submit}>
+          {busy !== null ? <Loader2 size={15} className="animate-spin" /> : null}
+          Save Changes
+        </Button>
+        <Button type="button" variant="destructive" className="w-fit" disabled={busy !== null} onClick={() => setConfirmDelete(true)}>
+          <Trash2 size={15} />
+          Delete
+        </Button>
+      </div>
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Delete this message?"
+        description="It will be permanently removed from the support queue. This action cannot be undone."
+        confirmLabel="Delete"
+        danger
+        busy={isBusy("delete")}
+        onConfirm={confirmDeleteTicket}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }

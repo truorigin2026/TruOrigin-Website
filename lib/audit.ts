@@ -68,6 +68,7 @@ export const AUDIT_ACTIONS = {
   INVOICE_MARK_FAILED: "invoice.mark_failed",
 
   TICKET_UPDATE: "ticket.update",
+  TICKET_DELETE: "ticket.delete",
 
   CMS_CREATE: "cms.create",
   CMS_UPDATE: "cms.update",

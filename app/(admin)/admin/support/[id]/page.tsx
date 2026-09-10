@@ -40,6 +40,7 @@ export default async function AdminSupportDetailPage({ params }: { params: Promi
             <div className="grid gap-3 md:grid-cols-2">
               <InfoTile label="From" value={`${ticket.name ?? "Unknown"}${ticket.email ? ` • ${ticket.email}` : ""}`} />
               <InfoTile label="Received" value={ticket.createdAt.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })} />
+              {ticket.phone ? <InfoTile label="Phone" value={ticket.phone} /> : null}
             </div>
             <p className="mt-5 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{ticket.message}</p>
             {ticket.resolutionNote ? (

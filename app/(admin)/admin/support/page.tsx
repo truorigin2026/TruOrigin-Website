@@ -21,13 +21,14 @@ const SOURCE_TABS = [
   ["CONTACT_MESSAGE", "Contact Messages"],
 ] as const;
 
-const STATUS_TABS = ["ALL", "OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"] as const;
+const STATUS_TABS = ["ALL", "NEW", "READ", "IN_PROGRESS", "REPLIED", "CLOSED"] as const;
 const TABLE_HEADERS = ["Source", "Subject", "Contact", "Status", "Priority"];
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  OPEN: "warning",
+  NEW: "warning",
+  READ: "outline",
   IN_PROGRESS: "info",
-  RESOLVED: "success",
+  REPLIED: "success",
   CLOSED: "outline",
 };
 
