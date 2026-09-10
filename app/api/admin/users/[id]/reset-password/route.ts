@@ -4,11 +4,17 @@ import { requireAdminSession } from "@/lib/api-auth";
 import { createResetToken, RESET_TOKEN_TTL_MS } from "@/lib/auth";
 import { sendEmail } from "@/lib/email";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdminSession(request);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rateLimit = checkRateLimit(`admin-reset-password:${session.sub}`, 10, 60 * 60 * 1000);
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit.retryAfterSeconds);
   }
 
   const { id } = await params;

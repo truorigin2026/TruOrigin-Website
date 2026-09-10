@@ -39,5 +39,5 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     request,
   });
 
-  return NextResponse.json({ ok: true, user: updated });
+  return NextResponse.json({ ok: true, user: { id: updated.id, active: updated.active } });
 }

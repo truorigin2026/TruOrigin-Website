@@ -18,6 +18,10 @@ type SubmitBody = {
 
 const DOC_TYPES = new Set(["CERTIFICATE", "LAB_REPORT", "INGREDIENT_LIST", "SOURCING_PROOF", "OTHER"]);
 
+function clamp(value: string, maxLength: number) {
+  return value.trim().slice(0, maxLength);
+}
+
 async function uniqueProductSlug(base: string) {
   let slug = base || "product";
   let suffix = 1;
@@ -66,35 +70,35 @@ export async function POST(request: NextRequest) {
   const product = await prisma.product.create({
     data: {
       slug,
-      name: body.name.trim(),
+      name: clamp(body.name, 200),
       brand: { connect: { id: session.brandId } },
       category: { connect: { id: category.id } },
-      subcategory: body.subcategory?.trim() || null,
-      description: body.description?.trim() || null,
+      subcategory: body.subcategory?.trim() ? clamp(body.subcategory, 200) : null,
+      description: body.description?.trim() ? clamp(body.description, 5000) : null,
       status: "SUBMITTED",
       submittedAt: new Date(),
       images: {
         create: images.map((image, index) => ({
           url: image.url,
-          altText: image.altText?.trim() || null,
+          altText: image.altText?.trim() ? clamp(image.altText, 300) : null,
           position: index,
         })),
       },
       claims: {
         create: claims.map((claim) => ({
-          label: claim.label.trim(),
-          evidence: claim.evidence?.trim() || null,
+          label: clamp(claim.label, 300),
+          evidence: claim.evidence?.trim() ? clamp(claim.evidence, 2000) : null,
         })),
       },
       ingredients: {
         create: ingredients.map((ingredient) => ({
-          name: ingredient.name.trim(),
-          note: ingredient.note?.trim() || null,
+          name: clamp(ingredient.name, 200),
+          note: ingredient.note?.trim() ? clamp(ingredient.note, 1000) : null,
         })),
       },
       certificates: {
         create: certificates.map((cert) => ({
-          title: cert.title.trim(),
+          title: clamp(cert.title, 300),
           fileUrl: cert.fileUrl,
           docType: cert.docType as never,
           mimeType: cert.mimeType,

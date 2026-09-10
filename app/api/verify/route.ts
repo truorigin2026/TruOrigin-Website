@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     return rateLimitResponse(rateLimit.retryAfterSeconds);
   }
 
-  const serial = request.nextUrl.searchParams.get("serial");
+  const serial = request.nextUrl.searchParams.get("serial")?.slice(0, 100);
 
   if (!serial) {
     return NextResponse.json({ error: "Missing ?serial= query param" }, { status: 400 });
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
   if (dbProduct) {
     await recordScanEvent({
       productId: dbProduct.id,
-      source: request.nextUrl.searchParams.get("source") ?? "serial-search",
+      source: (request.nextUrl.searchParams.get("source") ?? "serial-search").slice(0, 100),
       request,
     });
   }
