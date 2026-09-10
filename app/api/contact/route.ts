@@ -19,6 +19,16 @@ function resolveSource(formSource: unknown): "BRAND_CONTACT_MESSAGE" | "CUSTOMER
   return "CONTACT_MESSAGE";
 }
 
+function confirmationIntro(source: ReturnType<typeof resolveSource>): string {
+  if (source === "BRAND_CONTACT_MESSAGE") {
+    return "Thank you for your interest in TruOrigin. We've received your message and our team will follow up within one business day to help with your enquiry.";
+  }
+  if (source === "CUSTOMER_CONTACT_MESSAGE") {
+    return "Thank you for contacting TruOrigin Support. We've received your message and our support team will get back to you within one business day.";
+  }
+  return "Thank you for reaching out to TruOrigin. We've received your message and our team will get back to you within one business day.";
+}
+
 export async function POST(request: NextRequest) {
   const rateLimit = checkRateLimit(`contact:${getClientIp(request)}`, 5, 60 * 60 * 1000);
   if (!rateLimit.allowed) {
@@ -101,6 +111,19 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     console.error("[/api/contact] notification email failed:", err);
+  }
+
+  // Same non-blocking treatment for the visitor's own confirmation — the
+  // ticket is already stored, so a failed send here shouldn't surface as
+  // an error to someone who successfully got in touch.
+  try {
+    await sendEmail({
+      to: email,
+      subject: "We've received your message — TruOrigin",
+      body: `Hi ${name || "there"},\n\n${confirmationIntro(ticketData.source)}\n\nHere's a copy of what you sent us:\n\nSubject: ${subject}\n\n${message}\n\nIf there's anything else you'd like to add in the meantime, just reply to this email.\n\nBest regards,\nThe TruOrigin Team`,
+    });
+  } catch (err) {
+    console.error("[/api/contact] confirmation email failed:", err);
   }
 
   return NextResponse.json({ ok: true, message: "Your message has been submitted successfully." });
