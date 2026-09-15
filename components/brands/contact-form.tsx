@@ -68,10 +68,12 @@ export function ContactForm({
             <span>Name</span>
             <input type="text" name="name" placeholder="Your full name" />
           </label>
-          <label className="contact-form-field">
-            <span>Company Name</span>
-            <input type="text" name="company" placeholder="Your company" />
-          </label>
+          {formSource === "brand" ? (
+            <label className="contact-form-field">
+              <span>Company Name</span>
+              <input type="text" name="company" placeholder="Your company" />
+            </label>
+          ) : null}
           <label className="contact-form-field">
             <span>Email</span>
             <input type="email" name="email" required placeholder="you@company.com" />
