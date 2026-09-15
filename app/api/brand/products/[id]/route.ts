@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireBrandSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
 import { isTrustedBlobUrl } from "@/lib/blob";
+import { createCertificatesAndClaims, type CertificateInput, type ClaimInput } from "@/lib/product-submission";
 
 type PatchBody = {
   name?: string;
@@ -10,9 +11,9 @@ type PatchBody = {
   subcategory?: string;
   description?: string;
   images?: { url: string; altText?: string }[];
-  claims?: { label: string; evidence?: string }[];
+  claims?: ClaimInput[];
   ingredients?: { name: string; note?: string }[];
-  certificates?: { title: string; docType: string; fileUrl: string; mimeType?: string }[];
+  certificates?: CertificateInput[];
 };
 
 const DOC_TYPES = new Set(["CERTIFICATE", "LAB_REPORT", "INGREDIENT_LIST", "SOURCING_PROOF", "OTHER"]);
@@ -77,7 +78,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     await tx.ingredient.deleteMany({ where: { productId: id } });
     await tx.certificate.deleteMany({ where: { productId: id } });
 
-    return tx.product.update({
+    const updated = await tx.product.update({
       where: { id },
       data: {
         name: clamp(body.name!, 200),
@@ -94,28 +95,18 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             position: index,
           })),
         },
-        claims: {
-          create: claims.map((claim) => ({
-            label: clamp(claim.label, 300),
-            evidence: claim.evidence?.trim() ? clamp(claim.evidence, 2000) : null,
-          })),
-        },
         ingredients: {
           create: ingredients.map((ingredient) => ({
             name: clamp(ingredient.name, 200),
             note: ingredient.note?.trim() ? clamp(ingredient.note, 1000) : null,
           })),
         },
-        certificates: {
-          create: certificates.map((cert) => ({
-            title: clamp(cert.title, 300),
-            fileUrl: cert.fileUrl,
-            docType: cert.docType as never,
-            mimeType: cert.mimeType,
-          })),
-        },
       },
     });
+
+    await createCertificatesAndClaims(tx, id, certificates, claims);
+
+    return updated;
   });
 
   await logAudit({

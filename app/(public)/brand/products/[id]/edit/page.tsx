@@ -13,7 +13,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     include: {
       category: true,
       images: { orderBy: { position: "asc" } },
-      claims: true,
+      claims: { include: { certificates: true } },
       ingredients: true,
       certificates: true,
     },
@@ -54,7 +54,16 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
             docType: c.docType,
             fileUrl: c.fileUrl,
             mimeType: c.mimeType ?? "",
+            issuer: c.issuer ?? "",
+            testDate: c.testDate ? c.testDate.toISOString().slice(0, 10) : "",
+            testType: c.testType ?? "",
+            testScope: c.testScope ?? "",
+            summary: c.reviewNote ?? "",
+            isPublic: c.isPublic,
           })),
+          claimCertificateLinks: Object.fromEntries(
+            product.claims.map((c) => [c.id, c.certificates.map((cert) => cert.id)]),
+          ),
         }}
       />
     </>

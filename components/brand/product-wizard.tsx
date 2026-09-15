@@ -14,7 +14,20 @@ type ImageItem = { id: string; url: string; altText: string; uploading: boolean 
 type ClaimItem = { id: string; label: string; evidence: string };
 type IngredientItem = { id: string; name: string; note: string };
 type DocType = "CERTIFICATE" | "LAB_REPORT" | "INGREDIENT_LIST" | "SOURCING_PROOF" | "OTHER";
-type DocumentItem = { id: string; title: string; docType: DocType; fileUrl: string; mimeType: string; uploading: boolean };
+type DocumentItem = {
+  id: string;
+  title: string;
+  docType: DocType;
+  fileUrl: string;
+  mimeType: string;
+  uploading: boolean;
+  issuer: string;
+  testDate: string;
+  testType: string;
+  testScope: string;
+  summary: string;
+  isPublic: boolean;
+};
 
 const DOC_TYPE_OPTIONS: { value: DocType; label: string }[] = [
   { value: "CERTIFICATE", label: "Certification" },
@@ -24,7 +37,7 @@ const DOC_TYPE_OPTIONS: { value: DocType; label: string }[] = [
   { value: "OTHER", label: "Other" },
 ];
 
-const STEPS = ["Product Information", "Claims", "Ingredients", "Documents", "Review"] as const;
+const STEPS = ["Product Information", "Claims", "Ingredients", "Documents", "Link Evidence", "Review"] as const;
 
 function newId() {
   return Math.random().toString(36).slice(2);
@@ -38,7 +51,20 @@ export type ProductWizardInitialValues = {
   images: { id: string; url: string; altText: string }[];
   claims: { id: string; label: string; evidence: string }[];
   ingredients: { id: string; name: string; note: string }[];
-  documents: { id: string; title: string; docType: DocType; fileUrl: string; mimeType: string }[];
+  documents: {
+    id: string;
+    title: string;
+    docType: DocType;
+    fileUrl: string;
+    mimeType: string;
+    issuer?: string;
+    testDate?: string;
+    testType?: string;
+    testScope?: string;
+    summary?: string;
+    isPublic?: boolean;
+  }[];
+  claimCertificateLinks?: Record<string, string[]>;
 };
 
 type ProductWizardProps = {
@@ -67,7 +93,19 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
   );
   const [ingredients, setIngredients] = useState<IngredientItem[]>(initialValues?.ingredients ?? []);
   const [documents, setDocuments] = useState<DocumentItem[]>(
-    (initialValues?.documents ?? []).map((doc) => ({ ...doc, uploading: false })),
+    (initialValues?.documents ?? []).map((doc) => ({
+      ...doc,
+      uploading: false,
+      issuer: doc.issuer ?? "",
+      testDate: doc.testDate ?? "",
+      testType: doc.testType ?? "",
+      testScope: doc.testScope ?? "",
+      summary: doc.summary ?? "",
+      isPublic: doc.isPublic ?? true,
+    })),
+  );
+  const [claimCertificateLinks, setClaimCertificateLinks] = useState<Record<string, string[]>>(
+    initialValues?.claimCertificateLinks ?? {},
   );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -140,17 +178,36 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
     }
 
     const readyImages = images.filter((img) => img.url);
+    const attachedDocuments = documents.filter((doc) => doc.fileUrl);
     const payload = {
       name,
       category,
       subcategory,
       description,
       images: readyImages.map((img) => ({ url: img.url, altText: img.altText })),
-      claims: claims.filter((claim) => claim.label.trim()).map((claim) => ({ label: claim.label, evidence: claim.evidence })),
+      claims: claims
+        .filter((claim) => claim.label.trim())
+        .map((claim) => ({
+          label: claim.label,
+          evidence: claim.evidence,
+          linkedDocumentIds: (claimCertificateLinks[claim.id] ?? []).filter((docId) =>
+            attachedDocuments.some((doc) => doc.id === docId),
+          ),
+        })),
       ingredients: ingredients.filter((i) => i.name.trim()).map((i) => ({ name: i.name, note: i.note })),
-      certificates: documents
-        .filter((doc) => doc.fileUrl)
-        .map((doc) => ({ title: doc.title || doc.docType, docType: doc.docType, fileUrl: doc.fileUrl, mimeType: doc.mimeType })),
+      certificates: attachedDocuments.map((doc) => ({
+        localId: doc.id,
+        title: doc.title || doc.docType,
+        docType: doc.docType,
+        fileUrl: doc.fileUrl,
+        mimeType: doc.mimeType,
+        issuer: doc.issuer,
+        testDate: doc.testDate,
+        testType: doc.testType,
+        testScope: doc.testScope,
+        reviewNote: doc.summary,
+        isPublic: doc.isPublic,
+      })),
     };
 
     setSubmitting(true);
@@ -378,39 +435,90 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
         <Card className="p-6">
           <p className="text-sm leading-relaxed text-muted-foreground">
             Attach certificates, lab reports, or sourcing proof supporting your claims. Optional here — you can also
-            upload documents later from the Documents page.
+            upload documents later from the Documents page. The details below appear on the public product page, so
+            customers can see what backs up your claims — an admin can refine any of it before your product goes live.
           </p>
-          <div className="mt-5 grid gap-3">
+          <div className="mt-5 grid gap-4">
             {documents.map((doc) => (
-              <div key={doc.id} className="grid gap-3 rounded-lg border border-border bg-muted/30 p-4 md:grid-cols-[1fr_1fr_1.2fr_auto]">
-                <input
-                  value={doc.title}
-                  onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, title: event.target.value } : d)))}
-                  placeholder="Document title"
-                  className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
-                />
-                <select
-                  value={doc.docType}
-                  onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, docType: event.target.value as DocType } : d)))}
-                  className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
-                >
-                  {DOC_TYPE_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="file"
-                  accept="application/pdf,image/jpeg,image/png,image/webp"
-                  onChange={(event) => handleDocumentFileSelect(doc.id, event.target.files?.[0] ?? null)}
-                  className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm outline-none"
-                />
-                <Button type="button" variant="outline" onClick={() => setDocuments((prev) => prev.filter((d) => d.id !== doc.id))}>
-                  Remove
-                </Button>
-                {doc.uploading ? <p className="text-xs text-muted-foreground md:col-span-4">Uploading...</p> : null}
-                {doc.fileUrl && !doc.uploading ? <p className="text-xs font-semibold text-primary md:col-span-4">File attached</p> : null}
+              <div key={doc.id} className="grid gap-3 rounded-lg border border-border bg-muted/30 p-4">
+                <div className="grid gap-3 md:grid-cols-[1fr_1fr_1.2fr_auto]">
+                  <input
+                    value={doc.title}
+                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, title: event.target.value } : d)))}
+                    placeholder="Document title"
+                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+                  />
+                  <select
+                    value={doc.docType}
+                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, docType: event.target.value as DocType } : d)))}
+                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+                  >
+                    {DOC_TYPE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="file"
+                    accept="application/pdf,image/jpeg,image/png,image/webp"
+                    onChange={(event) => handleDocumentFileSelect(doc.id, event.target.files?.[0] ?? null)}
+                    className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm outline-none"
+                  />
+                  <Button type="button" variant="outline" onClick={() => setDocuments((prev) => prev.filter((d) => d.id !== doc.id))}>
+                    Remove
+                  </Button>
+                </div>
+                {doc.uploading ? <p className="text-xs text-muted-foreground">Uploading...</p> : null}
+                {doc.fileUrl && !doc.uploading ? <p className="text-xs font-semibold text-primary">File attached</p> : null}
+
+                <div className="grid gap-3 border-t border-border pt-3 md:grid-cols-2">
+                  <input
+                    value={doc.issuer}
+                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, issuer: event.target.value } : d)))}
+                    placeholder="Testing organization (e.g. SGS India)"
+                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+                  />
+                  <input
+                    type="date"
+                    value={doc.testDate}
+                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, testDate: event.target.value } : d)))}
+                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+                  />
+                  <input
+                    value={doc.testType}
+                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, testType: event.target.value } : d)))}
+                    placeholder="Test type (e.g. In-vitro Study)"
+                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+                  />
+                  <input
+                    value={doc.testScope}
+                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, testScope: event.target.value } : d)))}
+                    placeholder="Test scope (e.g. Skin brightness evaluation)"
+                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+                  />
+                  <textarea
+                    value={doc.summary}
+                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, summary: event.target.value } : d)))}
+                    placeholder="Plain-language summary of the findings, shown on the public product page"
+                    rows={2}
+                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring md:col-span-2"
+                  />
+                  <label className="flex items-center gap-2 text-sm font-medium md:col-span-2">
+                    <input
+                      type="checkbox"
+                      checked={doc.isPublic}
+                      onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, isPublic: event.target.checked } : d)))}
+                      className="size-4 rounded border-input"
+                    />
+                    <span>Public — let customers view/download the original file</span>
+                  </label>
+                  {!doc.isPublic ? (
+                    <p className="text-xs text-muted-foreground md:col-span-2">
+                      Private: customers only see the summary above, never the original file.
+                    </p>
+                  ) : null}
+                </div>
               </div>
             ))}
           </div>
@@ -418,7 +526,25 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
             type="button"
             variant="outline"
             className="mt-3"
-            onClick={() => setDocuments((prev) => [...prev, { id: newId(), title: "", docType: "CERTIFICATE", fileUrl: "", mimeType: "", uploading: false }])}
+            onClick={() =>
+              setDocuments((prev) => [
+                ...prev,
+                {
+                  id: newId(),
+                  title: "",
+                  docType: "CERTIFICATE",
+                  fileUrl: "",
+                  mimeType: "",
+                  uploading: false,
+                  issuer: "",
+                  testDate: "",
+                  testType: "",
+                  testScope: "",
+                  summary: "",
+                  isPublic: true,
+                },
+              ])
+            }
           >
             Add Document
           </Button>
@@ -426,6 +552,56 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
       ) : null}
 
       {step === 4 ? (
+        <Card className="p-6">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            For each claim, pick which of the documents you just uploaded support it. Customers will see this link on
+            the product page — optional, but claims backed by a document build more trust than a claim alone.
+          </p>
+          <div className="mt-5 grid gap-4">
+            {claims.filter((claim) => claim.label.trim()).length === 0 ? (
+              <p className="text-sm text-muted-foreground">Add a claim in the Claims step to link evidence to it.</p>
+            ) : null}
+            {claims
+              .filter((claim) => claim.label.trim())
+              .map((claim) => {
+                const attachedDocs = documents.filter((doc) => doc.fileUrl);
+                const linked = claimCertificateLinks[claim.id] ?? [];
+                return (
+                  <div key={claim.id} className="rounded-lg border border-border bg-muted/30 p-4">
+                    <p className="text-sm font-semibold text-foreground">{claim.label}</p>
+                    {attachedDocs.length === 0 ? (
+                      <p className="mt-2 text-xs text-muted-foreground">No documents uploaded yet — add one in the Documents step.</p>
+                    ) : (
+                      <div className="mt-2 grid gap-1.5">
+                        {attachedDocs.map((doc) => (
+                          <label key={doc.id} className="flex items-center gap-2 text-sm">
+                            <input
+                              type="checkbox"
+                              checked={linked.includes(doc.id)}
+                              onChange={(event) =>
+                                setClaimCertificateLinks((prev) => {
+                                  const current = prev[claim.id] ?? [];
+                                  const next = event.target.checked
+                                    ? [...current, doc.id]
+                                    : current.filter((id) => id !== doc.id);
+                                  return { ...prev, [claim.id]: next };
+                                })
+                              }
+                              className="size-4 rounded border-input"
+                            />
+                            <span>{doc.title || doc.docType}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
+        </Card>
+      ) : null}
+
+      {step === 5 ? (
         <Card className="p-6">
           <p className="text-sm font-semibold text-foreground">Review before submitting</p>
           <div className="mt-4 grid gap-4">
@@ -438,9 +614,15 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Claims</p>
               <div className="mt-1.5 flex flex-wrap gap-1.5">
-                {claims.filter((c) => c.label.trim()).map((c) => (
-                  <Badge key={c.id} variant="outline">{c.label}</Badge>
-                ))}
+                {claims.filter((c) => c.label.trim()).map((c) => {
+                  const linkedCount = (claimCertificateLinks[c.id] ?? []).length;
+                  return (
+                    <Badge key={c.id} variant="outline">
+                      {c.label}
+                      {linkedCount > 0 ? ` · ${linkedCount} document${linkedCount === 1 ? "" : "s"}` : ""}
+                    </Badge>
+                  );
+                })}
                 {claims.filter((c) => c.label.trim()).length === 0 ? <p className="text-sm text-muted-foreground">No claims added.</p> : null}
               </div>
             </div>

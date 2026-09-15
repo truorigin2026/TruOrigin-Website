@@ -4,6 +4,7 @@ import { requireBrandSession } from "@/lib/api-auth";
 import { slugify } from "@/lib/auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
 import { isTrustedBlobUrl } from "@/lib/blob";
+import { createCertificatesAndClaims, type CertificateInput, type ClaimInput } from "@/lib/product-submission";
 
 type SubmitBody = {
   name?: string;
@@ -11,9 +12,9 @@ type SubmitBody = {
   subcategory?: string;
   description?: string;
   images?: { url: string; altText?: string }[];
-  claims?: { label: string; evidence?: string }[];
+  claims?: ClaimInput[];
   ingredients?: { name: string; note?: string }[];
-  certificates?: { title: string; docType: string; fileUrl: string; mimeType?: string }[];
+  certificates?: CertificateInput[];
 };
 
 const DOC_TYPES = new Set(["CERTIFICATE", "LAB_REPORT", "INGREDIENT_LIST", "SOURCING_PROOF", "OTHER"]);
@@ -67,44 +68,36 @@ export async function POST(request: NextRequest) {
     create: { name: body.category.trim() },
   });
 
-  const product = await prisma.product.create({
-    data: {
-      slug,
-      name: clamp(body.name, 200),
-      brand: { connect: { id: session.brandId } },
-      category: { connect: { id: category.id } },
-      subcategory: body.subcategory?.trim() ? clamp(body.subcategory, 200) : null,
-      description: body.description?.trim() ? clamp(body.description, 5000) : null,
-      status: "SUBMITTED",
-      submittedAt: new Date(),
-      images: {
-        create: images.map((image, index) => ({
-          url: image.url,
-          altText: image.altText?.trim() ? clamp(image.altText, 300) : null,
-          position: index,
-        })),
+  const product = await prisma.$transaction(async (tx) => {
+    const created = await tx.product.create({
+      data: {
+        slug,
+        name: clamp(body.name!, 200),
+        brand: { connect: { id: session.brandId! } },
+        category: { connect: { id: category.id } },
+        subcategory: body.subcategory?.trim() ? clamp(body.subcategory, 200) : null,
+        description: body.description?.trim() ? clamp(body.description, 5000) : null,
+        status: "SUBMITTED",
+        submittedAt: new Date(),
+        images: {
+          create: images.map((image, index) => ({
+            url: image.url,
+            altText: image.altText?.trim() ? clamp(image.altText, 300) : null,
+            position: index,
+          })),
+        },
+        ingredients: {
+          create: ingredients.map((ingredient) => ({
+            name: clamp(ingredient.name, 200),
+            note: ingredient.note?.trim() ? clamp(ingredient.note, 1000) : null,
+          })),
+        },
       },
-      claims: {
-        create: claims.map((claim) => ({
-          label: clamp(claim.label, 300),
-          evidence: claim.evidence?.trim() ? clamp(claim.evidence, 2000) : null,
-        })),
-      },
-      ingredients: {
-        create: ingredients.map((ingredient) => ({
-          name: clamp(ingredient.name, 200),
-          note: ingredient.note?.trim() ? clamp(ingredient.note, 1000) : null,
-        })),
-      },
-      certificates: {
-        create: certificates.map((cert) => ({
-          title: clamp(cert.title, 300),
-          fileUrl: cert.fileUrl,
-          docType: cert.docType as never,
-          mimeType: cert.mimeType,
-        })),
-      },
-    },
+    });
+
+    await createCertificatesAndClaims(tx, created.id, certificates, claims);
+
+    return created;
   });
 
   await logAudit({
