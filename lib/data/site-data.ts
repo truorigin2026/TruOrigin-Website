@@ -30,16 +30,23 @@ export type ProductClaim = {
   status: StatusLabel;
   requiredEvidence: string;
   evidence: string;
+  certificateIds: string[];
 };
 
 export type ProductCertificate = {
   id: string;
   title: string;
   issuer: string | null;
-  fileUrl: string;
+  // Omitted entirely (not just hidden) when the certificate is private —
+  // never sent to the client for a document the brand marked non-public.
+  fileUrl: string | null;
   docType: string;
   verified: boolean;
   reviewNote: string | null;
+  isPublic: boolean;
+  testDate: string | null;
+  testType: string | null;
+  testScope: string | null;
 };
 
 export const certificateDocTypeLabels: Record<string, string> = {

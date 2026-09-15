@@ -25,7 +25,7 @@ type DbProduct = Prisma.ProductGetPayload<{
     brand: true;
     category: true;
     images: true;
-    claims: true;
+    claims: { include: { certificates: true } };
     certificates: true;
     ingredients: true;
     originCards: true;
@@ -36,7 +36,7 @@ const productInclude = {
   brand: true,
   category: true,
   images: { orderBy: { position: "asc" as const } },
-  claims: true,
+  claims: { include: { certificates: true } },
   certificates: true,
   ingredients: { orderBy: { name: "asc" as const } },
   originCards: {
@@ -74,16 +74,24 @@ function mapDbProduct(product: DbProduct): ProductRecord {
     status: claimStatusMap[claim.status],
     requiredEvidence: claim.label,
     evidence: claim.evidence ?? "",
+    certificateIds: claim.certificates.map((certificate) => certificate.id),
   }));
 
+  // fileUrl is only ever included for a Public certificate — a Private
+  // one's file location must never reach the client, not just be hidden
+  // in the UI, so this omission happens here at the data layer.
   const certificates = product.certificates.map((certificate) => ({
     id: certificate.id,
     title: certificate.title,
     issuer: certificate.issuer,
-    fileUrl: certificate.fileUrl,
+    fileUrl: certificate.isPublic ? certificate.fileUrl : null,
     docType: certificate.docType,
     verified: certificate.verified,
     reviewNote: certificate.reviewNote,
+    isPublic: certificate.isPublic,
+    testDate: certificate.testDate ? formatDate(certificate.testDate) : null,
+    testType: certificate.testType,
+    testScope: certificate.testScope,
   }));
 
   const ingredients = (product.ingredients ?? []).map((ingredient) => ({
@@ -128,6 +136,7 @@ function mapDbProduct(product: DbProduct): ProductRecord {
               status: "No Evidence Submitted",
               requiredEvidence: "Supporting documents",
               evidence: "No claim evidence has been linked yet.",
+              certificateIds: [],
             },
           ],
     certificates,
