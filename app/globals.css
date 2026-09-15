@@ -10697,6 +10697,7 @@ a.contact-method-value:hover {
   padding: 0;
   position: relative;
   isolation: isolate;
+  overflow-x: hidden;
 }
 
 .brands-hero-shell {
@@ -10856,7 +10857,7 @@ a.contact-method-value:hover {
   inset: -1px;
   z-index: 1;
   border-radius: inherit;
-  background: #123a25;
+  background: #4caf50;
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
@@ -11664,7 +11665,8 @@ a.contact-method-value:hover {
 
   .brands-hero-card,
   .products-hero-card-premium {
-    min-height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
     border-radius: 0;
   }
 
