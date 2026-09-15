@@ -14,7 +14,6 @@ export const productNavItems = [
 export const landingNavItems = [
   { href: "/for-brands/home", label: "Home" },
   { href: "/for-brands/how-it-works", label: "How It Works" },
-  { href: "/for-brands/industries", label: "Industries" },
   { href: "/for-brands/benefits", label: "Benefits" },
   { href: "/for-brands/resources", label: "Resources" },
   { href: "/for-brands/about", label: "About" },

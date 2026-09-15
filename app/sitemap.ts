@@ -14,7 +14,6 @@ const staticRoutes: StaticRoute[] = [
   { path: "/for-brands/about", changeFrequency: "monthly", priority: 0.6 },
   { path: "/for-brands/how-it-works", changeFrequency: "monthly", priority: 0.7 },
   { path: "/for-brands/benefits", changeFrequency: "monthly", priority: 0.7 },
-  { path: "/for-brands/industries", changeFrequency: "monthly", priority: 0.6 },
   { path: "/for-brands/resources", changeFrequency: "weekly", priority: 0.6 },
   { path: "/for-brands/resources/blog", changeFrequency: "weekly", priority: 0.6 },
   { path: "/for-brands/resources/faq", changeFrequency: "monthly", priority: 0.5 },
