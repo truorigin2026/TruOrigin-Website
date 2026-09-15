@@ -4112,6 +4112,8 @@ a.contact-method-value:hover {
 
 .contact-form-field input,
 .contact-form-field textarea {
+  width: 100%;
+  min-width: 0;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: #ffffff;
@@ -5338,6 +5340,19 @@ a.contact-method-value:hover {
   -webkit-backdrop-filter: blur(18px);
   box-shadow: 0 20px 48px rgba(6, 16, 10, 0.24);
   color: #ffffff;
+}
+
+@media (max-width: 639px) {
+  .support-contact-form .contact-form-card {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+    padding: 24px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
 }
 
 .support-contact-form .contact-form-title {
