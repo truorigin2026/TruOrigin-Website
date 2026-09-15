@@ -8844,6 +8844,10 @@ a.contact-method-value:hover {
     margin-bottom: 220px;
     padding: 28px 24px;
   }
+
+  .brands-why-card p {
+    text-align: left;
+  }
 }
 
 @media (max-width: 480px) {
@@ -9014,7 +9018,7 @@ a.contact-method-value:hover {
     font-size: clamp(1.2rem, 5.4vw, 1.6rem);
     line-height: 1.25;
     margin-bottom: 10px;
-    text-align: center;
+    text-align: left;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -9028,6 +9032,7 @@ a.contact-method-value:hover {
     overflow: hidden;
     font-size: 15px;
     line-height: 1.55;
+    text-align: left;
   }
 
   .brands-advantage-dots {
@@ -13514,6 +13519,12 @@ a.contact-method-value:hover {
   overflow: hidden;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+}
+
+@media (max-width: 767px) {
+  .brands-phone-card-body {
+    text-align: left;
+  }
 }
 
 @media (min-width: 768px) {
