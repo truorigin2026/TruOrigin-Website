@@ -44,6 +44,17 @@ export const landingNavGroups: readonly NavGroup[] = [
   },
 ] as const;
 
+export const socialLinks = [
+  { href: "https://x.com/truoriginco?s=11", label: "X / Twitter", icon: "/images/icons/x.svg" },
+  { href: "https://www.linkedin.com/company/truorigin/", label: "LinkedIn", icon: "/images/icons/linkedin.svg" },
+  {
+    href: "https://www.instagram.com/truoriginco?igsi=MWF1ZTNyYW9kcDdkeQ%3D%3D&utm_source=qr",
+    label: "Instagram",
+    icon: "/images/icons/instagram.svg",
+  },
+  { href: "https://www.facebook.com/share/185ueh1f52/?mibextid=wwXIfr", label: "Facebook", icon: "/images/icons/facebook.svg" },
+] as const;
+
 export const productFilterCategories = [
   "All Products",
   "Skincare",

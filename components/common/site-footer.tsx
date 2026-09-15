@@ -1,11 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/images/logos/TruOrigin-footer.png";
-import facebookIcon from "../../public/images/icons/facebook.svg";
-import xIcon from "../../public/images/icons/x.svg";
-import instagramIcon from "../../public/images/icons/instagram.svg";
-import linkedinIcon from "../../public/images/icons/linkedin.svg";
 import trademarkLogo from "../../public/images/trademark-LOGO.png";
+import { socialLinks } from "@/lib/data/frontend-data";
 
 const brandLinks = [
   ["Home", "/for-brands/home"],
@@ -31,17 +28,6 @@ const legalLinks = [
   ["Privacy Policy", "/privacy"],
   ["Disclaimer", "/disclaimer"],
 ] as const;
-
-const socialLinks = [
-  { href: "https://x.com/truoriginco?s=11", label: "X / Twitter", icon: xIcon },
-  { href: "https://www.linkedin.com/company/truorigin/", label: "LinkedIn", icon: linkedinIcon },
-  {
-    href: "https://www.instagram.com/truoriginco?igsi=MWF1ZTNyYW9kcDdkeQ%3D%3D&utm_source=qr",
-    label: "Instagram",
-    icon: instagramIcon,
-  },
-  { href: "https://www.facebook.com/share/185ueh1f52/?mibextid=wwXIfr", label: "Facebook", icon: facebookIcon },
-];
 
 export function SiteFooter() {
   return (

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Check, Mail } from "lucide-react";
+import { Check } from "lucide-react";
 import { ContactForm } from "@/components/brands/contact-form";
 import { ContactMethod } from "@/components/ui/contact-method";
+import { SocialLinks } from "@/components/ui/social-links";
 import { FaqAccordion } from "@/components/products/faq-accordion";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { FadeIn } from "@/components/motion";
@@ -74,12 +75,11 @@ export default function ForProductsSupportPage() {
                     ))}
                   </ul>
                   <div className="contact-method-row">
-                    <ContactMethod
-                      icon={Mail}
-                      label="Email"
-                      value="info@truorigin.in"
-                      href="mailto:info@truorigin.in"
-                    />
+                    <ContactMethod label="Email" value="info@truorigin.in" href="mailto:info@truorigin.in" />
+                    <div className="contact-method">
+                      <p className="contact-method-label">Social media:</p>
+                      <SocialLinks />
+                    </div>
                   </div>
                 </div>
               </FadeIn>

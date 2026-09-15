@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { Mail } from "lucide-react";
 import { ContactForm } from "@/components/brands/contact-form";
 import { ContactMethod } from "@/components/ui/contact-method";
+import { SocialLinks } from "@/components/ui/social-links";
 import { FadeIn } from "@/components/motion";
 import { pageMetadata } from "@/lib/seo";
 
@@ -44,7 +44,11 @@ export default function ForBrandsContactPage() {
                   catalog? Our team replies within one business day.
                 </p>
                 <div className="contact-method-row">
-                  <ContactMethod icon={Mail} label="Email" value="info@truorigin.in" href="mailto:info@truorigin.in" />
+                  <ContactMethod label="Email" value="info@truorigin.in" href="mailto:info@truorigin.in" />
+                  <div className="contact-method">
+                    <p className="contact-method-label">Social media:</p>
+                    <SocialLinks />
+                  </div>
                 </div>
               </div>
             </FadeIn>
