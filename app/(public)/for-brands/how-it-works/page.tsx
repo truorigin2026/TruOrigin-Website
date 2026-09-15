@@ -156,7 +156,7 @@ export default function ForBrandsHowItWorksPage() {
         <div className="container-shell">
           <SectionHeading
             eyebrow="The System"
-            title="Three connected layers, one source of truth"
+            title="Three connected layers, "
             centered
           />
           <div className="hiw-system-grid">

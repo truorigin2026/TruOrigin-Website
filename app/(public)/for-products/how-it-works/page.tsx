@@ -36,6 +36,7 @@ const consumerBenefits = [
   "Explore product details in one place",
   "Understand claims, ingredients, documents & specifications",
   "Discover information before making a choice",
+  "Find what matters, without the clutter",
 ];
 
 const brandBenefits = [

@@ -66,27 +66,27 @@ export const quickVerifySteps = [
 
 export const brandAdvantages = [
   {
-    title: "Real Engagement Insights                  ",
+    title: "Turn Product Interactions Into Actionable Insights",
     description:
-      "See exactly how customers interact with every product across every market you sell in. Track scan volumes, geography, and repeat verifications from one dashboard. Spot which claims get checked most often and where questions still linger. Compare performance across SKUs, batches, and regions over time. Decisions are backed by real behavior, not guesswork.",
+      "Track OriginCard scans, discover which product information gets the most attention, compare engagement across products and markets, and use real customer interaction data to improve how your products are presented.",
     icon: "chart",
   },
   {
-    title: "Customers Who Actually Understand",
+    title: "Customers Who Understand Your Product",
     description:
-      "Every OriginCard presents ingredients, origin, and certifications the same clear way every time. Customers no longer have to dig through packaging or hunt for fine print to find what matters. Complex sourcing and lab data are translated into a simple, guided digital experience. Shoppers walk away understanding exactly what they bought and why it matters. That clarity builds confidence long before the next purchase decision.",
+      "OriginCard brings your product claims, ingredients, certifications, and supporting information together in one clear place. Customers can easily access the information they need without searching across packaging, PDFs, websites, and other sources.",
     icon: "eye",
   },
   {
     title: "One Place For Every Record",
     description:
-      "Specs, certifications, lab reports, and claims live in a single structured OriginCard instead of scattered files and inboxes. Every document is versioned, dated, and tied directly to the product it belongs to. When formulas change or certifications renew, the record updates instead of multiplying. Your team always knows exactly where the current truth lives. Auditors, partners, and customers all see the same shared source.",
+      "Product claims, ingredients, certifications, supporting evidence, and product documents are brought together in one structured place. OriginCard keeps product information organized and accessible, so your team can manage what is presented to customers and keep information up to date as products change.",
     icon: "database",
   },
   {
-    title: "Defend Claims, Decide Faster",
+    title: "Organize Claims, Access Information Faster",
     description:
-      "When a claim is challenged, the documentation is already attached, dated, and ready to show. There is no scramble through email threads or shared drives to find the right document. That same structured data reveals patterns across products, batches, and markets. Your team can spot what is working and what needs attention sooner. Faster answers mean faster, more confident decisions.",
+      "When a claim needs supporting information, OriginCard brings the relevant documentation together in one place. Your team can quickly find the information associated with each product claim, making it easier to review, present, and update product information when needed.",
     icon: "scale",
   },
 ] as const;
@@ -155,7 +155,7 @@ export const originCardFeatures = [
   },
   {
     title: "QR Access",
-    description: "A scannable QR code that opens the product's OriginCard instantly.",
+    description: "A scannable QR code that opens the product's OriginCard instantly. ",
     icon: "/images/for-brands/features/feature-qr.webp",
   },
   {
@@ -169,23 +169,23 @@ export const originCardFeatures = [
     icon: "/images/for-brands/features/feature-certifications.webp",
   },
   {
-    title: "Lab Reports",
-    description: "Attach testing results and quality documentation directly to each product.",
+    title: "Supporting Documents",
+    description: "Attach supporting documents directly to each product.",
     icon: "/images/for-brands/features/feature-lab-reports.webp",
   },
   {
-    title: "Product Updates",
-    description: "Keep product details current as formulations, certifications, and documents change.",
+    title: "Product Information",
+    description: "Keep product information current as product details and documents change.",
     icon: "/images/for-brands/features/feature-batch.webp",
   },
   {
-    title: "Brand Story",
-    description: "Tell your brand's story and values to build connection with customers.",
+    title: "Product Content",
+    description: "Add product details, descriptions, and information for customers.",
     icon: "/images/for-brands/features/feature-story.webp",
   },
   {
-    title: "Analytics Dashboard",
-    description: "Track scans, engagement, and review trends across your product line.",
+    title: "Customer Insights",
+    description: "Understand how customers interact with your product information.",
     icon: "/images/for-brands/features/feature-analytics.webp",
   },
 ] as const;
