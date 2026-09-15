@@ -166,8 +166,8 @@ export default async function AdminProductDetailPage({ params }: { params: Promi
             </CardHeader>
             <CardContent className="grid gap-3">
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Documents stay confidential — only the plain-language note is ever shown to customers, on the
-                product&apos;s public Documents tab, in place of the file itself.
+                Public documents let customers view/download the original file; Private documents only ever show
+                the plain-language summary on the product page, never the file itself.
               </p>
               {product.certificates.map((certificate) => (
                 <CertificateReviewForm key={certificate.id} certificate={certificate} />

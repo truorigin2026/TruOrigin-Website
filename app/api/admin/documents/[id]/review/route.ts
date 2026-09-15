@@ -3,7 +3,19 @@ import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
 
-type Body = { verified?: boolean; reviewNote?: string };
+type Body = {
+  verified?: boolean;
+  reviewNote?: string;
+  isPublic?: boolean;
+  issuer?: string;
+  testDate?: string;
+  testType?: string;
+  testScope?: string;
+};
+
+function clamp(value: string, maxLength: number) {
+  return value.trim().slice(0, maxLength);
+}
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdminSession(request);
@@ -22,7 +34,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     where: { id },
     data: {
       verified: Boolean(body?.verified),
-      reviewNote: body?.reviewNote?.trim() || null,
+      reviewNote: body?.reviewNote?.trim() ? clamp(body.reviewNote, 2000) : null,
+      isPublic: body?.isPublic ?? certificate.isPublic,
+      issuer: body?.issuer?.trim() ? clamp(body.issuer, 200) : null,
+      testDate: body?.testDate ? new Date(body.testDate) : null,
+      testType: body?.testType?.trim() ? clamp(body.testType, 200) : null,
+      testScope: body?.testScope?.trim() ? clamp(body.testScope, 300) : null,
     },
   });
 

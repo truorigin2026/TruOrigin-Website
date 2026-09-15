@@ -24,7 +24,7 @@ export default async function ReviewDetailPage({ params }: { params: Promise<{ i
     include: {
       brand: true,
       category: true,
-      claims: true,
+      claims: { include: { certificates: true } },
       images: { orderBy: { position: "asc" } },
       certificates: true,
       ingredients: true,
@@ -76,7 +76,14 @@ export default async function ReviewDetailPage({ params }: { params: Promise<{ i
               {product.claims.map((claim) => (
                 <div key={claim.id} className="rounded-lg border border-border bg-muted/50 px-4 py-3">
                   <p className="text-sm font-semibold text-foreground">{claim.label}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{claim.evidence || "No evidence note linked yet."}</p>
+                  {claim.certificates.length > 0 ? (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Linked to: {claim.certificates.map((cert) => cert.title).join(", ")}
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-sm text-muted-foreground">No document linked yet.</p>
+                  )}
+                  {claim.evidence ? <p className="mt-1 text-sm text-muted-foreground">{claim.evidence}</p> : null}
                 </div>
               ))}
             </CardContent>
@@ -136,7 +143,9 @@ export default async function ReviewDetailPage({ params }: { params: Promise<{ i
                 <div key={doc.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-muted/50 px-4 py-3">
                   <div>
                     <p className="text-sm font-semibold text-foreground">{doc.title}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{doc.docType.replaceAll("_", " ")}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {doc.docType.replaceAll("_", " ")} • {doc.isPublic ? "Public" : "Private"}
+                    </p>
                   </div>
                   <a href={`/api/admin/documents/${doc.id}/download`} className="text-sm font-medium text-primary hover:underline">
                     Download
