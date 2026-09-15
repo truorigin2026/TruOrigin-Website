@@ -4984,31 +4984,34 @@ a.contact-method-value:hover {
   color: var(--muted);
 }
 
-/* Ingredient chips (accordion panel) */
-.ingredient-chip-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 10px;
+/* Ingredient list (row style, matching claim-list / detail-cert-summary-list) */
+.ingredient-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
 }
 
-.ingredient-chip {
+.ingredient-row {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: #f8fbf9;
-  border: 1px solid var(--line);
+  gap: 2px;
+  padding: 14px 2px;
+  border-bottom: 1px solid rgba(18, 58, 37, 0.08);
 }
 
-.ingredient-chip-name {
-  font-size: 13.5px;
+.ingredient-row:last-child {
+  border-bottom: none;
+}
+
+.ingredient-row-name {
+  font-size: 15px;
   font-weight: 700;
+  line-height: 1.3;
   color: var(--foreground);
 }
 
-.ingredient-chip-note {
-  font-size: 12px;
+.ingredient-row-note {
+  font-size: 13px;
   line-height: 1.5;
   color: var(--muted);
 }

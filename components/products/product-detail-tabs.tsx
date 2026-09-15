@@ -312,14 +312,14 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
             <div className="detail-section-card">
               <h2>Ingredients</h2>
               {ingredients.length > 0 ? (
-                <div className="ingredient-chip-grid">
+                <ul className="ingredient-list">
                   {ingredients.map((ingredient) => (
-                    <article key={ingredient.id} className="ingredient-chip">
-                      <span className="ingredient-chip-name">{ingredient.name}</span>
-                      {ingredient.note ? <span className="ingredient-chip-note">{ingredient.note}</span> : null}
-                    </article>
+                    <li key={ingredient.id} className="ingredient-row">
+                      <span className="ingredient-row-name">{ingredient.name}</span>
+                      {ingredient.note ? <span className="ingredient-row-note">{ingredient.note}</span> : null}
+                    </li>
                   ))}
-                </div>
+                </ul>
               ) : (
                 <p className="detail-muted">No ingredient list has been added for this product yet.</p>
               )}
