@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { AssetImage } from "@/components/brands/asset-image";
 import { FadeIn } from "@/components/motion";
@@ -13,6 +13,26 @@ type QuickStep = {
 };
 
 type StackPoint = [scrollX: number, scale: number, y: number, opacity: number, x: number, rotate: number];
+
+// Local to this section: the pinned photo-stack below drives up to five
+// scroll-linked transforms per step every scroll frame, which is too heavy
+// to feel smooth on phones. Below this breakpoint (matches this section's
+// own mobile CSS) we swap to a plain swipeable carousel instead of
+// scroll-jacking — same technique BrandsAdvantageSection already uses for
+// its own pinned crossfade.
+function useIsMobileVerify() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 860px)");
+    const update = () => setIsMobile(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, []);
+
+  return isMobile;
+}
 
 function VerifyPhoto({
   step,
@@ -78,6 +98,10 @@ export function BrandsQuickVerifySection({ steps }: { steps: readonly QuickStep[
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
   const activeIndexRef = useRef(0);
   const transitions = Math.max(steps.length - 1, 1);
+  const isMobile = useIsMobileVerify();
+
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [activeCard, setActiveCard] = useState(0);
 
   const { scrollYProgress } = useScroll({
     target: pinRef,
@@ -88,8 +112,10 @@ export function BrandsQuickVerifySection({ steps }: { steps: readonly QuickStep[
   // state — this callback fires on every scroll frame, and routing it
   // through setState triggered a full re-render of this section (including
   // re-running every VerifyPhoto's useTransform chain) on each index
-  // change, which is what caused the scroll jank.
+  // change, which is what caused the scroll jank. Skipped entirely on
+  // mobile, where the steps/stack aren't rendered at all.
   useMotionValueEvent(scrollYProgress, "change", (value) => {
+    if (isMobile) return;
     const next = Math.min(steps.length - 1, Math.max(0, Math.floor(value * transitions)));
     if (activeIndexRef.current === next) return;
     stepRefs.current[activeIndexRef.current]?.classList.remove("is-active");
@@ -97,9 +123,44 @@ export function BrandsQuickVerifySection({ steps }: { steps: readonly QuickStep[
     activeIndexRef.current = next;
   });
 
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!isMobile || !el) return;
+
+    const onScroll = () => {
+      const cards = Array.from(el.children) as HTMLElement[];
+      let closest = 0;
+      let smallestDelta = Infinity;
+      cards.forEach((card, index) => {
+        const delta = Math.abs(card.offsetLeft - el.scrollLeft);
+        if (delta < smallestDelta) {
+          smallestDelta = delta;
+          closest = index;
+        }
+      });
+      setActiveCard(closest);
+    };
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [isMobile]);
+
+  const scrollToCard = (index: number) => {
+    const el = carouselRef.current;
+    const card = el?.children[index] as HTMLElement | undefined;
+    if (el && card) {
+      el.scrollTo({ left: card.offsetLeft, behavior: "smooth" });
+    }
+  };
+
   return (
     <section id="how-it-works" className="brands-section brands-verify-shell">
-      <div className="brands-verify-pin" ref={pinRef} style={{ height: `${steps.length * 100}vh` }}>
+      <div
+        className="brands-verify-pin"
+        ref={pinRef}
+        style={isMobile ? undefined : { height: `${steps.length * 100}vh` }}
+      >
         <div className="brands-verify-sticky">
           <div className="container-shell">
             <FadeIn>
@@ -113,29 +174,67 @@ export function BrandsQuickVerifySection({ steps }: { steps: readonly QuickStep[
             </FadeIn>
           </div>
 
-          <div className="container-shell brands-verify-grid">
-            <div className="brands-verify-steps">
-              {steps.map((step, index) => (
-                <div
-                  key={step.title}
-                  ref={(el) => {
-                    stepRefs.current[index] = el;
-                  }}
-                  className={`brands-verify-step${index === 0 ? " is-active" : ""}`}
-                >
-                  <span className="brands-verify-step-tag">Step 0{index + 1}</span>
-                  <h3>{step.title}</h3>
-                  <p>{step.description}</p>
-                </div>
-              ))}
-            </div>
+          {isMobile ? (
+            <>
+              <div className="brands-verify-carousel" ref={carouselRef}>
+                {steps.map((step, index) => (
+                  <article key={step.title} className="brands-verify-card">
+                    <div className="brands-verify-card-image">
+                      <AssetImage
+                        src={step.image}
+                        alt={step.title}
+                        fill
+                        className="brands-verify-card-img"
+                        priority={index === 0}
+                      />
+                    </div>
+                    <div className="brands-verify-card-body">
+                      <span className="brands-verify-step-tag">Step 0{index + 1}</span>
+                      <h3>{step.title}</h3>
+                      <p>{step.description}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              <div className="brands-verify-dots" role="tablist" aria-label="Product information steps">
+                {steps.map((step, index) => (
+                  <button
+                    key={step.title}
+                    type="button"
+                    role="tab"
+                    aria-selected={index === activeCard}
+                    aria-label={`Show step ${index + 1} of ${steps.length}`}
+                    className={`brands-verify-dot${index === activeCard ? " is-active" : ""}`}
+                    onClick={() => scrollToCard(index)}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="container-shell brands-verify-grid">
+              <div className="brands-verify-steps">
+                {steps.map((step, index) => (
+                  <div
+                    key={step.title}
+                    ref={(el) => {
+                      stepRefs.current[index] = el;
+                    }}
+                    className={`brands-verify-step${index === 0 ? " is-active" : ""}`}
+                  >
+                    <span className="brands-verify-step-tag">Step 0{index + 1}</span>
+                    <h3>{step.title}</h3>
+                    <p>{step.description}</p>
+                  </div>
+                ))}
+              </div>
 
-            <div className="brands-verify-stack">
-              {steps.map((step, index) => (
-                <VerifyPhoto key={step.title} step={step} index={index} total={steps.length} scrollYProgress={scrollYProgress} />
-              ))}
+              <div className="brands-verify-stack">
+                {steps.map((step, index) => (
+                  <VerifyPhoto key={step.title} step={step} index={index} total={steps.length} scrollYProgress={scrollYProgress} />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </section>

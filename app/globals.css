@@ -9219,41 +9219,101 @@ a.contact-method-value:hover {
 }
 
 @media (max-width: 860px) {
-  .brands-verify-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
+  .brands-verify-pin {
+    min-height: auto;
   }
 
-  .brands-verify-steps {
-    gap: 8px;
+  .brands-verify-sticky {
+    position: static;
+    height: auto;
+    overflow: visible;
+    padding-top: 0;
   }
 
-  .brands-verify-step {
-    padding: 14px 18px;
+  .brands-verify-carousel {
+    display: flex;
+    width: 100%;
+    gap: 14px;
+    padding: 20px 24px 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 24px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
 
-  .brands-verify-step h3 {
-    font-size: 1.05rem;
-    margin-top: 4px;
+  .brands-verify-carousel::-webkit-scrollbar {
+    display: none;
   }
 
-  .brands-verify-step p {
-    max-height: 0;
-    margin-top: 0;
-    font-size: 14px;
-    opacity: 0;
+  .brands-verify-card {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 82%;
+    max-width: 340px;
+    scroll-snap-align: start;
+    border-radius: 24px;
     overflow: hidden;
-    transition: max-height 0.35s ease, opacity 0.3s ease, margin-top 0.3s ease;
+    background: #173d2a;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 20px 44px rgba(3, 10, 6, 0.35);
   }
 
-  .brands-verify-step.is-active p {
-    max-height: 120px;
-    margin-top: 6px;
-    opacity: 1;
+  .brands-verify-card-image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #eef3ee;
   }
 
-  .brands-verify-stack {
-    max-width: 320px;
+  .brands-verify-card-img {
+    object-fit: cover;
+  }
+
+  .brands-verify-card-body {
+    padding: 18px 20px 22px;
+  }
+
+  .brands-verify-card-body h3 {
+    margin: 6px 0 0;
+    font-family: var(--font-playfair), "Sora", sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #ffffff;
+    text-align: left;
+  }
+
+  .brands-verify-card-body p {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: rgba(244, 255, 248, 0.8);
+    text-align: left;
+  }
+
+  .brands-verify-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .brands-verify-dot {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: rgba(76, 175, 80, 0.3);
+    transition: background-color 0.2s ease, transform 0.2s ease, width 0.2s ease;
+  }
+
+  .brands-verify-dot.is-active {
+    width: 20px;
+    border-radius: 999px;
+    background: #4caf50;
   }
 }
 
