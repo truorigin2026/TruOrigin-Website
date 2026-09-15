@@ -217,13 +217,14 @@ enum ClaimStatus {
 }
 
 model Claim {
-  id        String      @id @default(cuid())
-  product   Product     @relation(fields: [productId], references: [id])
-  productId String
-  label     String // e.g. "Organic", "Cruelty Free", "Lab Tested"
-  status    ClaimStatus @default(UNVERIFIED)
-  evidence  String? // free text or link to a Certificate
-  createdAt DateTime    @default(now())
+  id           String        @id @default(cuid())
+  product      Product       @relation(fields: [productId], references: [id])
+  productId    String
+  label        String // e.g. "Organic", "Cruelty Free", "Lab Tested"
+  status       ClaimStatus   @default(UNVERIFIED)
+  evidence     String? // supplementary free text note; used as a fallback display when no certificates are linked
+  certificates Certificate[]
+  createdAt    DateTime      @default(now())
 }
 
 model Certificate {
@@ -231,13 +232,18 @@ model Certificate {
   product    Product            @relation(fields: [productId], references: [id])
   productId  String
   title      String
-  issuer     String?
+  issuer     String? // shown publicly as "Testing Organization"
   fileUrl    String
   docType    CertificateDocType @default(OTHER)
   mimeType   String?
   expiresAt  DateTime?
   verified   Boolean            @default(false)
-  reviewNote String?
+  reviewNote String? // shown publicly as "Summary" / key findings, brand-writable at upload
+  isPublic   Boolean            @default(true)
+  testDate   DateTime?
+  testType   String?
+  testScope  String?
+  claims     Claim[]
   createdAt  DateTime           @default(now())
 }
 
