@@ -60,8 +60,6 @@ export default async function BrandProductDetailPage({ params }: { params: Promi
     notFound();
   }
 
-  const canEdit = product.status === "DRAFT" || product.status === "REJECTED";
-
   return (
     <>
       <PageHeader
@@ -77,7 +75,7 @@ export default async function BrandProductDetailPage({ params }: { params: Promi
             <CardHeader>
               <CardTitle>Overview</CardTitle>
               <CardAction>
-                <ProductEditActions productId={product.id} canEdit={canEdit} status={product.status} />
+                <ProductEditActions productId={product.id} />
               </CardAction>
             </CardHeader>
             <CardContent>

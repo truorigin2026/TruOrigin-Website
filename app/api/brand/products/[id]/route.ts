@@ -35,13 +35,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
   }
 
-  if (product.status !== "DRAFT" && product.status !== "REJECTED") {
-    return NextResponse.json(
-      { error: "This product can only be edited while it's a draft or has been rejected." },
-      { status: 400 },
-    );
-  }
-
   const body = (await request.json().catch(() => null)) as PatchBody | null;
 
   if (!body?.name?.trim()) {
@@ -64,7 +57,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "fileUrl must point to an uploaded file" }, { status: 400 });
   }
 
-  const wasRejected = product.status === "REJECTED";
+  // Editing anything past DRAFT (SUBMITTED, IN_REVIEW, APPROVED, REJECTED)
+  // sends it back through review — for an already-live product this takes
+  // it offline until an admin re-approves the change, which is also how
+  // admin finds out an edit happened: it reappears in the pending queue.
+  const needsReReview = product.status !== "DRAFT";
 
   const category = await prisma.category.upsert({
     where: { name: body.category.trim() },
@@ -85,7 +82,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         category: { connect: { id: category.id } },
         subcategory: body.subcategory?.trim() ? clamp(body.subcategory, 200) : null,
         description: body.description?.trim() ? clamp(body.description, 5000) : null,
-        ...(wasRejected
+        ...(needsReReview
           ? { status: "SUBMITTED", submittedAt: new Date(), reviewedAt: null, rejectionNote: null }
           : {}),
         images: {
@@ -111,7 +108,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   await logAudit({
     actor: session,
-    action: wasRejected ? AUDIT_ACTIONS.PRODUCT_RESUBMIT : AUDIT_ACTIONS.PRODUCT_EDIT,
+    action: needsReReview ? AUDIT_ACTIONS.PRODUCT_RESUBMIT : AUDIT_ACTIONS.PRODUCT_EDIT,
     targetType: "Product",
     targetId: id,
     targetLabel: updated.name,

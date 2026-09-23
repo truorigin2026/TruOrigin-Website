@@ -44,6 +44,7 @@ function newId() {
 }
 
 export type ProductWizardInitialValues = {
+  status?: string;
   name: string;
   category: string;
   subcategory: string;
@@ -652,6 +653,13 @@ export function ProductWizard({
             Once submitted, this product enters the TruOrigin review queue. An admin reviews your claims against the
             attached evidence before it goes live with a serial number and QR-linked OriginCard.
           </p>
+          {mode === "edit" && initialValues?.status && initialValues.status !== "DRAFT" ? (
+            <div className="mt-3 rounded-lg bg-warning-bg px-4 py-3 text-sm leading-relaxed text-warning">
+              {initialValues.status === "APPROVED"
+                ? "This product is currently live. Saving these changes will take it offline until TruOrigin reviews them again."
+                : "This product is currently pending review. Saving these changes restarts that review."}
+            </div>
+          ) : null}
         </Card>
       ) : null}
 

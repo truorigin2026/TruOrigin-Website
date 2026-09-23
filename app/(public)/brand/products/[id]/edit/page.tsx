@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { ProductWizard } from "@/components/brand/product-wizard";
 import { prisma } from "@/lib/prisma";
@@ -23,10 +23,6 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     notFound();
   }
 
-  if (product.status !== "DRAFT" && product.status !== "REJECTED") {
-    redirect(`/brand/products/${product.id}`);
-  }
-
   const categories = await prisma.category.findMany({ orderBy: { name: "asc" }, select: { name: true } });
 
   return (
@@ -41,6 +37,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         mode="edit"
         productId={product.id}
         initialValues={{
+          status: product.status,
           name: product.name,
           category: product.category.name,
           subcategory: product.subcategory ?? "",
