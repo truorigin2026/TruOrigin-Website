@@ -1,40 +1,19 @@
 import { QrCode, Clock, Globe2, MapPin } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { StatGrid, StatCard } from "@/components/dashboard/stat-card";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { BucketList } from "@/components/dashboard/bucket-list";
 import { getAnalyticsSummary } from "@/lib/analytics";
 import { prisma } from "@/lib/prisma";
 import { requireAdminUser } from "@/lib/session";
-
-function BucketList({ title, buckets }: { title: string; buckets: { key: string; count: number }[] }) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="grid gap-2.5">
-        {buckets.length > 0 ? (
-          buckets.map((bucket) => (
-            <div key={bucket.key} className="flex items-center justify-between rounded-lg border border-border bg-muted/50 px-4 py-3">
-              <p className="text-sm font-semibold text-foreground">{bucket.key}</p>
-              <Badge variant="outline">{bucket.count}</Badge>
-            </div>
-          ))
-        ) : (
-          <p className="text-sm text-muted-foreground">No data yet.</p>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
 
 export default async function AdminAnalyticsPage() {
   await requireAdminUser();
 
   const summary = await getAnalyticsSummary();
 
-  const productIds = summary.mostViewedProducts.map((row) => row.productId);
+  const productIds = Array.from(
+    new Set([...summary.mostViewedProducts.map((row) => row.productId), ...summary.mostScannedProducts.map((row) => row.productId)]),
+  );
   const claimIds = summary.mostViewedClaims.map((row) => row.claimId);
   const certificateIds = summary.mostViewedCertificates.map((row) => row.certificateId);
 
@@ -74,6 +53,10 @@ export default async function AdminAnalyticsPage() {
         <BucketList
           title="Most Viewed Products"
           buckets={summary.mostViewedProducts.map((row) => ({ key: productNames.get(row.productId) ?? row.productId, count: row.count }))}
+        />
+        <BucketList
+          title="Most Scanned Products"
+          buckets={summary.mostScannedProducts.map((row) => ({ key: productNames.get(row.productId) ?? row.productId, count: row.count }))}
         />
         <BucketList
           title="Most Viewed Claims"

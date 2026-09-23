@@ -90,6 +90,7 @@ export type AnalyticsSummary = {
   byCity: { key: string; count: number }[];
   byDevice: { key: string; count: number }[];
   mostViewedProducts: { productId: string; count: number }[];
+  mostScannedProducts: { productId: string; count: number }[];
   mostViewedClaims: { claimId: string; count: number }[];
   mostViewedCertificates: { certificateId: string; count: number }[];
   averageViewTimeMs: number | null;
@@ -99,25 +100,35 @@ export type AnalyticsSummary = {
 export async function getAnalyticsSummary(productIds?: string[]): Promise<AnalyticsSummary> {
   const productScope = productIds ? { productId: { in: productIds } } : {};
 
-  const [totalScans, byCountryRaw, byCityRaw, byDeviceRaw, byProductRaw, byClaimRaw, byCertificateRaw, avgDuration] =
-    await Promise.all([
-      prisma.scanEvent.count({ where: { eventType: "SCAN", ...productScope } }),
-      prisma.scanEvent.groupBy({ by: ["country"], _count: { _all: true }, where: { eventType: "SCAN", ...productScope } }),
-      prisma.scanEvent.groupBy({ by: ["city"], _count: { _all: true }, where: { eventType: "SCAN", ...productScope } }),
-      prisma.scanEvent.groupBy({ by: ["device"], _count: { _all: true }, where: { eventType: "SCAN", ...productScope } }),
-      prisma.scanEvent.groupBy({ by: ["productId"], _count: { _all: true }, where: productScope }),
-      prisma.scanEvent.groupBy({
-        by: ["claimId"],
-        _count: { _all: true },
-        where: { eventType: "CLAIM_VIEW", claimId: { not: null }, ...productScope },
-      }),
-      prisma.scanEvent.groupBy({
-        by: ["certificateId"],
-        _count: { _all: true },
-        where: { eventType: "CERTIFICATE_VIEW", certificateId: { not: null }, ...productScope },
-      }),
-      prisma.scanEvent.aggregate({ _avg: { viewDurationMs: true }, where: { viewDurationMs: { not: null }, ...productScope } }),
-    ]);
+  const [
+    totalScans,
+    byCountryRaw,
+    byCityRaw,
+    byDeviceRaw,
+    byViewedProductRaw,
+    byScannedProductRaw,
+    byClaimRaw,
+    byCertificateRaw,
+    avgDuration,
+  ] = await Promise.all([
+    prisma.scanEvent.count({ where: { eventType: "SCAN", ...productScope } }),
+    prisma.scanEvent.groupBy({ by: ["country"], _count: { _all: true }, where: { eventType: "SCAN", ...productScope } }),
+    prisma.scanEvent.groupBy({ by: ["city"], _count: { _all: true }, where: { eventType: "SCAN", ...productScope } }),
+    prisma.scanEvent.groupBy({ by: ["device"], _count: { _all: true }, where: { eventType: "SCAN", ...productScope } }),
+    prisma.scanEvent.groupBy({ by: ["productId"], _count: { _all: true }, where: { eventType: "VIEW", ...productScope } }),
+    prisma.scanEvent.groupBy({ by: ["productId"], _count: { _all: true }, where: { eventType: "SCAN", ...productScope } }),
+    prisma.scanEvent.groupBy({
+      by: ["claimId"],
+      _count: { _all: true },
+      where: { eventType: "CLAIM_VIEW", claimId: { not: null }, ...productScope },
+    }),
+    prisma.scanEvent.groupBy({
+      by: ["certificateId"],
+      _count: { _all: true },
+      where: { eventType: "CERTIFICATE_VIEW", certificateId: { not: null }, ...productScope },
+    }),
+    prisma.scanEvent.aggregate({ _avg: { viewDurationMs: true }, where: { viewDurationMs: { not: null }, ...productScope } }),
+  ]);
 
   const bucket = (rows: { _count: { _all: number } }[], keyOf: (r: unknown) => string | null) =>
     rows
@@ -130,7 +141,11 @@ export async function getAnalyticsSummary(productIds?: string[]): Promise<Analyt
     byCountry: bucket(byCountryRaw, (r) => (r as { country: string | null }).country),
     byCity: bucket(byCityRaw, (r) => (r as { city: string | null }).city),
     byDevice: bucket(byDeviceRaw, (r) => (r as { device: string | null }).device),
-    mostViewedProducts: byProductRaw
+    mostViewedProducts: byViewedProductRaw
+      .map((r) => ({ productId: r.productId, count: r._count._all }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10),
+    mostScannedProducts: byScannedProductRaw
       .map((r) => ({ productId: r.productId, count: r._count._all }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 10),

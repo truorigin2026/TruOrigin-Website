@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import { StatGrid, StatCard } from "@/components/dashboard/stat-card";
 import { DataTable } from "@/components/dashboard/data-table";
 import { ScanActivityChart } from "@/components/dashboard/scan-activity-chart";
+import { BucketList } from "@/components/dashboard/bucket-list";
 import { CustomerInterestBars } from "@/components/brand/customer-interest-bars";
 import { prisma } from "@/lib/prisma";
 import { requireBrandUser } from "@/lib/session";
@@ -36,7 +37,7 @@ export default async function BrandAnalyticsPage() {
     }),
   ]);
 
-  const [viewEventCounts, scansByProduct, viewsByProduct] = await Promise.all([
+  const [viewEventCounts, scansByProduct, viewsByProduct, viewTimeByProduct] = await Promise.all([
     prisma.scanEvent.groupBy({
       by: ["eventType"],
       where: { productId: { in: productIds } },
@@ -52,20 +53,27 @@ export default async function BrandAnalyticsPage() {
       where: { productId: { in: productIds }, eventType: "VIEW" },
       _count: { _all: true },
     }),
+    prisma.scanEvent.groupBy({
+      by: ["productId"],
+      where: { productId: { in: productIds }, viewDurationMs: { not: null } },
+      _avg: { viewDurationMs: true },
+    }),
   ]);
   const countByType = new Map(viewEventCounts.map((e) => [e.eventType, e._count._all]));
   const scansByProductId = new Map(scansByProduct.map((r) => [r.productId, r._count._all]));
   const viewsByProductId = new Map(viewsByProduct.map((r) => [r.productId, r._count._all]));
+  const viewTimeByProductId = new Map(viewTimeByProduct.map((r) => [r.productId, r._avg.viewDurationMs]));
 
   const productRows = productIds
     .filter((id) => (scansByProductId.get(id) ?? 0) > 0 || (viewsByProductId.get(id) ?? 0) > 0)
+    .sort((a, b) => (scansByProductId.get(b) ?? 0) - (scansByProductId.get(a) ?? 0))
     .map((id) => ({
       key: id,
       cells: [
         productNameById.get(id) ?? "Unknown product",
         scansByProductId.get(id) ?? 0,
         viewsByProductId.get(id) ?? 0,
-        formatDuration(summary.averageViewTimeMs),
+        formatDuration(viewTimeByProductId.get(id) ?? null),
       ],
     }));
 
@@ -92,6 +100,23 @@ export default async function BrandAnalyticsPage() {
             { label: "Claims", count: countByType.get("CLAIM_VIEW") ?? 0 },
             { label: "Certifications & Documents", count: countByType.get("CERTIFICATE_VIEW") ?? 0 },
           ]}
+        />
+      </div>
+
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
+        <BucketList
+          title="Most Viewed Products"
+          buckets={summary.mostViewedProducts.map((row) => ({
+            key: productNameById.get(row.productId) ?? "Unknown product",
+            count: row.count,
+          }))}
+        />
+        <BucketList
+          title="Most Scanned Products"
+          buckets={summary.mostScannedProducts.map((row) => ({
+            key: productNameById.get(row.productId) ?? "Unknown product",
+            count: row.count,
+          }))}
         />
       </div>
 
