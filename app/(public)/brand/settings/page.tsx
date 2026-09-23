@@ -2,13 +2,14 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import { SettingsTabs } from "@/components/brand/settings-tabs";
 import { prisma } from "@/lib/prisma";
 import { requireBrandUser } from "@/lib/session";
+import { getNotifications } from "@/lib/notifications";
 
 export default async function BrandSettingsPage() {
   const user = await requireBrandUser();
 
   const brandId = user.brandId as string;
 
-  const [brand, subscription, invoiceCount] = await Promise.all([
+  const [brand, subscription, invoiceCount, notifications] = await Promise.all([
     prisma.brand.findUnique({ where: { id: brandId } }),
     prisma.subscription.findFirst({
       where: { brandId },
@@ -16,6 +17,7 @@ export default async function BrandSettingsPage() {
       include: { plan: true },
     }),
     prisma.invoice.count({ where: { brandId } }),
+    getNotifications(brandId),
   ]);
 
   if (!brand) {
@@ -30,6 +32,7 @@ export default async function BrandSettingsPage() {
         canEditProfile={user.brandRole === "OWNER" || user.brandRole === "ADMIN"}
         subscription={subscription ? { planName: subscription.plan.name, status: subscription.status } : null}
         invoiceCount={invoiceCount}
+        notifications={notifications}
       />
     </>
   );

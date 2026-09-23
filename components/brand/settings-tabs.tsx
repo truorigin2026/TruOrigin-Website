@@ -2,34 +2,43 @@
 
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardAction } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BrandProfileForm } from "@/components/brand/brand-profile-form";
 import { PasswordChangeForm } from "@/components/brand/password-change-form";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-const NOTIFICATION_PREFS = [
-  { key: "certExpiry", label: "Certificate expiring soon" },
-  { key: "claimEvidence", label: "Claim missing supporting evidence" },
-  { key: "cardGenerated", label: "OriginCard generated" },
-  { key: "verificationComplete", label: "Product review completed" },
-];
+export type NotificationRow = {
+  id: string;
+  message: string;
+  detail: string | null;
+  href: string | null;
+  read: boolean;
+  createdAt: Date;
+};
 
 type SettingsTabsProps = {
   brand: { name: string; logoUrl: string; summary: string };
   canEditProfile: boolean;
   subscription: { planName: string; status: string } | null;
   invoiceCount: number;
+  notifications: NotificationRow[];
 };
 
-export function SettingsTabs({ brand, canEditProfile, subscription, invoiceCount }: SettingsTabsProps) {
-  const [prefs, setPrefs] = useState<Record<string, boolean>>({
-    certExpiry: true,
-    claimEvidence: true,
-    cardGenerated: true,
-    verificationComplete: true,
-  });
+export function SettingsTabs({ brand, canEditProfile, subscription, invoiceCount, notifications: initialNotifications }: SettingsTabsProps) {
+  const [notifications, setNotifications] = useState(initialNotifications);
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  function markRead(id: string) {
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    fetch(`/api/brand/notifications/${id}`, { method: "PATCH" }).catch(() => {});
+  }
+
+  function markAllRead() {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    fetch("/api/brand/notifications/mark-all-read", { method: "POST" }).catch(() => {});
+  }
 
   return (
     <Tabs defaultValue="profile">
@@ -70,21 +79,54 @@ export function SettingsTabs({ brand, canEditProfile, subscription, invoiceCount
       <TabsContent value="notifications" className="mt-5">
         <Card>
           <CardHeader>
-            <CardTitle>Notification Preferences</CardTitle>
+            <CardTitle>Notifications</CardTitle>
+            {unreadCount > 0 ? (
+              <CardAction>
+                <Button variant="outline" size="sm" onClick={markAllRead}>
+                  Mark all as read
+                </Button>
+              </CardAction>
+            ) : null}
           </CardHeader>
-          <CardContent className="grid gap-3">
-            {NOTIFICATION_PREFS.map((pref) => (
-              <label key={pref.key} className="flex items-center gap-3 text-sm">
-                <input
-                  type="checkbox"
-                  checked={prefs[pref.key] ?? true}
-                  onChange={(event) => setPrefs((prev) => ({ ...prev, [pref.key]: event.target.checked }))}
-                  className="size-4 rounded border-input"
-                />
-                {pref.label}
-              </label>
-            ))}
-            <p className="text-xs text-muted-foreground">Preferences shown here aren&apos;t saved yet — this is a preview of upcoming controls.</p>
+          <CardContent className="grid gap-2.5">
+            {notifications.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No notifications yet.</p>
+            ) : (
+              notifications.map((item) => {
+                const row = (
+                  <>
+                    <span className="flex items-center gap-2">
+                      {!item.read ? <span className="size-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" /> : null}
+                      <span className={item.read ? "font-medium text-muted-foreground" : "font-semibold text-foreground"}>
+                        {item.message}
+                      </span>
+                    </span>
+                    {item.detail ? <p className="mt-0.5 text-xs text-muted-foreground">{item.detail}</p> : null}
+                    <p className="mt-1 text-xs text-muted-foreground">{item.createdAt.toLocaleDateString()}</p>
+                  </>
+                );
+
+                return item.href ? (
+                  <Link
+                    key={item.id}
+                    href={item.href}
+                    onClick={() => !item.read && markRead(item.id)}
+                    className="block rounded-lg bg-muted px-3.5 py-3 text-sm leading-relaxed transition-colors hover:bg-muted/70"
+                  >
+                    {row}
+                  </Link>
+                ) : (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => !item.read && markRead(item.id)}
+                    className="rounded-lg bg-muted px-3.5 py-3 text-left text-sm leading-relaxed transition-colors hover:bg-muted/70"
+                  >
+                    {row}
+                  </button>
+                );
+              })
+            )}
           </CardContent>
         </Card>
       </TabsContent>
