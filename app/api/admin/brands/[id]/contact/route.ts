@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
 import { sendEmail } from "@/lib/email";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdminSession(request);
@@ -44,6 +45,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     note: body.message.trim(),
     metadata: { recipient, sent: result.sent, reason: result.reason },
     request,
+  });
+
+  await createNotification({
+    brandId: id,
+    type: "ADMIN_MESSAGE",
+    message: "Message from TruOrigin",
+    detail: body.message.trim(),
+    href: "/brand/settings",
   });
 
   return NextResponse.json({ ok: true, ...result });

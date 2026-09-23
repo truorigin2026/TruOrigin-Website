@@ -10,6 +10,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import type { Notification, NotificationType } from "../generated/prisma/client";
 
 export type AttentionItem = {
   id: string;
@@ -111,11 +112,11 @@ export async function getRecentActivity(brandId: string, limit = 10): Promise<Ac
   });
 
   const ACTION_LABELS: Record<string, string> = {
-    "product.submit": "Product submitted for verification",
+    "product.submit": "Product submitted for review",
     "product.approve": "Product approved",
     "product.reject": "Product rejected",
     "product.edit": "Product updated",
-    "product.resubmit": "Product resubmitted for verification",
+    "product.resubmit": "Product resubmitted for review",
   };
 
   return logs.map((log) => ({
@@ -124,4 +125,49 @@ export async function getRecentActivity(brandId: string, limit = 10): Promise<Ac
     detail: log.targetLabel ?? "",
     createdAt: log.createdAt,
   }));
+}
+
+/** Real, persisted, dismissible events — distinct from getNeedsAttention()'s
+ * live-recomputed ongoing state above. Created at specific admin actions
+ * (product rejected/approved, admin sent a message) and read/unread tracked
+ * per row. */
+export async function createNotification(params: {
+  brandId: string;
+  type: NotificationType;
+  message: string;
+  detail?: string;
+  href?: string;
+}): Promise<void> {
+  await prisma.notification.create({
+    data: {
+      brandId: params.brandId,
+      type: params.type,
+      message: params.message,
+      detail: params.detail,
+      href: params.href,
+    },
+  });
+}
+
+export async function getNotifications(brandId: string, limit = 20): Promise<Notification[]> {
+  return prisma.notification.findMany({
+    where: { brandId },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+}
+
+/** Scoped by both id and brandId so one brand can never mark another's notification read. */
+export async function markNotificationRead(id: string, brandId: string): Promise<void> {
+  await prisma.notification.updateMany({
+    where: { id, brandId },
+    data: { read: true },
+  });
+}
+
+export async function markAllNotificationsRead(brandId: string): Promise<void> {
+  await prisma.notification.updateMany({
+    where: { brandId, read: false },
+    data: { read: true },
+  });
 }

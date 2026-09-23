@@ -4,6 +4,7 @@ import { generateQrDataUrl, productVerificationUrl } from "@/lib/qr";
 import { nextSerialNumber } from "@/lib/serial";
 import { requireAdminSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdminSession(request);
@@ -49,6 +50,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       request,
     });
 
+    await createNotification({
+      brandId: product.brandId,
+      type: "PRODUCT_REJECTED",
+      message: `"${product.name}" was rejected`,
+      detail: updated.rejectionNote ?? undefined,
+      href: `/brand/products/${id}/edit`,
+    });
+
     return NextResponse.json({ ok: true, product: updated });
   }
 
@@ -86,6 +95,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     targetLabel: product.name,
     metadata: { serialNumber },
     request,
+  });
+
+  await createNotification({
+    brandId: product.brandId,
+    type: "PRODUCT_APPROVED",
+    message: `"${product.name}" was approved and is now live`,
+    href: `/brand/products/${id}`,
   });
 
   return NextResponse.json({
