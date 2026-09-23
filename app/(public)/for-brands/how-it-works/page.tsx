@@ -29,7 +29,7 @@ const systemLayers = [
   {
     icon: Cpu,
     title: "TruOrigin Engine",
-    subtitle: "Structure, validate, and connect the information",
+    subtitle: "Structure, organise, and connect the information",
     description:
       "TruOrigin organises submitted product information, maps supporting evidence, and creates a unique digital identity for each product.",
     points: ["Evidence mapping", "Product information structuring", "Unique QR & product identity", "Review status"],
@@ -40,7 +40,7 @@ const systemLayers = [
     subtitle: "Explore product information with clarity",
     description:
       "Consumers access the product's information in one place, including origin, claims, certifications, supporting documents, and review status.",
-    points: ["Product information access", "Origin & certification details", "Evidence-backed claims", "Supporting documents"],
+    points: ["Product information access", "Certification details", "Evidence-backed claims", "Supporting documents"],
   },
 ];
 
