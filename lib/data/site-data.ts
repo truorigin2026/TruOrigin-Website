@@ -24,6 +24,13 @@ export const statusConfig = {
 
 export type StatusLabel = keyof typeof statusConfig;
 
+export const claimStatusMap: Record<"VERIFIED" | "PARTIALLY_VERIFIED" | "UNVERIFIED" | "REJECTED", StatusLabel> = {
+  VERIFIED: "Evidence Available",
+  PARTIALLY_VERIFIED: "Limited Evidence",
+  UNVERIFIED: "No Evidence Submitted",
+  REJECTED: "No Evidence Submitted",
+};
+
 export type ProductClaim = {
   id?: string;
   text: string;

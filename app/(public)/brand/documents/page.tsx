@@ -63,7 +63,7 @@ export default async function BrandDocumentsPage({ searchParams }: DocumentsPage
       <PageHeader
         eyebrow="Documents"
         title="Manage the evidence supporting your product claims."
-        description="Certificates, lab reports, and sourcing proof stay private until the admin team reviews and approves the product they support."
+        description="Certificates, lab reports, and sourcing documents stay private until the admin team reviews and approves the product they support."
       />
 
       <Card className="mb-6">

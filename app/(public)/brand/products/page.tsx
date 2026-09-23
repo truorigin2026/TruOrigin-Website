@@ -71,7 +71,7 @@ export default async function BrandProductsPage({ searchParams }: ProductsPagePr
     <>
       <PageHeader
         eyebrow="Products"
-        title="Manage the products and information verified through TruOrigin."
+        title="Manage the products and information reviewed through TruOrigin."
         description="Search your catalog, track review status, and open a product to edit its details, claims, and documents."
         actions={
           <Button render={<Link href="/brand/products/new" />} nativeButton={false}>

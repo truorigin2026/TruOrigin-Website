@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ProductEditActions } from "@/components/brand/product-edit-actions";
 import { prisma } from "@/lib/prisma";
 import { requireBrandUser } from "@/lib/session";
+import { claimStatusMap } from "@/lib/data/site-data";
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   APPROVED: "success",
@@ -105,7 +106,7 @@ export default async function BrandProductDetailPage({ params }: { params: Promi
             </CardHeader>
             <CardContent className="grid gap-3">
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Claim verification status is set by TruOrigin during review. You can edit a claim&apos;s label or
+                Claim review status is set by TruOrigin during review. You can edit a claim&apos;s label or
                 evidence while this product is a draft or after it&apos;s rejected.
               </p>
               <div className="grid gap-2.5">
@@ -113,7 +114,7 @@ export default async function BrandProductDetailPage({ params }: { params: Promi
                   <InfoRow
                     key={claim.id}
                     label={claim.label}
-                    value={<Badge variant={CLAIM_STATUS_VARIANT[claim.status] ?? "outline"}>{claim.status.replaceAll("_", " ").toLowerCase()}</Badge>}
+                    value={<Badge variant={CLAIM_STATUS_VARIANT[claim.status] ?? "outline"}>{claimStatusMap[claim.status]}</Badge>}
                   />
                 ))}
                 {product.claims.length === 0 ? <p className="text-sm text-muted-foreground">No claims added yet.</p> : null}

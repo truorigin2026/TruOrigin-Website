@@ -27,7 +27,7 @@ export function OriginCardDetailActions({ cardId, status }: { cardId: string; st
       </CardHeader>
       <CardContent>
         <p className="mb-3 text-sm leading-relaxed text-muted-foreground">
-          Deactivating removes this product&apos;s verification page from customer access. You can&apos;t undo this from
+          Deactivating removes this product&apos;s information page from customer access. You can&apos;t undo this from
           here — contact TruOrigin support to republish.
         </p>
         <Button variant="destructive" onClick={() => setConfirmOpen(true)} disabled={isBusy("deactivate")}>
@@ -38,7 +38,7 @@ export function OriginCardDetailActions({ cardId, status }: { cardId: string; st
       <ConfirmDialog
         open={confirmOpen}
         title="Deactivate this OriginCard?"
-        description="Customers who scan this product's QR code will no longer see its verification page."
+        description="Customers who scan this product's QR code will no longer see its product information page."
         confirmLabel="Deactivate"
         danger
         busy={isBusy("deactivate")}

@@ -33,7 +33,7 @@ const DOC_TYPE_OPTIONS: { value: DocType; label: string }[] = [
   { value: "CERTIFICATE", label: "Certification" },
   { value: "LAB_REPORT", label: "Lab Report" },
   { value: "INGREDIENT_LIST", label: "Ingredient List" },
-  { value: "SOURCING_PROOF", label: "Invoice / Sourcing Proof" },
+  { value: "SOURCING_PROOF", label: "Invoice / Sourcing Documentation" },
   { value: "OTHER", label: "Other" },
 ];
 
@@ -225,7 +225,7 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
       }
 
       const data = (await response.json()) as { product?: { id: string } };
-      showToast("success", mode === "edit" ? "Product updated and resubmitted for verification." : "Product submitted for verification.");
+      showToast("success", mode === "edit" ? "Product updated and resubmitted for review." : "Product submitted for review.");
       router.push(mode === "edit" ? `/brand/products/${productId}` : `/brand/products/${data.product?.id ?? ""}`);
       router.refresh();
     } catch (err) {
@@ -356,7 +356,7 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
         <Card className="p-6">
           <p className="text-sm leading-relaxed text-muted-foreground">
             List the claims you want to make about this product (e.g. &quot;Organic&quot;, &quot;Cruelty Free&quot;). Add a
-            short evidence note for each — TruOrigin verifies each claim against your supporting documents during review.
+            short evidence note for each — TruOrigin reviews each claim against your supporting documents during review.
           </p>
           <div className="mt-5 grid gap-3">
             {claims.map((claim) => (
@@ -434,7 +434,7 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
       {step === 3 ? (
         <Card className="p-6">
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Attach certificates, lab reports, or sourcing proof supporting your claims. Optional here — you can also
+            Attach certificates, lab reports, or sourcing documentation supporting your claims. Optional here — you can also
             upload documents later from the Documents page. The details below appear on the public product page, so
             customers can see what backs up your claims — an admin can refine any of it before your product goes live.
           </p>
@@ -555,7 +555,7 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
         <Card className="p-6">
           <p className="text-sm leading-relaxed text-muted-foreground">
             For each claim, pick which of the documents you just uploaded support it. Customers will see this link on
-            the product page — optional, but claims backed by a document build more trust than a claim alone.
+            the product page — optional, but claims backed by a document are clearer to customers than a claim alone.
           </p>
           <div className="mt-5 grid gap-4">
             {claims.filter((claim) => claim.label.trim()).length === 0 ? (
@@ -638,7 +638,7 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
             </div>
           </div>
           <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
-            Once submitted, this product enters the TruOrigin review queue. An admin verifies your claims against the
+            Once submitted, this product enters the TruOrigin review queue. An admin reviews your claims against the
             attached evidence before it goes live with a serial number and QR-linked OriginCard.
           </p>
         </Card>
@@ -655,7 +655,7 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
         ) : (
           <Button type="button" disabled={submitting} onClick={handleSubmit}>
             {submitting ? <Loader2 size={15} className="animate-spin" /> : null}
-            {mode === "edit" ? "Save & Resubmit for Verification" : "Submit for Verification"}
+            {mode === "edit" ? "Save & Resubmit for Review" : "Submit for Review"}
           </Button>
         )}
       </div>

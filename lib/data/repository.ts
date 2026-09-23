@@ -16,6 +16,7 @@ import {
   sampleBrand,
   publicProductCollection,
   productCategories,
+  claimStatusMap,
   type ProductRecord,
   type BrandRecord,
 } from "./site-data";
@@ -45,13 +46,6 @@ const productInclude = {
     take: 1,
   },
 } satisfies Prisma.ProductInclude;
-
-const claimStatusMap: Record<"VERIFIED" | "PARTIALLY_VERIFIED" | "UNVERIFIED" | "REJECTED", ProductRecord["claims"][number]["status"]> = {
-  VERIFIED: "Evidence Available",
-  PARTIALLY_VERIFIED: "Limited Evidence",
-  UNVERIFIED: "No Evidence Submitted",
-  REJECTED: "No Evidence Submitted",
-};
 
 function formatDate(value: Date | null | undefined): string {
   const date = value ?? new Date();

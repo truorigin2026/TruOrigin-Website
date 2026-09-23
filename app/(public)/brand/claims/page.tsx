@@ -3,6 +3,7 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { requireBrandUser } from "@/lib/session";
+import { claimStatusMap } from "@/lib/data/site-data";
 import type { Prisma } from "../../../../generated/prisma/client";
 
 const CLAIM_STATUS_VARIANT: Record<string, BadgeVariant> = {
@@ -32,7 +33,7 @@ export default async function BrandClaimsPage() {
       <span key="label" className="font-medium">{claim.label}</span>,
       claim.product.name,
       <span key="evidence" className="text-muted-foreground">{claim.evidence || "No evidence added"}</span>,
-      <Badge key="status" variant={CLAIM_STATUS_VARIANT[claim.status] ?? "outline"}>{claim.status.replaceAll("_", " ").toLowerCase()}</Badge>,
+      <Badge key="status" variant={CLAIM_STATUS_VARIANT[claim.status] ?? "outline"}>{claimStatusMap[claim.status]}</Badge>,
       claim.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
     ],
   }));
@@ -41,8 +42,8 @@ export default async function BrandClaimsPage() {
     <>
       <PageHeader
         eyebrow="Claims"
-        title="Track every claim you've made and its verification status."
-        description="Verification status is set by TruOrigin during review. Edit a claim's evidence from its product while the product is a draft or after it's rejected."
+        title="Track every claim you've made and its review status."
+        description="Review status is set by TruOrigin during review. Edit a claim's evidence from its product while the product is a draft or after it's rejected."
       />
       <DataTable
         headers={TABLE_HEADERS}

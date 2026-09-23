@@ -73,8 +73,8 @@ export default async function BrandAnalyticsPage() {
     <>
       <PageHeader
         eyebrow="Analytics"
-        title="See how customers interact with your verified products."
-        description="QR scans, verification page views, and which parts of your product information customers actually explore."
+        title="See how customers interact with your product information."
+        description="QR scans, product page views, and which parts of your product information customers actually explore."
       />
 
       <StatGrid>

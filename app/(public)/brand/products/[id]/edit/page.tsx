@@ -34,7 +34,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
       <PageHeader
         eyebrow="Edit Product"
         title={product.name}
-        description="Update your product details, claims, and documents, then resubmit for verification."
+        description="Update your product details, claims, and documents, then resubmit for review."
       />
       <ProductWizard
         categoryOptions={categories.map((c) => c.name)}

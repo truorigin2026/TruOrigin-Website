@@ -10,7 +10,7 @@ const DOC_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: "CERTIFICATE", label: "Certification" },
   { value: "LAB_REPORT", label: "Lab Report" },
   { value: "INGREDIENT_LIST", label: "Ingredient List" },
-  { value: "SOURCING_PROOF", label: "Invoice / Sourcing Proof" },
+  { value: "SOURCING_PROOF", label: "Invoice / Sourcing Documentation" },
   { value: "OTHER", label: "Other" },
 ];
 

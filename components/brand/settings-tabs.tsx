@@ -13,7 +13,7 @@ const NOTIFICATION_PREFS = [
   { key: "certExpiry", label: "Certificate expiring soon" },
   { key: "claimEvidence", label: "Claim missing supporting evidence" },
   { key: "cardGenerated", label: "OriginCard generated" },
-  { key: "verificationComplete", label: "Product verification completed" },
+  { key: "verificationComplete", label: "Product review completed" },
 ];
 
 type SettingsTabsProps = {

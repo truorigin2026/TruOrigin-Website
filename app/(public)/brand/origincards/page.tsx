@@ -74,7 +74,7 @@ export default async function BrandOriginCardsPage() {
     <>
       <PageHeader
         eyebrow="OriginCards"
-        title="Manage the OriginCards generated for your verified products."
+        title="Manage the OriginCards generated for your products."
         description="OriginCards use TruOrigin's standard template — a serial number and QR code are generated automatically once a product is approved."
       />
       <DataTable
