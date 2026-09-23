@@ -64,7 +64,7 @@ export default async function ProductPage({
     notFound();
   }
 
-  const relatedProducts = await getRelatedProducts(product.slug, 6);
+  const relatedProducts = await getRelatedProducts(product.category, product.slug, 6);
 
   return (
     <>

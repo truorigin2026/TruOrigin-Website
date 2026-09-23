@@ -31,7 +31,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       <SmoothScroll />
       <SiteHeader />
       <main className={`relative z-10 ${isAudienceHome ? "" : "site-content-with-header"}`}>
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode="popLayout" initial={false}>
           <motion.div
             key={pathname}
             initial={{ opacity: 0 }}

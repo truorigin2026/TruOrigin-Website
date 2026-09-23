@@ -9,6 +9,7 @@
  * remains usable while the product-upload flow is still being built.
  */
 
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "../../generated/prisma/client";
 import {
@@ -222,7 +223,7 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Product
 }
 
 /** Returns a single product by its slug (used by /product/[slug] and /p/[slug]). */
-export async function getProductBySlug(slug: string): Promise<ProductRecord | null> {
+async function getProductBySlugUncached(slug: string): Promise<ProductRecord | null> {
   const product = (await prisma.product.findFirst({
     where: { slug, status: "APPROVED", hidden: false, archived: false, deletedAt: null },
     include: productInclude,
@@ -235,8 +236,12 @@ export async function getProductBySlug(slug: string): Promise<ProductRecord | nu
   return allDemoProducts().find((p) => p.slug === slug) ?? null;
 }
 
-/** Returns a single product by its public-facing serial number. */
-export async function getProductBySerial(serial: string): Promise<ProductRecord | null> {
+// Wrapped in React's cache() so generateMetadata and the page component
+// (which both resolve the same product) share one Prisma query per
+// request instead of issuing it twice.
+export const getProductBySlug = cache(getProductBySlugUncached);
+
+async function getProductBySerialUncached(serial: string): Promise<ProductRecord | null> {
   const normalized = serial.trim().toUpperCase();
 
   const product = (await prisma.product.findFirst({
@@ -260,6 +265,9 @@ export async function getProductBySerial(serial: string): Promise<ProductRecord 
     ) ?? null
   );
 }
+
+/** Returns a single product by its public-facing serial number. */
+export const getProductBySerial = cache(getProductBySerialUncached);
 
 /** Returns every distinct product category. */
 export async function getCategories(): Promise<string[]> {
@@ -332,18 +340,15 @@ export async function getBrands(): Promise<BrandRecord[]> {
 }
 
 /** Related products: same category, excluding the product itself, capped to `limit`. */
-export async function getRelatedProducts(slug: string, limit = 4): Promise<ProductRecord[]> {
-  const current = await getProductBySlug(slug);
-  if (!current) return [];
-
-  const dbRelated = await getProducts({ category: current.category });
-  const related = dbRelated.filter((product) => product.slug !== slug).slice(0, limit);
+export async function getRelatedProducts(category: string, excludeSlug: string, limit = 4): Promise<ProductRecord[]> {
+  const dbRelated = await getProducts({ category });
+  const related = dbRelated.filter((product) => product.slug !== excludeSlug).slice(0, limit);
 
   if (related.length > 0) {
     return related;
   }
 
   return allDemoProducts()
-    .filter((product) => product.slug !== slug && product.category === current.category)
+    .filter((product) => product.slug !== excludeSlug && product.category === category)
     .slice(0, limit);
 }
