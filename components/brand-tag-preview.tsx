@@ -15,7 +15,7 @@ export function BrandTagPreview({
     <div className="overflow-hidden rounded-[32px] border border-[color:var(--line)] bg-white shadow-[0_20px_80px_rgba(13,43,29,0.12)]">
       <div className="relative aspect-[2399/2298] w-full bg-[#eef3ee]">
         <Image
-          src="/images/for-brands/tag/truorigin-tag.png"
+          src="/images/for-brands/tag/truorigin-tag-updated.png"
           alt="TruOrigin tag preview"
           fill
           priority
