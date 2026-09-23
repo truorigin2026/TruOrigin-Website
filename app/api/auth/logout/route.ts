@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   const session = token ? await verifySessionToken(token) : null;
   const redirectTo = session?.role === "ADMIN" ? "/admin/login" : "/login";
 
-  const response = NextResponse.redirect(new URL(redirectTo, request.url));
+  const response = NextResponse.redirect(new URL(redirectTo, request.url), { status: 303 });
   response.cookies.set(SESSION_COOKIE_NAME, "", {
     ...SESSION_COOKIE_OPTIONS,
     maxAge: 0,
