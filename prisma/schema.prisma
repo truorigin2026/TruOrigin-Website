@@ -68,6 +68,12 @@ enum ScanEventType {
   CERTIFICATE_VIEW
 }
 
+enum NotificationType {
+  PRODUCT_REJECTED
+  PRODUCT_APPROVED
+  ADMIN_MESSAGE
+}
+
 enum SubscriptionStatus {
   TRIALING
   ACTIVE
@@ -154,6 +160,7 @@ model Brand {
   subscriptions   Subscription[]
   invoices        Invoice[]
   supportTickets  SupportTicket[]
+  notifications   Notification[]
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 }
@@ -319,6 +326,21 @@ model AuditLog {
   @@index([actorId])
   @@index([action])
   @@index([createdAt])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  brandId   String
+  brand     Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  message   String
+  detail    String?
+  href      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([brandId, createdAt])
+  @@index([brandId, read])
 }
 
 model Plan {
