@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireBrandSession } from "@/lib/api-auth";
+import { prisma } from "@/lib/prisma";
+import { requireAdminSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
 import { isTrustedBlobUrl } from "@/lib/blob";
 import { createProductForBrand, type CertificateInput, type ClaimInput } from "@/lib/product-submission";
@@ -17,10 +18,16 @@ type SubmitBody = {
 
 const DOC_TYPES = new Set(["CERTIFICATE", "LAB_REPORT", "INGREDIENT_LIST", "SOURCING_PROOF", "OTHER"]);
 
-export async function POST(request: NextRequest) {
-  const session = await requireBrandSession(request);
-  if (!session || !session.brandId) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await requireAdminSession(request);
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id: brandId } = await params;
+  const brand = await prisma.brand.findUnique({ where: { id: brandId } });
+  if (!brand || brand.deletedAt) {
+    return NextResponse.json({ error: "Brand not found" }, { status: 404 });
   }
 
   const body = (await request.json().catch(() => null)) as SubmitBody | null;
@@ -45,7 +52,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "fileUrl must point to an uploaded file" }, { status: 400 });
   }
 
-  const product = await createProductForBrand(session.brandId, {
+  const product = await createProductForBrand(brandId, {
     name: body.name,
     category: body.category,
     subcategory: body.subcategory,
@@ -58,10 +65,11 @@ export async function POST(request: NextRequest) {
 
   await logAudit({
     actor: session,
-    action: AUDIT_ACTIONS.PRODUCT_SUBMIT,
+    action: AUDIT_ACTIONS.PRODUCT_ADMIN_CREATE,
     targetType: "Product",
     targetId: product.id,
     targetLabel: product.name,
+    metadata: { brandId, brandName: brand.name },
     request,
   });
 

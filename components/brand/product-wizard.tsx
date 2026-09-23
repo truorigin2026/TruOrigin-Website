@@ -72,9 +72,20 @@ type ProductWizardProps = {
   mode?: "create" | "edit";
   productId?: string;
   initialValues?: ProductWizardInitialValues;
+  /** Defaults to "/api/brand/products" — override for e.g. the admin "upload for a brand" tool. */
+  apiBasePath?: string;
+  /** Defaults to "/brand/products" — where the wizard sends the browser after a successful submit. */
+  redirectBasePath?: string;
 };
 
-export function ProductWizard({ categoryOptions, mode = "create", productId, initialValues }: ProductWizardProps) {
+export function ProductWizard({
+  categoryOptions,
+  mode = "create",
+  productId,
+  initialValues,
+  apiBasePath = "/api/brand/products",
+  redirectBasePath = "/brand/products",
+}: ProductWizardProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const { uploadFile } = useFileUpload();
@@ -212,7 +223,7 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
 
     setSubmitting(true);
     try {
-      const endpoint = mode === "edit" ? `/api/brand/products/${productId}` : "/api/brand/products";
+      const endpoint = mode === "edit" ? `${apiBasePath}/${productId}` : apiBasePath;
       const response = await fetch(endpoint, {
         method: mode === "edit" ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
@@ -226,7 +237,7 @@ export function ProductWizard({ categoryOptions, mode = "create", productId, ini
 
       const data = (await response.json()) as { product?: { id: string } };
       showToast("success", mode === "edit" ? "Product updated and resubmitted for review." : "Product submitted for review.");
-      router.push(mode === "edit" ? `/brand/products/${productId}` : `/brand/products/${data.product?.id ?? ""}`);
+      router.push(mode === "edit" ? `${redirectBasePath}/${productId}` : `${redirectBasePath}/${data.product?.id ?? ""}`);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save product.");

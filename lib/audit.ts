@@ -26,6 +26,7 @@ export const AUDIT_ACTIONS = {
   PRODUCT_UNARCHIVE: "product.unarchive",
   PRODUCT_DELETE: "product.delete",
   PRODUCT_SUBMIT: "product.submit",
+  PRODUCT_ADMIN_CREATE: "product.admin_create",
   PRODUCT_EDIT: "product.edit",
   PRODUCT_RESUBMIT: "product.resubmit",
   PRODUCT_DESCRIPTION_UPDATE: "product.description_update",

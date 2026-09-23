@@ -127,13 +127,18 @@ export default async function AdminBrandDetailPage({ params }: { params: Promise
           <Card>
             <CardHeader>
               <CardTitle>Products ({brand.products.length})</CardTitle>
-              {brand.products.length > PRODUCTS_SHOWN ? (
-                <CardAction>
-                  <Button variant="outline" size="sm" render={<Link href={`/admin/products?brandId=${brand.id}`} />} nativeButton={false}>
-                    View all
+              <CardAction>
+                <div className="flex items-center gap-2">
+                  {brand.products.length > PRODUCTS_SHOWN ? (
+                    <Button variant="outline" size="sm" render={<Link href={`/admin/products?brandId=${brand.id}`} />} nativeButton={false}>
+                      View all
+                    </Button>
+                  ) : null}
+                  <Button size="sm" render={<Link href={`/admin/brands/${brand.id}/products/new`} />} nativeButton={false}>
+                    Upload Product for this Brand
                   </Button>
-                </CardAction>
-              ) : null}
+                </div>
+              </CardAction>
             </CardHeader>
             <CardContent>
               <DataTable

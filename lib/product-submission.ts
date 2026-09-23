@@ -8,6 +8,8 @@
  * be resolved, then claims are created with `connect` to those ids.
  */
 import type { Prisma } from "../generated/prisma/client";
+import { prisma } from "./prisma";
+import { slugify } from "./auth";
 
 export type CertificateInput = {
   localId?: string;
@@ -80,4 +82,72 @@ export async function createCertificatesAndClaims(
       });
     }),
   );
+}
+
+export type ProductCreateInput = {
+  name: string;
+  category: string;
+  subcategory?: string;
+  description?: string;
+  images: { url: string; altText?: string }[];
+  ingredients: { name: string; note?: string }[];
+  certificates: CertificateInput[];
+  claims: ClaimInput[];
+};
+
+async function uniqueProductSlug(base: string) {
+  let slug = base || "product";
+  let suffix = 1;
+  while (await prisma.product.findUnique({ where: { slug } })) {
+    suffix += 1;
+    slug = `${base}-${suffix}`;
+  }
+  return slug;
+}
+
+/**
+ * Creates a product (with images, ingredients, certificates, claims)
+ * under an explicit brandId — used both by a brand's own submission
+ * (brandId from their session) and by the admin "upload for this brand"
+ * tool (brandId from the URL). Caller validates the request body first.
+ */
+export async function createProductForBrand(brandId: string, input: ProductCreateInput) {
+  const slug = await uniqueProductSlug(slugify(input.name));
+  const category = await prisma.category.upsert({
+    where: { name: input.category.trim() },
+    update: {},
+    create: { name: input.category.trim() },
+  });
+
+  return prisma.$transaction(async (tx) => {
+    const created = await tx.product.create({
+      data: {
+        slug,
+        name: clamp(input.name, 200),
+        brand: { connect: { id: brandId } },
+        category: { connect: { id: category.id } },
+        subcategory: input.subcategory?.trim() ? clamp(input.subcategory, 200) : null,
+        description: input.description?.trim() ? clamp(input.description, 5000) : null,
+        status: "SUBMITTED",
+        submittedAt: new Date(),
+        images: {
+          create: input.images.map((image, index) => ({
+            url: image.url,
+            altText: image.altText?.trim() ? clamp(image.altText, 300) : null,
+            position: index,
+          })),
+        },
+        ingredients: {
+          create: input.ingredients.map((ingredient) => ({
+            name: clamp(ingredient.name, 200),
+            note: ingredient.note?.trim() ? clamp(ingredient.note, 1000) : null,
+          })),
+        },
+      },
+    });
+
+    await createCertificatesAndClaims(tx, created.id, input.certificates, input.claims);
+
+    return created;
+  });
 }
