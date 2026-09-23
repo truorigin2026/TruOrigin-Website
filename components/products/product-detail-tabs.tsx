@@ -107,74 +107,28 @@ function DocumentDetailPanel({
   );
 }
 
-function ClaimDetailPanel({
+function ClaimRow({
   claim,
   certificates,
-  onBack,
   onOpenDocument,
 }: {
   claim: ProductClaim;
   certificates: ProductCertificate[];
-  onBack: () => void;
   onOpenDocument: (certificateId: string) => void;
 }) {
-  return (
-    <div className="detail-section-card claim-detail-panel">
-      <button type="button" className="detail-back-link" onClick={onBack}>
-        ← Back to Claims
-      </button>
-
-      <div className="claim-detail-header">
-        <span className="claim-detail-icon">
-          <ShieldCheck size={20} strokeWidth={2.2} aria-hidden="true" />
-        </span>
-        <h3>{claim.text}</h3>
-      </div>
-
-      {certificates.length > 0 ? (
-        <>
-          <p className="claim-detail-provided-badge">Supporting information provided by the brand.</p>
-          <div className="claim-detail-document-list">
-            {certificates.map((certificate) => (
-              <button
-                key={certificate.id}
-                type="button"
-                className="claim-detail-document-row"
-                onClick={() => onOpenDocument(certificate.id)}
-              >
-                <span className="claim-detail-document-icon">
-                  <FileText size={16} strokeWidth={2} aria-hidden="true" />
-                </span>
-                <span className="claim-detail-document-copy">
-                  <span className="claim-detail-document-type">
-                    {certificateDocTypeLabels[certificate.docType] ?? certificate.docType}
-                  </span>
-                  <span className="claim-detail-document-title">{certificate.title}</span>
-                </span>
-                <Badge variant={certificate.isPublic ? "success" : "warning"}>
-                  {certificate.isPublic ? "Public" : "Private"}
-                </Badge>
-                <ChevronRight size={16} strokeWidth={2.2} className="claim-detail-document-chevron" aria-hidden="true" />
-              </button>
-            ))}
-          </div>
-        </>
-      ) : (
-        <p className="detail-muted">
-          {claim.evidence || "No supporting evidence has been linked for this claim yet."}
-        </p>
-      )}
-    </div>
-  );
-}
-
-function ClaimRow({ claim, onOpen }: { claim: ProductClaim; onOpen: () => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const claimCertificates = certificates.filter((certificate) => claim.certificateIds.includes(certificate.id));
   const supportCount = claim.certificateIds.length;
 
   return (
     <TrackInView eventType="CLAIM_VIEW" targetId={claim.id}>
-      <article className="claim-row">
-        <button type="button" className="claim-row-trigger" onClick={onOpen}>
+      <article className={`claim-row${isOpen ? " is-open" : ""}`}>
+        <button
+          type="button"
+          className="claim-row-trigger"
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen((open) => !open)}
+        >
           <span className="claim-row-icon">
             <ShieldCheck size={18} strokeWidth={2.2} aria-hidden="true" />
           </span>
@@ -190,6 +144,44 @@ function ClaimRow({ claim, onOpen }: { claim: ProductClaim; onOpen: () => void }
             <ChevronRight size={18} strokeWidth={2.2} />
           </span>
         </button>
+
+        {isOpen ? (
+          <div className="claim-row-details">
+            {claimCertificates.length > 0 ? (
+              <>
+                <p className="claim-detail-provided-badge">Supporting information provided by the brand.</p>
+                <div className="claim-detail-document-list">
+                  {claimCertificates.map((certificate) => (
+                    <button
+                      key={certificate.id}
+                      type="button"
+                      className="claim-detail-document-row"
+                      onClick={() => onOpenDocument(certificate.id)}
+                    >
+                      <span className="claim-detail-document-icon">
+                        <FileText size={16} strokeWidth={2} aria-hidden="true" />
+                      </span>
+                      <span className="claim-detail-document-copy">
+                        <span className="claim-detail-document-type">
+                          {certificateDocTypeLabels[certificate.docType] ?? certificate.docType}
+                        </span>
+                        <span className="claim-detail-document-title">{certificate.title}</span>
+                      </span>
+                      <Badge variant={certificate.isPublic ? "success" : "warning"}>
+                        {certificate.isPublic ? "Public" : "Private"}
+                      </Badge>
+                      <ChevronRight size={16} strokeWidth={2.2} className="claim-detail-document-chevron" aria-hidden="true" />
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="detail-muted">
+                {claim.evidence || "No supporting evidence has been linked for this claim yet."}
+              </p>
+            )}
+          </div>
+        ) : null}
       </article>
     </TrackInView>
   );
@@ -197,25 +189,19 @@ function ClaimRow({ claim, onOpen }: { claim: ProductClaim; onOpen: () => void }
 
 export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
-  const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null);
   const [selectedCertificateId, setSelectedCertificateId] = useState<string | null>(null);
   const ingredients = product.ingredients ?? [];
   const certificates = product.certificates ?? [];
   const showOverviewNote = Boolean(product.productNote) && product.productNote !== product.summary;
 
-  const selectedClaim = product.claims.find((claim) => claim.id === selectedClaimId) ?? null;
   const selectedCertificate = certificates.find((cert) => cert.id === selectedCertificateId) ?? null;
-  const claimCertificates = selectedClaim
-    ? certificates.filter((cert) => selectedClaim.certificateIds.includes(cert.id))
-    : [];
 
   function switchTab(tab: TabKey) {
     setActiveTab(tab);
-    setSelectedClaimId(null);
     setSelectedCertificateId(null);
   }
 
-  const paneKey = `${activeTab}:${selectedCertificateId ?? selectedClaimId ?? ""}`;
+  const paneKey = `${activeTab}:${selectedCertificateId ?? ""}`;
 
   return (
     <div className="product-tabs">
@@ -283,26 +269,22 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
           {activeTab === "claims" && selectedCertificate ? (
             <DocumentDetailPanel
               certificate={selectedCertificate}
-              backLabel={selectedClaim ? "Back to Claim" : "Back to Claims"}
+              backLabel="Back to Claims"
               onBack={() => setSelectedCertificateId(null)}
             />
           ) : null}
 
-          {activeTab === "claims" && !selectedCertificate && selectedClaim ? (
-            <ClaimDetailPanel
-              claim={selectedClaim}
-              certificates={claimCertificates}
-              onBack={() => setSelectedClaimId(null)}
-              onOpenDocument={(certificateId) => setSelectedCertificateId(certificateId)}
-            />
-          ) : null}
-
-          {activeTab === "claims" && !selectedCertificate && !selectedClaim ? (
+          {activeTab === "claims" && !selectedCertificate ? (
             <div className="detail-section-card">
               <h2>Claims</h2>
               <div className="claim-list">
                 {product.claims.map((claim) => (
-                  <ClaimRow key={claim.id ?? claim.text} claim={claim} onOpen={() => claim.id && setSelectedClaimId(claim.id)} />
+                  <ClaimRow
+                    key={claim.id ?? claim.text}
+                    claim={claim}
+                    certificates={certificates}
+                    onOpenDocument={(certificateId) => setSelectedCertificateId(certificateId)}
+                  />
                 ))}
               </div>
             </div>
