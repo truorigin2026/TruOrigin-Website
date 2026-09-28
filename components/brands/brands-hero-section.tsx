@@ -1,9 +1,13 @@
 "use client";
 
-import ColorBends from "@/components/brands/color-bends";
+import dynamic from "next/dynamic";
 import { HeroReveal } from "@/components/motion";
 import { ButtonFillSweep } from "@/components/ui/button-fill-sweep";
 import { ButtonHoverUnderline } from "@/components/ui/button-hover-underline";
+
+// Pulls in three.js — code-split the same way the homepage's shader
+// background already is, so it doesn't block hydration of this page.
+const ColorBends = dynamic(() => import("@/components/brands/color-bends"), { ssr: false });
 
 export function BrandsHeroSection() {
   return (
