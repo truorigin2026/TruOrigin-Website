@@ -203,6 +203,7 @@ export default function ForBrandsHowItWorksPage() {
               <AssetImage
                 src="/images/for-brands/how-it-works/review-team.jpg"
                 alt="TruOrigin review team checking a brand's submitted product evidence"
+                fill
                 className="h-full w-full object-cover"
               />
             </FadeIn>

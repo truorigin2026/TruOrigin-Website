@@ -15257,6 +15257,8 @@ a.contact-method-value:hover {
 }
 
 .bnf-switcher-chart {
+  position: relative;
+  aspect-ratio: 1361 / 772;
   border-radius: 20px;
   overflow: hidden;
   border: 1px solid var(--line);

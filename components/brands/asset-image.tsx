@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 type AssetImageProps = {
   src: string;
@@ -10,6 +11,8 @@ type AssetImageProps = {
   width?: number;
   height?: number;
   priority?: boolean;
+  /** Only used when fill is set. Defaults to full-bleed since every current fill usage is a decorative/background image. */
+  sizes?: string;
 };
 
 export function AssetImage({
@@ -20,6 +23,7 @@ export function AssetImage({
   width,
   height,
   priority,
+  sizes,
 }: AssetImageProps) {
   const [failed, setFailed] = useState(false);
 
@@ -37,16 +41,17 @@ export function AssetImage({
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <Image
       src={src}
       alt={alt}
       className={className}
+      fill={fill}
       width={fill ? undefined : width}
       height={fill ? undefined : height}
-      loading={priority ? "eager" : "lazy"}
+      sizes={fill ? (sizes ?? "100vw") : undefined}
+      priority={priority}
       onError={() => setFailed(true)}
-      style={fill ? { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" } : undefined}
+      style={fill ? { objectFit: "cover" } : undefined}
     />
   );
 }

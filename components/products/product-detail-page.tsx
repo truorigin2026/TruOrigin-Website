@@ -76,7 +76,7 @@ export function ProductDetailPage({
               <article className="origincard-banner">
                 <div className="origincard-banner-media">
                   {originCard.pngUrl ? (
-                    <AssetImage src={originCard.pngUrl} alt={originCard.title ?? "OriginCard"} className="origincard-banner-image" />
+                    <AssetImage src={originCard.pngUrl} alt={originCard.title ?? "OriginCard"} fill className="origincard-banner-image" />
                   ) : (
                     <div className="origincard-banner-fallback">
                       <Image src={docElement} alt="" width={32} height={32} />
