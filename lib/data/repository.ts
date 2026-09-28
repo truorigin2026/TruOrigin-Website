@@ -48,6 +48,20 @@ const productInclude = {
   },
 } satisfies Prisma.ProductInclude;
 
+// Lighter include for list views (catalog grid, related products): the
+// card only renders name/brand/category/image, and the only other thing
+// read client-side is claim.status (for the certification filter) — no
+// need to fetch every claim's linked certificates, the product's own
+// certificates, ingredients, or origin cards for every row in a listing.
+const productSummaryInclude = {
+  brand: true,
+  category: true,
+  images: { orderBy: { position: "asc" as const } },
+  claims: { select: { id: true, status: true } },
+} satisfies Prisma.ProductInclude;
+
+type DbProductSummary = Prisma.ProductGetPayload<{ include: typeof productSummaryInclude }>;
+
 function formatDate(value: Date | null | undefined): string {
   const date = value ?? new Date();
   return new Intl.DateTimeFormat("en-US", {
@@ -140,6 +154,42 @@ function mapDbProduct(product: DbProduct): ProductRecord {
   };
 }
 
+function mapDbProductSummary(product: DbProductSummary): ProductRecord {
+  const imageGallery = product.images
+    .slice()
+    .sort((a, b) => a.position - b.position)
+    .map((image) => image.url);
+
+  const claims = product.claims.map((claim) => ({
+    id: claim.id,
+    text: "",
+    status: claimStatusMap[claim.status],
+    requiredEvidence: "",
+    evidence: "",
+    certificateIds: [] as string[],
+  }));
+
+  return {
+    id: product.id,
+    slug: product.slug,
+    scanCode: product.serialNumber ?? product.slug.toUpperCase(),
+    imageGallery: imageGallery.length > 0 ? imageGallery : ["/images/hero.webp"],
+    name: product.name,
+    brand: product.brand.name,
+    brandSlug: product.brand.slug,
+    brandLogoUrl: product.brand.logoUrl,
+    category: product.category.name,
+    subcategory: product.subcategory ?? product.category.name,
+    summary: product.description ?? "",
+    productNote: product.description ?? "",
+    lastUpdated: formatDate(product.approvedAt ?? product.updatedAt),
+    claims,
+    certificates: [],
+    ingredients: [],
+    originCard: null,
+  };
+}
+
 function allDemoProducts(): ProductRecord[] {
   const bySlug = new Map<string, ProductRecord>();
   for (const product of [...sampleProducts, ...publicProductCollection]) {
@@ -211,12 +261,12 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Product
           }
         : {}),
     },
-    include: productInclude,
+    include: productSummaryInclude,
     orderBy: { updatedAt: "desc" },
-  })) as DbProduct[];
+  })) as DbProductSummary[];
 
   if (dbProducts.length > 0) {
-    return dbProducts.map(mapDbProduct);
+    return dbProducts.map(mapDbProductSummary);
   }
 
   return applyDemoFilters(allDemoProducts(), filters);
