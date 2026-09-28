@@ -1,4 +1,4 @@
-import { QrCode, Clock, Globe2, MapPin } from "lucide-react";
+import { QrCode, Clock } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { StatGrid, StatCard } from "@/components/dashboard/stat-card";
 import { BucketList } from "@/components/dashboard/bucket-list";
@@ -31,7 +31,7 @@ export default async function AdminAnalyticsPage() {
       <PageHeader
         eyebrow="Admin Analytics"
         title="How consumers are scanning and exploring products."
-        description="Total scans, geography, and device breakdowns are live from product-page lookups and QR scans. Claim/certificate view time requires product-page instrumentation and shows an honest empty state until that ships."
+        description="Total scans and device breakdowns are live from product-page lookups and QR scans. Claim/certificate view time requires product-page instrumentation and shows an honest empty state until that ships."
       />
 
       <StatGrid>
@@ -42,13 +42,9 @@ export default async function AdminAnalyticsPage() {
           value={summary.averageViewTimeMs ? `${Math.round(summary.averageViewTimeMs / 1000)}s` : "No data yet"}
           detail="Requires product-page instrumentation"
         />
-        <StatCard icon={Globe2} label="Countries Reached" value={summary.byCountry.length} detail="Distinct scan origins" />
-        <StatCard icon={MapPin} label="Cities Reached" value={summary.byCity.length} detail="Distinct scan origins" />
       </StatGrid>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <BucketList title="By Country" buckets={summary.byCountry} />
-        <BucketList title="By City" buckets={summary.byCity} />
         <BucketList title="By Device" buckets={summary.byDevice} />
         <BucketList
           title="Most Viewed Products"

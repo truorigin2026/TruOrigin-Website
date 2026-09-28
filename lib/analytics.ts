@@ -86,8 +86,6 @@ export async function recordViewDuration(params: { sessionId: string; productId:
 
 export type AnalyticsSummary = {
   totalScans: number;
-  byCountry: { key: string; count: number }[];
-  byCity: { key: string; count: number }[];
   byDevice: { key: string; count: number }[];
   mostViewedProducts: { productId: string; count: number }[];
   mostScannedProducts: { productId: string; count: number }[];
@@ -102,8 +100,6 @@ export async function getAnalyticsSummary(productIds?: string[]): Promise<Analyt
 
   const [
     totalScans,
-    byCountryRaw,
-    byCityRaw,
     byDeviceRaw,
     byViewedProductRaw,
     byScannedProductRaw,
@@ -112,8 +108,6 @@ export async function getAnalyticsSummary(productIds?: string[]): Promise<Analyt
     avgDuration,
   ] = await Promise.all([
     prisma.scanEvent.count({ where: { eventType: "SCAN", ...productScope } }),
-    prisma.scanEvent.groupBy({ by: ["country"], _count: { _all: true }, where: { eventType: "SCAN", ...productScope } }),
-    prisma.scanEvent.groupBy({ by: ["city"], _count: { _all: true }, where: { eventType: "SCAN", ...productScope } }),
     prisma.scanEvent.groupBy({ by: ["device"], _count: { _all: true }, where: { eventType: "SCAN", ...productScope } }),
     prisma.scanEvent.groupBy({ by: ["productId"], _count: { _all: true }, where: { eventType: "VIEW", ...productScope } }),
     prisma.scanEvent.groupBy({ by: ["productId"], _count: { _all: true }, where: { eventType: "SCAN", ...productScope } }),
@@ -138,8 +132,6 @@ export async function getAnalyticsSummary(productIds?: string[]): Promise<Analyt
 
   return {
     totalScans,
-    byCountry: bucket(byCountryRaw, (r) => (r as { country: string | null }).country),
-    byCity: bucket(byCityRaw, (r) => (r as { city: string | null }).city),
     byDevice: bucket(byDeviceRaw, (r) => (r as { device: string | null }).device),
     mostViewedProducts: byViewedProductRaw
       .map((r) => ({ productId: r.productId, count: r._count._all }))
