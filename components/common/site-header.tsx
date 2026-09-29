@@ -87,9 +87,12 @@ function DesktopNavDropdown({ group, pathname }: { group: NavGroup; pathname: st
   );
 }
 
+// Point straight at the destination page rather than the bare segment
+// root (which just permanentRedirects here) — one fewer transition
+// stacked under the page crossfade when switching audiences.
 const audienceTabs = [
-  { key: "brands" as const, href: "/for-brands", label: "Brands", drawerLabel: "For Brands" },
-  { key: "products" as const, href: "/for-products", label: "Products", drawerLabel: "For Products" },
+  { key: "brands" as const, href: "/for-brands/home", label: "Brands", drawerLabel: "For Brands" },
+  { key: "products" as const, href: "/for-products/home", label: "Products", drawerLabel: "For Products" },
 ];
 
 const drawerSocialLinks = [

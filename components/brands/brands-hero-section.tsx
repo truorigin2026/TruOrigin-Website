@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { HeroReveal } from "@/components/motion";
 import { ButtonFillSweep } from "@/components/ui/button-fill-sweep";
 import { ButtonHoverUnderline } from "@/components/ui/button-hover-underline";
+import { ShaderErrorBoundary } from "@/components/gateway/shader-error-boundary";
 
 // Pulls in three.js — code-split the same way the homepage's shader
 // background already is, so it doesn't block hydration of this page.
@@ -14,22 +15,24 @@ export function BrandsHeroSection() {
     <section id="what-is-origincard" className="brands-hero-shell">
       <div className="container-shell">
         <div className="brands-hero-card">
-          <ColorBends
-            className="brands-hero-bg"
-            colors={["#0d4a28", "#1a7a44", "#4caf50", "#7bd682"]}
-            rotation={110}
-            speed={0.16}
-            scale={1.4}
-            frequency={1.1}
-            warpStrength={1.1}
-            mouseInfluence={0.6}
-            parallax={0.35}
-            noise={0.1}
-            iterations={2}
-            intensity={1.15}
-            bandWidth={5}
-            transparent={false}
-          />
+          <ShaderErrorBoundary>
+            <ColorBends
+              className="brands-hero-bg"
+              colors={["#0d4a28", "#1a7a44", "#4caf50", "#7bd682"]}
+              rotation={110}
+              speed={0.16}
+              scale={1.4}
+              frequency={1.1}
+              warpStrength={1.1}
+              mouseInfluence={0.6}
+              parallax={0.35}
+              noise={0.1}
+              iterations={2}
+              intensity={1.15}
+              bandWidth={5}
+              transparent={false}
+            />
+          </ShaderErrorBoundary>
           <div className="brands-hero-overlay" />
 
           <div className="brands-hero-card-inner">

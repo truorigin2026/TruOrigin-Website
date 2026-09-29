@@ -196,11 +196,24 @@ export default function ColorBends({
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: false,
-      powerPreference: "high-performance",
-      alpha: true,
-    });
+    // WebGLRenderer's constructor throws synchronously if it can't create a
+    // context (e.g. the browser's live-context limit is briefly exceeded
+    // while a previous instance's cleanup is still pending). Fail quietly
+    // instead of taking down the page — this is a decorative background,
+    // not essential content.
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: false,
+        powerPreference: "high-performance",
+        alpha: true,
+      });
+    } catch (error) {
+      console.warn("ColorBends: WebGL context unavailable, skipping shader background.", error);
+      geometry.dispose();
+      material.dispose();
+      return;
+    }
     rendererRef.current = renderer;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));

@@ -30,10 +30,11 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     <>
       <SmoothScroll />
       <SiteHeader />
-      <main className={`relative z-10 ${isAudienceHome ? "" : "site-content-with-header"}`}>
+      <motion.main layout className={`relative z-10 ${isAudienceHome ? "" : "site-content-with-header"}`}>
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.div
             key={pathname}
+            layout
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -42,7 +43,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             {children}
           </motion.div>
         </AnimatePresence>
-      </main>
+      </motion.main>
       <SiteFooter />
     </>
   );
