@@ -1,12 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FadeIn, HeroReveal } from "@/components/motion";
-import { AssetImage } from "@/components/brands/asset-image";
 import { ProductDetailTabs } from "@/components/products/product-detail-tabs";
 import { RelatedProductsStrip } from "@/components/products/related-products-strip";
 import { ScanSessionProvider, ScanTracker } from "@/components/analytics/scan-tracking";
 import { ProductRecord } from "@/lib/data/site-data";
-import docElement from "../../public/images/claim-elements/doc.webp";
 
 export function ProductDetailPage({
   product,
@@ -21,8 +19,6 @@ export function ProductDetailPage({
     { title: "Information Sources", value: "Brand-provided information" },
     { title: "Last Updated", value: product.lastUpdated },
   ];
-
-  const originCard = product.originCard;
 
   return (
     <ScanSessionProvider productId={product.id}>
@@ -71,44 +67,6 @@ export function ProductDetailPage({
         </section>
 
         <section className="container-shell product-detail-sections">
-          {originCard && originCard.status === "PUBLISHED" ? (
-            <FadeIn delay={0.05}>
-              <article className="origincard-banner">
-                <div className="origincard-banner-media">
-                  {originCard.pngUrl ? (
-                    <AssetImage src={originCard.pngUrl} alt={originCard.title ?? "OriginCard"} fill className="origincard-banner-image" />
-                  ) : (
-                    <div className="origincard-banner-fallback">
-                      <Image src={docElement} alt="" width={32} height={32} />
-                    </div>
-                  )}
-                </div>
-                <div className="origincard-banner-copy">
-                  <p className="origincard-banner-eyebrow">OriginCard</p>
-                  <h2>{originCard.title ?? "Product OriginCard"}</h2>
-                  <p>
-                    TruOrigin has published this product&apos;s information.
-                    {originCard.publishedAt ? ` Published ${originCard.publishedAt}.` : ""}
-                  </p>
-                  {originCard.pngUrl || originCard.pdfUrl ? (
-                    <div className="origincard-banner-actions">
-                      {originCard.pngUrl ? (
-                        <a href={originCard.pngUrl} target="_blank" rel="noreferrer" className="saas-btn-primary">
-                          <span>View Card</span>
-                        </a>
-                      ) : null}
-                      {originCard.pdfUrl ? (
-                        <a href={originCard.pdfUrl} target="_blank" rel="noreferrer" className="saas-btn-outline">
-                          <span>Download PDF</span>
-                        </a>
-                      ) : null}
-                    </div>
-                  ) : null}
-                </div>
-              </article>
-            </FadeIn>
-          ) : null}
-
           <FadeIn>
             <div className="product-stat-card">
               {highlightCards.map((item) => (
