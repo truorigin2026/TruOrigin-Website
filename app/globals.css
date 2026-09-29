@@ -4883,6 +4883,20 @@ a.contact-method-value:hover {
   background: rgba(26, 122, 68, 0.05);
 }
 
+.detail-cert-summary-chevron {
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: transform 0.2s ease;
+}
+
+.detail-cert-row.is-open .detail-cert-summary-chevron {
+  transform: rotate(90deg);
+}
+
+.detail-cert-row-details {
+  padding: 4px 12px 20px;
+}
+
 .detail-cert-summary-copy {
   display: flex;
   flex-direction: column;

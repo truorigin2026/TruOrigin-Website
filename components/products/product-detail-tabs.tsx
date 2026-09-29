@@ -107,6 +107,80 @@ function DocumentDetailPanel({
   );
 }
 
+function DocumentRow({ certificate }: { certificate: ProductCertificate }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const keyInfo = [
+    certificate.issuer ? { label: "Testing Organization", value: certificate.issuer } : null,
+    certificate.testType ? { label: "Test Type", value: certificate.testType } : null,
+    certificate.testDate ? { label: "Test Date", value: certificate.testDate } : null,
+    certificate.testScope ? { label: "Test Scope", value: certificate.testScope } : null,
+  ].filter((tile): tile is { label: string; value: string } => tile !== null);
+
+  return (
+    <TrackInView eventType="CERTIFICATE_VIEW" targetId={certificate.id}>
+      <li className={`detail-cert-row${isOpen ? " is-open" : ""}`}>
+        <button
+          type="button"
+          className="detail-cert-summary-row"
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen((open) => !open)}
+        >
+          <span className="detail-cert-summary-copy">
+            <span className="detail-cert-summary-type">
+              {certificateDocTypeLabels[certificate.docType] ?? certificate.docType}
+            </span>
+            <span className="detail-cert-summary-title">{certificate.title}</span>
+          </span>
+          <Badge variant={certificate.isPublic ? "success" : "warning"}>
+            {certificate.isPublic ? "Public" : "Private"}
+          </Badge>
+          <ChevronRight size={16} strokeWidth={2.2} className="detail-cert-summary-chevron" aria-hidden="true" />
+        </button>
+
+        {isOpen ? (
+          <div className="detail-cert-row-details">
+            {certificate.isPublic && certificate.fileUrl ? (
+              <div className="document-detail-actions">
+                <a href={certificate.fileUrl} target="_blank" rel="noreferrer" className="saas-btn-primary document-detail-action">
+                  <ExternalLink size={15} strokeWidth={2.2} />
+                  View Document
+                </a>
+                <a href={certificate.fileUrl} download className="document-detail-action document-detail-action-outline">
+                  <Download size={15} strokeWidth={2.2} />
+                  Download
+                </a>
+              </div>
+            ) : (
+              <p className="document-private-notice">
+                This document is kept private by the brand — only the information below is shown, never the
+                original file.
+              </p>
+            )}
+
+            {keyInfo.length > 0 ? (
+              <div className="key-info-section">
+                <p className="key-info-section-label">Key Information</p>
+                <div className="key-info-grid">
+                  {keyInfo.map((tile) => (
+                    <KeyInfoTile key={tile.label} label={tile.label} value={tile.value} />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {certificate.reviewNote ? (
+              <div className="key-findings-box">
+                <p className="key-findings-label">Key Findings</p>
+                <p className="key-findings-text">{certificate.reviewNote}</p>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </li>
+    </TrackInView>
+  );
+}
+
 function ClaimRow({
   claim,
   certificates,
@@ -308,38 +382,13 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
             </div>
           ) : null}
 
-          {activeTab === "documents" && selectedCertificate ? (
-            <DocumentDetailPanel
-              certificate={selectedCertificate}
-              backLabel="Back to Documents"
-              onBack={() => setSelectedCertificateId(null)}
-            />
-          ) : null}
-
-          {activeTab === "documents" && !selectedCertificate ? (
+          {activeTab === "documents" ? (
             <div className="detail-section-card">
               <h2>Documents</h2>
               {certificates.length > 0 ? (
                 <ul className="detail-cert-summary-list">
                   {certificates.map((certificate) => (
-                    <li key={certificate.id}>
-                      <button
-                        type="button"
-                        className="detail-cert-summary-row"
-                        onClick={() => setSelectedCertificateId(certificate.id)}
-                      >
-                        <span className="detail-cert-summary-copy">
-                          <span className="detail-cert-summary-type">
-                            {certificateDocTypeLabels[certificate.docType] ?? certificate.docType}
-                          </span>
-                          <span className="detail-cert-summary-title">{certificate.title}</span>
-                        </span>
-                        <Badge variant={certificate.isPublic ? "success" : "warning"}>
-                          {certificate.isPublic ? "Public" : "Private"}
-                        </Badge>
-                        <ChevronRight size={16} strokeWidth={2.2} aria-hidden="true" />
-                      </button>
-                    </li>
+                    <DocumentRow key={certificate.id} certificate={certificate} />
                   ))}
                 </ul>
               ) : (
