@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useScroll, useMotionValueEvent } from "framer-motion";
 
 type WhyPoint = {
   title: string;
@@ -9,27 +10,28 @@ type WhyPoint = {
 
 export function BrandsWhySection({ points }: { points: readonly WhyPoint[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const stackRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Array<HTMLElement | null>>([]);
+  const transitions = Math.max(points.length - 1, 1);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const index = Number((entry.target as HTMLElement).dataset.index);
-            setActiveIndex(index);
-          }
-        });
-      },
-      { rootMargin: "-45% 0px -45% 0px", threshold: 0 }
-    );
+  // Each card is `position: sticky` and visually stacks on top of the
+  // previous one — IntersectionObserver can't tell which is topmost
+  // (covered siblings stay geometrically "intersecting" even once hidden
+  // behind the next card), which made the active index track correctly
+  // scrolling down but get stuck on the last card scrolling back up.
+  // Mapping continuous scroll progress to an index instead — the same
+  // technique BrandsQuickVerifySection already uses for its own sticky
+  // stack — works identically in both directions since it's just "where
+  // am I right now," not an enter/exit event.
+  const { scrollYProgress } = useScroll({
+    target: stackRef,
+    offset: ["start start", "end end"],
+  });
 
-    cardRefs.current.forEach((el) => {
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [points]);
+  useMotionValueEvent(scrollYProgress, "change", (value) => {
+    const next = Math.min(points.length - 1, Math.max(0, Math.round(value * transitions)));
+    setActiveIndex(next);
+  });
 
   const scrollToCard = (index: number) => {
     cardRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "center" });
