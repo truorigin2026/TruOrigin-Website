@@ -9142,6 +9142,8 @@ a.contact-method-value:hover {
   max-width: 560px;
   aspect-ratio: 4 / 3;
   margin-inline: auto;
+  overflow: hidden;
+  border-radius: 28px;
 }
 
 .brands-verify-photo {
