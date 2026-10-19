@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
+import { revalidatePublicProduct } from "@/lib/revalidate";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdminSession(request);
@@ -14,6 +15,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (!brand) {
     return NextResponse.json({ error: "Brand not found" }, { status: 404 });
   }
+
+  const affectedProducts = await prisma.product.findMany({
+    where: { brandId: id, hidden: false },
+    select: { slug: true, serialNumber: true },
+  });
 
   const now = new Date();
   await prisma.$transaction([
@@ -29,6 +35,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     targetLabel: brand.name,
     request,
   });
+
+  // This hides every product the brand had live, which is a public-facing
+  // change on statically-cached pages — same revalidation this route was
+  // missing relative to every other product-visibility route.
+  for (const product of affectedProducts) {
+    revalidatePublicProduct({ slug: product.slug, serialNumber: product.serialNumber });
+  }
 
   return NextResponse.json({ ok: true });
 }
