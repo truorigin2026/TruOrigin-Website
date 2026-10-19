@@ -5,6 +5,7 @@ import { nextSerialNumber } from "@/lib/serial";
 import { requireAdminSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
+import { revalidatePublicProduct } from "@/lib/revalidate";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdminSession(request);
@@ -58,6 +59,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       href: `/brand/products/${id}/edit`,
     });
 
+    revalidatePublicProduct({ slug: product.slug, serialNumber: product.serialNumber });
+
     return NextResponse.json({ ok: true, product: updated });
   }
 
@@ -103,6 +106,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     message: `"${product.name}" was approved and is now live`,
     href: `/brand/products/${id}`,
   });
+
+  revalidatePublicProduct({ slug: updated.slug, serialNumber: updated.serialNumber });
 
   return NextResponse.json({
     ok: true,

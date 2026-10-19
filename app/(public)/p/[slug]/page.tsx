@@ -5,6 +5,12 @@ import { getProductBySerial, getProductBySlug, getProducts, getRelatedProducts }
 import { JsonLd } from "@/components/seo/json-ld";
 import { absoluteUrl, breadcrumbJsonLd, productJsonLd } from "@/lib/seo";
 
+// Statically generated per product (see generateStaticParams below), so
+// without this a product edit never reaches this page until a full
+// redeploy — revalidatePublicProduct() gives an immediate refresh after a
+// mutation, this is just a self-healing fallback in case a path misses it.
+export const revalidate = 3600;
+
 async function resolveProduct(param: string) {
   return (await getProductBySerial(param)) ?? (await getProductBySlug(param));
 }

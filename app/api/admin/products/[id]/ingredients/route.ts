@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
+import { revalidatePublicProduct } from "@/lib/revalidate";
 
 type Body = { ingredients?: { name?: string; note?: string }[] };
 
@@ -42,6 +43,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     metadata: { ingredientCount: result.length },
     request,
   });
+
+  revalidatePublicProduct({ slug: product.slug, serialNumber: product.serialNumber });
 
   return NextResponse.json({ ok: true, ingredients: result });
 }

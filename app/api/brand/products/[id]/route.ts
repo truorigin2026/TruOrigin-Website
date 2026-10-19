@@ -4,6 +4,7 @@ import { requireBrandSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
 import { isTrustedBlobUrl } from "@/lib/blob";
 import { createCertificatesAndClaims, type CertificateInput, type ClaimInput } from "@/lib/product-submission";
+import { revalidatePublicProduct } from "@/lib/revalidate";
 
 type PatchBody = {
   name?: string;
@@ -114,6 +115,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     targetLabel: updated.name,
     request,
   });
+
+  // Covers both directions: an edit to a live product takes it offline
+  // (needsReReview), and a re-approval later brings an edited product back —
+  // either way the public pages were showing this product's old state.
+  revalidatePublicProduct({ slug: updated.slug, serialNumber: updated.serialNumber });
 
   return NextResponse.json({ ok: true, product: { id: updated.id, slug: updated.slug } });
 }

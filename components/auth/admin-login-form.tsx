@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
@@ -9,7 +8,6 @@ import { HeroReveal } from "@/components/motion";
 import { PasswordInput } from "@/components/ui/password-input";
 
 export function AdminLoginForm() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -33,10 +31,14 @@ export function AdminLoginForm() {
         throw new Error(data.error ?? "Unable to sign in.");
       }
 
-      router.replace(data.redirectTo ?? "/admin");
+      // A hard navigation instead of router.replace(): the App Router's
+      // client-side cache can reuse a previously-fetched (pre-login)
+      // version of the destination route, so the first click would land
+      // back on login and only a second click (after the cache gave up)
+      // would actually get through.
+      window.location.href = data.redirectTo ?? "/admin";
     } catch (error) {
       setError(error instanceof Error ? error.message : "Unable to sign in.");
-    } finally {
       setLoading(false);
     }
   }

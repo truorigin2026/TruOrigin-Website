@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
+import { revalidatePublicProduct } from "@/lib/revalidate";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdminSession(request);
@@ -25,6 +26,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     targetLabel: product.name,
     request,
   });
+
+  revalidatePublicProduct({ slug: product.slug, serialNumber: product.serialNumber });
 
   return NextResponse.json({ ok: true });
 }
