@@ -1,8 +1,17 @@
 "use client";
 
+import { useEffect } from "react";
 import { ShaderGradientCanvas, ShaderGradient } from "@shadergradient/react";
 
-export function GatewayShaderBackground() {
+export function GatewayShaderBackground({ onReady }: { onReady?: () => void }) {
+  useEffect(() => {
+    // Wait a frame past mount so the canvas has actually painted before the
+    // caller starts animating it into view, instead of revealing emptiness.
+    const raf = requestAnimationFrame(() => requestAnimationFrame(() => onReady?.()));
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <ShaderGradientCanvas
       style={{ width: "100%", height: "100%" }}

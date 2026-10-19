@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 import { FadeIn, HeroReveal } from "@/components/motion";
 import { ShaderErrorBoundary } from "@/components/gateway/shader-error-boundary";
 import logo from "../../public/images/logos/truorigin-logo.svg";
@@ -13,11 +14,13 @@ const GatewayShaderBackground = dynamic(
 );
 
 export function SiteGateway() {
+  const [bgRevealed, setBgRevealed] = useState(false);
+
   return (
     <div className="gateway-page">
-      <div className="gateway-shader-bg" aria-hidden="true">
+      <div className={`gateway-shader-bg${bgRevealed ? " is-revealed" : ""}`} aria-hidden="true">
         <ShaderErrorBoundary>
-          <GatewayShaderBackground />
+          <GatewayShaderBackground onReady={() => setBgRevealed(true)} />
         </ShaderErrorBoundary>
       </div>
 

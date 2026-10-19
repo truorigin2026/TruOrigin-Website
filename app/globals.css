@@ -10090,6 +10090,19 @@ a.contact-method-value:hover {
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  clip-path: circle(0px at 100% 0%);
+  transition: clip-path 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gateway-shader-bg.is-revealed {
+  clip-path: circle(farthest-corner at 100% 0%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gateway-shader-bg {
+    clip-path: none;
+    transition: none;
+  }
 }
 
 .gateway-shader-bg::after {
