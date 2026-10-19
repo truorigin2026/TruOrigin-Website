@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useScroll, useMotionValueEvent } from "framer-motion";
 
 type WhyPoint = {
@@ -8,28 +8,59 @@ type WhyPoint = {
   description: string;
 };
 
+// Walks the offsetParent chain to get an element's normal-flow resting
+// position — unaffected by `position: sticky`'s current stuck state or any
+// in-flight CSS transform, unlike getBoundingClientRect().
+function getStaticTop(el: HTMLElement): number {
+  let top = 0;
+  let node: HTMLElement | null = el;
+  while (node) {
+    top += node.offsetTop;
+    node = node.offsetParent as HTMLElement | null;
+  }
+  return top;
+}
+
 export function BrandsWhySection({ points }: { points: readonly WhyPoint[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const stackRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Array<HTMLElement | null>>([]);
-  const transitions = Math.max(points.length - 1, 1);
+  const thresholdsRef = useRef<number[]>([]);
+  const { scrollY } = useScroll();
 
   // Each card is `position: sticky` and visually stacks on top of the
-  // previous one — IntersectionObserver can't tell which is topmost
-  // (covered siblings stay geometrically "intersecting" even once hidden
-  // behind the next card), which made the active index track correctly
-  // scrolling down but get stuck on the last card scrolling back up.
-  // Mapping continuous scroll progress to an index instead — the same
-  // technique BrandsQuickVerifySection already uses for its own sticky
-  // stack — works identically in both directions since it's just "where
-  // am I right now," not an enter/exit event.
-  const { scrollYProgress } = useScroll({
-    target: stackRef,
-    offset: ["start start", "end end"],
-  });
+  // previous one. A card becomes the topmost card exactly when the page
+  // has scrolled far enough for its own sticky `top` offset to engage —
+  // i.e. when scrollY reaches (card's static top - its sticky top offset).
+  // Computing that threshold directly per card (rather than estimating a
+  // proportional share of total scroll progress) keeps the active index
+  // pixel-accurate to which card is actually on top, in both directions.
+  useEffect(() => {
+    function measure() {
+      thresholdsRef.current = cardRefs.current.map((el) => {
+        if (!el) return 0;
+        const topOffset = parseFloat(getComputedStyle(el).top) || 0;
+        return getStaticTop(el) - topOffset;
+      });
+    }
 
-  useMotionValueEvent(scrollYProgress, "change", (value) => {
-    const next = Math.min(points.length - 1, Math.max(0, Math.round(value * transitions)));
+    const raf = requestAnimationFrame(measure);
+    window.addEventListener("resize", measure);
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(document.body);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", measure);
+      resizeObserver.disconnect();
+    };
+  }, [points]);
+
+  useMotionValueEvent(scrollY, "change", (value) => {
+    const thresholds = thresholdsRef.current;
+    let next = 0;
+    for (let i = 0; i < thresholds.length; i += 1) {
+      if (value >= thresholds[i]) next = i;
+    }
     setActiveIndex(next);
   });
 
