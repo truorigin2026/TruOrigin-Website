@@ -10097,7 +10097,11 @@ a.contact-method-value:hover {
 }
 
 .gateway-shader-bg.is-revealed {
-  clip-path: circle(farthest-corner at 100% 0%);
+  /* circle() only supports closest-side/farthest-side keywords, not
+     farthest-corner (that's a radial-gradient() extent keyword) — 150%
+     safely clears the diagonal to the opposite corner from any aspect
+     ratio, since a percentage radius resolves against sqrt((w²+h²)/2). */
+  clip-path: circle(150% at 100% 0%);
 }
 
 @media (prefers-reduced-motion: reduce) {
