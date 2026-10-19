@@ -8,61 +8,43 @@ type WhyPoint = {
   description: string;
 };
 
-// Walks the offsetParent chain to get an element's normal-flow resting
-// position — unaffected by `position: sticky`'s current stuck state or any
-// in-flight CSS transform, unlike getBoundingClientRect().
-function getStaticTop(el: HTMLElement): number {
-  let top = 0;
-  let node: HTMLElement | null = el;
-  while (node) {
-    top += node.offsetTop;
-    node = node.offsetParent as HTMLElement | null;
-  }
-  return top;
-}
-
 export function BrandsWhySection({ points }: { points: readonly WhyPoint[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const cardRefs = useRef<Array<HTMLElement | null>>([]);
-  const thresholdsRef = useRef<number[]>([]);
   const { scrollY } = useScroll();
 
-  // Each card is `position: sticky` and visually stacks on top of the
-  // previous one. A card becomes the topmost card exactly when the page
-  // has scrolled far enough for its own sticky `top` offset to engage —
-  // i.e. when scrollY reaches (card's static top - its sticky top offset).
-  // Computing that threshold directly per card (rather than estimating a
-  // proportional share of total scroll progress) keeps the active index
-  // pixel-accurate to which card is actually on top, in both directions.
-  useEffect(() => {
-    function measure() {
-      thresholdsRef.current = cardRefs.current.map((el) => {
-        if (!el) return 0;
-        const topOffset = parseFloat(getComputedStyle(el).top) || 0;
-        return getStaticTop(el) - topOffset;
-      });
-    }
-
-    const raf = requestAnimationFrame(measure);
-    window.addEventListener("resize", measure);
-    const resizeObserver = new ResizeObserver(measure);
-    resizeObserver.observe(document.body);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", measure);
-      resizeObserver.disconnect();
-    };
-  }, [points]);
-
-  useMotionValueEvent(scrollY, "change", (value) => {
-    const thresholds = thresholdsRef.current;
+  // Each card is `position: sticky`, higher-indexed cards stacking on top
+  // of earlier ones via z-index. A sticky element's rendered top can never
+  // go above its own CSS `top` offset — it sits below that offset before
+  // engaging, then locks exactly at it once stuck (and stays there even
+  // after being visually covered by a later card, or after scrolling past
+  // it off-screen). So "rect.top has reached the card's own offset" is a
+  // direct, always-current signal of "this card's threshold is behind us,"
+  // checked fresh on every scroll tick — nothing is cached, so nothing can
+  // go stale regardless of when layout settles, and it's symmetric in
+  // both scroll directions since it's just reading where things are right now.
+  function resolveActiveIndex() {
     let next = 0;
-    for (let i = 0; i < thresholds.length; i += 1) {
-      if (value >= thresholds[i]) next = i;
-    }
-    setActiveIndex(next);
+    cardRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const rectTop = el.getBoundingClientRect().top;
+      const cssTop = parseFloat(getComputedStyle(el).top) || 0;
+      if (rectTop <= cssTop + 1) next = i;
+    });
+    return next;
+  }
+
+  useMotionValueEvent(scrollY, "change", () => {
+    setActiveIndex(resolveActiveIndex());
   });
+
+  // Covers loading the page already scrolled mid-section (anchor link,
+  // scroll restoration) — otherwise the index wouldn't update until the
+  // next scroll event.
+  useEffect(() => {
+    setActiveIndex(resolveActiveIndex());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [points]);
 
   const scrollToCard = (index: number) => {
     cardRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "center" });
