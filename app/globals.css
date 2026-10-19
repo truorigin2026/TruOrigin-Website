@@ -9064,7 +9064,7 @@ a.contact-method-value:hover {
 
 .brands-verify-grid {
   display: grid;
-  grid-template-columns: minmax(280px, 0.85fr) minmax(320px, 1.1fr);
+  grid-template-columns: minmax(320px, 1.1fr) minmax(280px, 0.85fr);
   gap: clamp(32px, 5vw, 72px);
   align-items: center;
   width: 100%;
@@ -9073,60 +9073,67 @@ a.contact-method-value:hover {
 .brands-verify-steps {
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1.4vh, 14px);
 }
 
 .brands-verify-step {
-  padding: clamp(10px, 2.2vh, 18px) 22px;
-  border-radius: 18px;
-  background: transparent;
-  transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.4s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: clamp(14px, 2.6vh, 22px) 0;
+  border-bottom: 1px solid rgba(18, 58, 37, 0.12);
 }
 
-.brands-verify-step.is-active {
-  background: linear-gradient(135deg, #4caf50, #2e8b3f);
-  box-shadow: 0 16px 32px rgba(76, 175, 80, 0.32);
+.brands-verify-step:last-child {
+  border-bottom: none;
 }
 
-.brands-verify-step-tag {
-  display: block;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(76, 175, 80, 0.75);
+.brands-verify-step-index {
+  flex: 0 0 auto;
+  padding-top: 3px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(76, 175, 80, 0.55);
   transition: color 0.35s ease;
 }
 
-.brands-verify-step.is-active .brands-verify-step-tag {
-  color: rgba(255, 255, 255, 0.85);
+.brands-verify-step.is-active .brands-verify-step-index {
+  color: #2e8b3f;
+}
+
+.brands-verify-step-content {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .brands-verify-step h3 {
-  margin: 6px 0 0;
+  margin: 0;
   font-family: var(--font-playfair), "Sora", sans-serif;
   font-size: clamp(1.15rem, 1.5vw, 1.5rem);
   font-weight: 600;
-  color: rgba(10, 31, 22, 0.55);
+  color: rgba(10, 31, 22, 0.42);
   transition: color 0.35s ease;
 }
 
 .brands-verify-step.is-active h3 {
-  color: #ffffff;
+  color: #0f1a14;
 }
 
 .brands-verify-step p {
-  margin: 8px 0 0;
   max-width: 42ch;
+  margin: 0;
   font-size: 15px;
   line-height: 1.65;
-  color: rgba(15, 26, 20, 0.45);
-  transition: color 0.35s ease;
+  color: rgba(15, 26, 20, 0.6);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, margin-top 0.45s ease;
 }
 
 .brands-verify-step.is-active p {
-  color: rgba(255, 255, 255, 0.88);
+  margin-top: 10px;
+  max-height: 160px;
+  opacity: 1;
 }
 
 .brands-verify-stack {
@@ -9204,6 +9211,15 @@ a.contact-method-value:hover {
     padding: 18px 20px 22px;
   }
 
+  .brands-verify-step-tag {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(76, 175, 80, 0.85);
+  }
+
   .brands-verify-card-body h3 {
     margin: 6px 0 0;
     font-family: var(--font-playfair), "Sora", sans-serif;
@@ -9252,12 +9268,8 @@ a.contact-method-value:hover {
     display: none;
   }
 
-  .brands-verify-steps {
-    gap: 6px;
-  }
-
   .brands-verify-step {
-    padding: 10px 16px;
+    padding: 10px 0;
   }
 
   .brands-verify-step p {

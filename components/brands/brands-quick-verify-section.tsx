@@ -12,14 +12,12 @@ type QuickStep = {
   image: string;
 };
 
-type StackPoint = [scrollX: number, scale: number, y: number, opacity: number, x: number, rotate: number];
-
-// Local to this section: the pinned photo-stack below drives up to five
-// scroll-linked transforms per step every scroll frame, which is too heavy
-// to feel smooth on phones. Below this breakpoint (matches this section's
-// own mobile CSS) we swap to a plain swipeable carousel instead of
-// scroll-jacking — same technique BrandsAdvantageSection already uses for
-// its own pinned crossfade.
+// Local to this section: the pinned photo below drives a scroll-linked
+// transform per step every scroll frame, which is too heavy to feel smooth
+// on phones. Below this breakpoint (matches this section's own mobile CSS)
+// we swap to a plain swipeable carousel instead of scroll-jacking — same
+// technique BrandsAdvantageSection already uses for its own pinned
+// crossfade.
 function useIsMobileVerify() {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -46,49 +44,17 @@ function VerifyPhoto({
   scrollYProgress: MotionValue<number>;
 }) {
   const transitions = Math.max(total - 1, 1);
-  const segFrac = 1 / transitions;
-  const isFirst = index === 0;
-  const isLast = index === total - 1;
-
-  const settleStart = isFirst ? 0 : (index - 1) * segFrac;
-  const settleEnd = isFirst ? 0 : index * segFrac;
-  const flyEnd = !isLast ? (index + 1) * segFrac : 1;
-
-  const peekScale = 1 - index * 0.045;
-  const peekY = index * 26;
-  const peekX = index * 26;
-  const peekRotate = index * 4;
-  const peekOpacity = isFirst ? 1 : 0.92;
-
-  const points: StackPoint[] = [];
-  if (isFirst) {
-    points.push([0, 1, 0, 1, 0, 0]);
-  } else {
-    points.push([0, peekScale, peekY, peekOpacity, peekX, peekRotate]);
-    if (settleStart > 0) points.push([settleStart, peekScale, peekY, peekOpacity, peekX, peekRotate]);
-    points.push([settleEnd, 1, 0, 1, 0, 0]);
-  }
-  if (!isLast) points.push([flyEnd, 0.95, -40, 0, -14, -3]);
-
-  const deduped: StackPoint[] = [];
-  for (const point of points) {
-    if (deduped.length && deduped[deduped.length - 1][0] === point[0]) {
-      deduped[deduped.length - 1] = point;
-    } else {
-      deduped.push(point);
-    }
-  }
-
-  const xs = deduped.map((point) => point[0]);
-  const scale = useTransform(scrollYProgress, xs, deduped.map((point) => point[1]));
-  const y = useTransform(scrollYProgress, xs, deduped.map((point) => point[2]));
-  const opacity = useTransform(scrollYProgress, xs, deduped.map((point) => point[3]));
-  const x = useTransform(scrollYProgress, xs, deduped.map((point) => point[4]));
-  const rotate = useTransform(scrollYProgress, xs, deduped.map((point) => point[5]));
+  // The first photo is already in place when the section loads. Every later
+  // photo slides up from below to cover whatever's currently showing, over
+  // the same scroll window during which the step before it is active — so
+  // the cover finishes exactly as its own step's text becomes active.
+  const range: [number, number] = index === 0 ? [0, 1] : [(index - 1) / transitions, index / transitions];
+  const output = index === 0 ? ["0%", "0%"] : ["100%", "0%"];
+  const y = useTransform(scrollYProgress, range, output);
 
   return (
-    <motion.div className="brands-verify-photo" style={{ scale, y, x, rotate, opacity, zIndex: total - index }}>
-      <AssetImage src={step.image} alt={step.title} fill className="brands-verify-photo-img" priority />
+    <motion.div className="brands-verify-photo" style={{ y, zIndex: index + 1 }}>
+      <AssetImage src={step.image} alt={step.title} fill className="brands-verify-photo-img" priority={index === 0} />
     </motion.div>
   );
 }
@@ -212,6 +178,12 @@ export function BrandsQuickVerifySection({ steps }: { steps: readonly QuickStep[
             </>
           ) : (
             <div className="container-shell brands-verify-grid">
+              <div className="brands-verify-stack">
+                {steps.map((step, index) => (
+                  <VerifyPhoto key={step.title} step={step} index={index} total={steps.length} scrollYProgress={scrollYProgress} />
+                ))}
+              </div>
+
               <div className="brands-verify-steps">
                 {steps.map((step, index) => (
                   <div
@@ -221,16 +193,12 @@ export function BrandsQuickVerifySection({ steps }: { steps: readonly QuickStep[
                     }}
                     className={`brands-verify-step${index === 0 ? " is-active" : ""}`}
                   >
-                    <span className="brands-verify-step-tag">Step 0{index + 1}</span>
-                    <h3>{step.title}</h3>
-                    <p>{step.description}</p>
+                    <span className="brands-verify-step-index">.0{index + 1}</span>
+                    <div className="brands-verify-step-content">
+                      <h3>{step.title}</h3>
+                      <p>{step.description}</p>
+                    </div>
                   </div>
-                ))}
-              </div>
-
-              <div className="brands-verify-stack">
-                {steps.map((step, index) => (
-                  <VerifyPhoto key={step.title} step={step} index={index} total={steps.length} scrollYProgress={scrollYProgress} />
                 ))}
               </div>
             </div>
