@@ -28,8 +28,21 @@ export async function POST(request: NextRequest) {
   const tokenHash = hashResetToken(token);
   const user = await prisma.user.findUnique({ where: { resetTokenHash: tokenHash } });
 
+  // Same generic message for every rejection reason (expired, reused —
+  // resetTokenHash is cleared below so a second use of the same token
+  // simply matches no user — wrong role, or a suspended account) so a
+  // leaked/guessed token can't be used to learn *why* it didn't work,
+  // which would otherwise leak account status.
+  const invalidOrExpired = NextResponse.json({ error: "This reset link is invalid or has expired." }, { status: 400 });
+
   if (!user || !user.resetTokenExpires || user.resetTokenExpires < new Date()) {
-    return NextResponse.json({ error: "This reset link is invalid or has expired." }, { status: 400 });
+    return invalidOrExpired;
+  }
+  // Defense in depth: nothing else in the codebase currently sets
+  // resetTokenHash for a non-BRAND or inactive user, but this endpoint
+  // shouldn't rely on that staying true elsewhere to stay safe.
+  if (user.role !== "BRAND" || !user.active) {
+    return invalidOrExpired;
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -41,6 +54,10 @@ export async function POST(request: NextRequest) {
       resetTokenHash: null,
       resetTokenExpires: null,
       mustChangePassword: false,
+      // Same reasoning as the self-service password-change route: this
+      // is a real credential change, so every other already-issued
+      // session for this user should stop working.
+      tokenVersion: { increment: 1 },
     },
   });
 

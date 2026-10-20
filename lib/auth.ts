@@ -15,6 +15,18 @@ export type SessionPayload = {
   brandSlug?: string | null;
   brandName?: string | null;
   mustChangePassword?: boolean;
+  // Required (not optional): every call site must supply the user's
+  // current User.tokenVersion at sign time, so a token can't be issued
+  // without one by omission. Checked against the live DB value wherever
+  // a session is resolved to a user (getCurrentUser, requireAdminSession,
+  // requireBrandSession) — a mismatch means the password was changed
+  // (or the session was otherwise force-revoked) since this token was
+  // issued, and it's rejected even though its signature and expiry are
+  // still valid. verifySessionToken() itself has no DB access and can't
+  // check this — it only confirms the token wasn't tampered with and
+  // hasn't expired; tokenVersion is checked one layer up, by whichever
+  // function fetches the user record anyway (no added DB round-trip).
+  tokenVersion: number;
 };
 
 function getJwtSecret() {

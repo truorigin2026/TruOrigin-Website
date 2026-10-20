@@ -20,7 +20,7 @@ function req(path: string, cookieValue?: string) {
 }
 
 async function adminToken(overrides: Partial<Parameters<typeof signSession>[0]> = {}) {
-  return signSession({ sub: "admin-1", email: "admin@example.test", role: "ADMIN", ...overrides });
+  return signSession({ sub: "admin-1", email: "admin@example.test", role: "ADMIN", tokenVersion: 0, ...overrides });
 }
 
 async function brandToken(overrides: Partial<Parameters<typeof signSession>[0]> = {}) {
@@ -30,6 +30,7 @@ async function brandToken(overrides: Partial<Parameters<typeof signSession>[0]> 
     role: "BRAND",
     brandId: "brand-1",
     mustChangePassword: false,
+    tokenVersion: 0,
     ...overrides,
   });
 }
