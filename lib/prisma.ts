@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
+import { resolveSslConfig } from "./db-connection";
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
@@ -20,19 +21,11 @@ if (!connectionString) {
 // (confirmed in CI: "the server does not support SSL connections").
 // Scoped to hostname rather than NODE_ENV/CI env vars so it can't be
 // accidentally toggled by an unrelated environment flag — nothing
-// resolving to a real deployment is ever reachable via localhost.
-function isLoopbackHost(url: string): boolean {
-  try {
-    const { hostname } = new URL(url);
-    return hostname === "localhost" || hostname === "127.0.0.1";
-  } catch {
-    return false;
-  }
-}
-
+// resolving to a real deployment is ever reachable via a loopback
+// hostname. See lib/db-connection.ts for the (unit-tested) logic.
 const adapter = new PrismaPg({
   connectionString,
-  ssl: isLoopbackHost(connectionString) ? false : { rejectUnauthorized: true },
+  ssl: resolveSslConfig(connectionString),
 });
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
