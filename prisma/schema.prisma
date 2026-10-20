@@ -134,6 +134,14 @@ model User {
   role              UserRole   @default(VISITOR)
   active            Boolean    @default(true)
   mustChangePassword Boolean   @default(false)
+  // Bumped on password change (and available for an admin-forced
+  // "sign out everywhere" later). Embedded in every issued JWT as a
+  // claim; a session whose claim doesn't match the current value is
+  // rejected even though the token's signature and expiry are still
+  // valid — this is what makes a password change actually revoke
+  // every other already-issued session instead of just the one that
+  // changed it.
+  tokenVersion      Int        @default(0)
   lastLoginAt       DateTime?
   resetTokenHash    String?    @unique
   resetTokenExpires DateTime?

@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same branch/PR instead of letting them
+# queue and finish out of order.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Placeholder values only — nothing here is a real secret. These exist so
+  # code that reads process.env.* at import time (e.g. the admin-login
+  # module hashing ADMIN_PASSWORD at load time) doesn't throw during
+  # typecheck/lint/test. Do not put real credentials in this file — use
+  # repository secrets (${{ secrets.NAME }}) if a future job needs one.
+  JWT_SECRET: "ci-placeholder-secret-not-for-real-use"
+  ADMIN_EMAIL: "ci-placeholder@example.com"
+  ADMIN_PASSWORD: "ci-placeholder-password"
+  NEXT_PUBLIC_SITE_URL: "https://example.com"
+
+jobs:
+  verify:
+    name: Typecheck, lint, test, build
+    runs-on: ubuntu-latest
+
+    # The production build is NOT purely static: /p/[slug]'s
+    # generateStaticParams() queries the database directly (via Prisma, not
+    # Next's fetch cache) to enumerate which products to pre-render, so
+    # `next build` genuinely fails without a reachable Postgres instance —
+    # confirmed locally: the build throws ECONNREFUSED from
+    # generateStaticParams the moment the configured DATABASE_URL isn't
+    # reachable. An empty, ephemeral database is sufficient — the query
+    # just needs to succeed, not return real rows.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci"
+      DIRECT_URL: "postgresql://ci:ci@localhost:5432/ci"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Push schema to the ephemeral CI database
+        run: npx prisma db push --config prisma.config.ts --accept-data-loss
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Production build
+        run: npm run build
+
+      - name: Dependency audit (production dependencies only, informational)
+        run: npm audit --omit=dev || true

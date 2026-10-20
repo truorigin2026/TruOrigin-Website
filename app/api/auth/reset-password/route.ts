@@ -28,8 +28,25 @@ export async function POST(request: NextRequest) {
   const tokenHash = hashResetToken(token);
   const user = await prisma.user.findUnique({ where: { resetTokenHash: tokenHash } });
 
+  // Same generic message for every rejection reason (expired, reused —
+  // resetTokenHash is cleared below so a second use of the same token
+  // simply matches no user — wrong role, or a suspended account) so a
+  // leaked/guessed token can't be used to learn *why* it didn't work,
+  // which would otherwise leak account status.
+  const invalidOrExpired = NextResponse.json({ error: "This reset link is invalid or has expired." }, { status: 400 });
+
   if (!user || !user.resetTokenExpires || user.resetTokenExpires < new Date()) {
-    return NextResponse.json({ error: "This reset link is invalid or has expired." }, { status: 400 });
+    return invalidOrExpired;
+  }
+  // Both BRAND and ADMIN accounts can legitimately hold a reset token:
+  // the brand self-service/forgot-password flow for BRAND, and
+  // app/api/admin/users/[id]/reset-password (deliberately requested,
+  // not the auto-sync-on-login path) for ADMIN — that route places no
+  // role restriction on which user it can target. Anything else
+  // (VISITOR/CONSUMER) should never have a resetTokenHash set by any
+  // code path; rejected here as defense in depth regardless.
+  if ((user.role !== "BRAND" && user.role !== "ADMIN") || !user.active) {
+    return invalidOrExpired;
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -41,6 +58,10 @@ export async function POST(request: NextRequest) {
       resetTokenHash: null,
       resetTokenExpires: null,
       mustChangePassword: false,
+      // Same reasoning as the self-service password-change route: this
+      // is a real credential change, so every other already-issued
+      // session for this user should stop working.
+      tokenVersion: { increment: 1 },
     },
   });
 

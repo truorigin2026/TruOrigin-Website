@@ -25,7 +25,9 @@ const WEBP_CONVERTIBLE_TYPES = new Set(["image/jpeg", "image/png"]);
 // The browser-reported File.type is client-supplied and trivially spoofable, so it's only
 // a first-pass filter. matchesMagicBytes() checks the actual file signature (first bytes)
 // against what each allowed MIME type looks like on disk before it's trusted for upload.
-function matchesMagicBytes(bytes: Uint8Array, mimeType: string): boolean {
+// Exported for unit testing — the real defense against a spoofed MIME type lives here,
+// not in the (trivially bypassable) assertUploadableFile() declared-type check.
+export function matchesMagicBytes(bytes: Uint8Array, mimeType: string): boolean {
   switch (mimeType) {
     case "image/jpeg":
       return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;

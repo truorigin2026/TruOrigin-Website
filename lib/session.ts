@@ -18,10 +18,18 @@ export const getCurrentUser = cache(async () => {
   const session = await getSession();
   if (!session) return null;
 
-  return prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: session.sub },
     include: { brand: true },
   });
+
+  // The token's signature and expiry can both be valid and it should
+  // still be rejected if tokenVersion doesn't match the live value — that
+  // mismatch means the password was changed (or the session was
+  // otherwise force-revoked) since this specific token was issued.
+  if (!user || user.tokenVersion !== session.tokenVersion) return null;
+
+  return user;
 });
 
 /** Guards admin `page.tsx` server components — redirects if the caller isn't an active ADMIN. */

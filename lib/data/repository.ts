@@ -319,6 +319,31 @@ async function getProductBySerialUncached(serial: string): Promise<ProductRecord
 /** Returns a single product by its public-facing serial number. */
 export const getProductBySerial = cache(getProductBySerialUncached);
 
+/**
+ * Cheap existence check that ignores status/hidden/archived/deletedAt —
+ * unlike getProductBySlug/getProductBySerial, this tells you whether a row
+ * exists at all under this identifier, not whether it's currently public.
+ *
+ * Used by /p/[slug] to distinguish "never existed" (safe to notFound() —
+ * this identifier was never a cached success) from "exists but isn't
+ * currently visible" (must NOT use notFound() for that case — see the
+ * comment in that page for why on-demand and time-based ISR revalidation
+ * both fail to turn an already-cached success into a 404).
+ */
+export async function productExistsByIdentifier(identifier: string): Promise<boolean> {
+  const normalized = identifier.trim();
+  if (!normalized) return false;
+
+  const product = await prisma.product.findFirst({
+    where: {
+      OR: [{ slug: normalized }, { serialNumber: { equals: normalized, mode: "insensitive" } }],
+    },
+    select: { id: true },
+  });
+
+  return product !== null;
+}
+
 /** Returns every distinct product category. */
 export async function getCategories(): Promise<string[]> {
   const categories = await prisma.category.findMany({

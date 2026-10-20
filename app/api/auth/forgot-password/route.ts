@@ -3,11 +3,21 @@ import { prisma } from "@/lib/prisma";
 import { createResetToken, normalizeEmail, RESET_TOKEN_TTL_MS } from "@/lib/auth";
 import { sendEmail } from "@/lib/email";
 import { checkRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
+import { padToMinimumDuration } from "@/lib/timing";
 
 const GENERIC_RESPONSE = {
   ok: true,
   message: "If an account exists for that email, we've sent a password reset link.",
 };
+
+// The eligible branch does a DB write plus an external email-send call;
+// the ineligible branch used to return immediately. Padding every
+// response (from here on, after basic input validation) to the same
+// floor closes that gap. This can't fully equalize against a *slow*
+// email-provider response (which can exceed the floor on its own), but
+// it closes the obvious always-present gap between "did nothing" and
+// "did real work".
+const MIN_FORGOT_PASSWORD_RESPONSE_MS = 400;
 
 export async function POST(request: NextRequest) {
   const ipLimit = checkRateLimit(`forgot-password:ip:${getClientIp(request)}`, 5, 60 * 60 * 1000);
@@ -22,8 +32,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Email is required." }, { status: 400 });
   }
 
+  const start = Date.now();
+
   const emailLimit = checkRateLimit(`forgot-password:email:${email}`, 3, 60 * 60 * 1000);
   if (!emailLimit.allowed) {
+    await padToMinimumDuration(start, MIN_FORGOT_PASSWORD_RESPONSE_MS);
     return NextResponse.json(GENERIC_RESPONSE);
   }
 
@@ -49,5 +62,6 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  await padToMinimumDuration(start, MIN_FORGOT_PASSWORD_RESPONSE_MS);
   return NextResponse.json(GENERIC_RESPONSE);
 }

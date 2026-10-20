@@ -45,7 +45,16 @@ export async function PATCH(request: NextRequest) {
   }
 
   const passwordHash = await bcrypt.hash(newPassword, 12);
-  await prisma.user.update({ where: { id: user.id }, data: { passwordHash, mustChangePassword: false } });
+  // Incrementing tokenVersion invalidates every other already-issued
+  // session for this user (different device/browser, or a stolen
+  // cookie) — their embedded tokenVersion claim no longer matches once
+  // this lands, even though the token itself is still validly signed
+  // and unexpired. The current request re-issues a fresh token below
+  // with the new version, so it isn't locked out by its own change.
+  const updated = await prisma.user.update({
+    where: { id: user.id },
+    data: { passwordHash, mustChangePassword: false, tokenVersion: { increment: 1 } },
+  });
 
   await logAudit({
     actor: session,
@@ -57,7 +66,7 @@ export async function PATCH(request: NextRequest) {
   });
 
   const response = NextResponse.json({ ok: true });
-  const token = await signSession({ ...session, mustChangePassword: false });
+  const token = await signSession({ ...session, mustChangePassword: false, tokenVersion: updated.tokenVersion });
   response.cookies.set(SESSION_COOKIE_NAME, token, SESSION_COOKIE_OPTIONS);
   return response;
 }

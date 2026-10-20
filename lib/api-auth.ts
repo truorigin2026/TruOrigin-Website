@@ -16,8 +16,11 @@ export async function requireAdminSession(request: NextRequest): Promise<Session
   const session = token ? await verifySessionToken(token) : null;
   if (session?.role !== "ADMIN") return null;
 
-  const user = await prisma.user.findUnique({ where: { id: session.sub }, select: { active: true } });
-  if (!user?.active) return null;
+  const user = await prisma.user.findUnique({ where: { id: session.sub }, select: { active: true, tokenVersion: true } });
+  // tokenVersion mismatch: signature/expiry are still valid, but the
+  // password was changed (or the session force-revoked) since this
+  // token was issued — reject it the same as an inactive account.
+  if (!user?.active || user.tokenVersion !== session.tokenVersion) return null;
 
   return session;
 }
@@ -35,9 +38,14 @@ export async function requireBrandSession(request: NextRequest): Promise<Session
 
   const user = await prisma.user.findUnique({
     where: { id: session.sub },
-    select: { active: true, brand: { select: { status: true } } },
+    select: { active: true, tokenVersion: true, brand: { select: { status: true } } },
   });
-  if (!user?.active || !user.brand || user.brand.status === "SUSPENDED") return null;
+  // tokenVersion mismatch: signature/expiry are still valid, but the
+  // password was changed (or the session force-revoked) since this
+  // token was issued — reject it the same as an inactive account.
+  if (!user?.active || user.tokenVersion !== session.tokenVersion || !user.brand || user.brand.status === "SUSPENDED") {
+    return null;
+  }
 
   return session;
 }
