@@ -80,12 +80,20 @@ describe("POST /api/auth/reset-password", () => {
     expect(updateMock).toHaveBeenCalledTimes(1); // not called again
   });
 
-  it("rejects a token belonging to a non-BRAND user (defense in depth)", async () => {
-    findUniqueMock.mockResolvedValue({ ...BASE_USER, role: "ADMIN" });
+  it("rejects a token belonging to a role that can never log in (defense in depth)", async () => {
+    findUniqueMock.mockResolvedValue({ ...BASE_USER, role: "VISITOR" });
     const res = await POST(req({ token: "some-token", password: STRONG_PASSWORD }));
     expect(res.status).toBe(400);
     expect((await res.json()).error).toMatch(/invalid or has expired/i);
     expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it("accepts a token belonging to an ADMIN account — a deliberate reset issued via /api/admin/users/[id]/reset-password, not the auto-sync-on-login path, so the role check must not block it", async () => {
+    findUniqueMock.mockResolvedValue({ ...BASE_USER, id: "admin-1", role: "ADMIN" });
+    const res = await POST(req({ token: "admin-reset-token", password: STRONG_PASSWORD }));
+    expect(res.status).toBe(200);
+    expect(updateMock).toHaveBeenCalledTimes(1);
+    expect(updateMock.mock.calls[0][0].data.tokenVersion).toEqual({ increment: 1 });
   });
 
   it("rejects a token belonging to a suspended/inactive account", async () => {
@@ -101,7 +109,7 @@ describe("POST /api/auth/reset-password", () => {
     const noToken = await POST(req({ token: "a", password: STRONG_PASSWORD }));
     findUniqueMock.mockResolvedValueOnce({ ...BASE_USER, active: false }); // inactive
     const inactive = await POST(req({ token: "b", password: STRONG_PASSWORD }));
-    findUniqueMock.mockResolvedValueOnce({ ...BASE_USER, role: "ADMIN" }); // wrong role
+    findUniqueMock.mockResolvedValueOnce({ ...BASE_USER, role: "VISITOR" }); // role that can never log in
     const wrongRole = await POST(req({ token: "c", password: STRONG_PASSWORD }));
 
     const [m1, m2, m3] = await Promise.all([noToken.json(), inactive.json(), wrongRole.json()]);

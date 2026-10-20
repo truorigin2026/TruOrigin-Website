@@ -129,3 +129,42 @@ describe("POST /api/auth/login — tokenVersion is embedded in the issued sessio
     expect(payload.tokenVersion).toBe(7);
   });
 });
+
+describe("POST /api/auth/login — ordinary admin login never touches tokenVersion", () => {
+  // The ADMIN_EMAIL branch re-hashes and upserts the admin's password on
+  // EVERY login with that email (syncing the DB to whatever
+  // ADMIN_PASSWORD currently is) — this is not a deliberate password
+  // change, so it must never bump tokenVersion, or every normal admin
+  // login would log out every other admin session.
+  it("the upsert for an ordinary admin login does not set tokenVersion in its update or create data", async () => {
+    upsertMock.mockResolvedValue({ id: "admin-1", email: process.env.ADMIN_EMAIL, active: true, tokenVersion: 3 });
+    updateMock.mockResolvedValue({});
+
+    const res = await POST(req({ email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD }));
+    expect(res.status).toBe(200);
+
+    expect(upsertMock).toHaveBeenCalledTimes(1);
+    const [[upsertArgs]] = upsertMock.mock.calls;
+    expect(upsertArgs.update).not.toHaveProperty("tokenVersion");
+    expect(upsertArgs.create).not.toHaveProperty("tokenVersion");
+    // The plain lastLoginAt update afterward must not touch it either.
+    expect(updateMock).toHaveBeenCalledTimes(1);
+    expect(updateMock.mock.calls[0][0].data).not.toHaveProperty("tokenVersion");
+  });
+
+  it("carries forward the admin's current tokenVersion into the issued token without changing it", async () => {
+    // tokenVersion is already at 3 here (e.g. from an earlier deliberate
+    // reset) — an ordinary login must preserve that value, not reset it.
+    upsertMock.mockResolvedValue({ id: "admin-1", email: process.env.ADMIN_EMAIL, active: true, tokenVersion: 3 });
+    updateMock.mockResolvedValue({});
+
+    const res = await POST(req({ email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD }));
+    const setCookie = res.headers.get("set-cookie") ?? "";
+    const match = setCookie.match(/truorigin_session=([^;]+)/);
+
+    const { jwtVerify } = await import("jose");
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    const { payload } = await jwtVerify(match![1], secret);
+    expect(payload.tokenVersion).toBe(3);
+  });
+});

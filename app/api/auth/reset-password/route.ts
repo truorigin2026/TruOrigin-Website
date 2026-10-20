@@ -38,10 +38,14 @@ export async function POST(request: NextRequest) {
   if (!user || !user.resetTokenExpires || user.resetTokenExpires < new Date()) {
     return invalidOrExpired;
   }
-  // Defense in depth: nothing else in the codebase currently sets
-  // resetTokenHash for a non-BRAND or inactive user, but this endpoint
-  // shouldn't rely on that staying true elsewhere to stay safe.
-  if (user.role !== "BRAND" || !user.active) {
+  // Both BRAND and ADMIN accounts can legitimately hold a reset token:
+  // the brand self-service/forgot-password flow for BRAND, and
+  // app/api/admin/users/[id]/reset-password (deliberately requested,
+  // not the auto-sync-on-login path) for ADMIN — that route places no
+  // role restriction on which user it can target. Anything else
+  // (VISITOR/CONSUMER) should never have a resetTokenHash set by any
+  // code path; rejected here as defense in depth regardless.
+  if ((user.role !== "BRAND" && user.role !== "ADMIN") || !user.active) {
     return invalidOrExpired;
   }
 
