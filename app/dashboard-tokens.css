@@ -33,6 +33,12 @@
   /* Brand accent — the template's own --primary here is near-black/near-white (a monochrome invert); this is the one token we intentionally swapped. */
   --primary: #1a7a44;
   --primary-foreground: #ffffff;
+  /* Solid (not alpha-blended) hover shade — hover:bg-primary/80 used to
+     alpha-blend toward whatever's behind the button, which in light mode
+     lightened the green enough to drop white-text contrast to ~3.6:1
+     (fails WCAG AA). A solid, pre-computed darker shade keeps contrast
+     independent of what's behind the button. */
+  --primary-hover: #15663a;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -85,6 +91,7 @@
 
   --primary: #35c374;
   --primary-foreground: #04150a;
+  --primary-hover: #4ed08c;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -130,6 +137,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
