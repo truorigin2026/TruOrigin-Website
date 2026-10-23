@@ -2,10 +2,11 @@
 
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useFileUpload } from "@/components/dashboard/use-file-upload";
 import { useToast } from "@/components/dashboard/toast";
 import { AssetImage } from "@/components/brands/asset-image";
@@ -38,10 +39,27 @@ const DOC_TYPE_OPTIONS: { value: DocType; label: string }[] = [
   { value: "OTHER", label: "Other" },
 ];
 
-const STEPS = ["Product Information", "Claims", "Ingredients", "Documents", "Link Evidence", "Review"] as const;
+const STEPS = ["Product Information", "Claims & Evidence", "Ingredients", "Review"] as const;
 
 function newId() {
   return Math.random().toString(36).slice(2);
+}
+
+function blankDocument(): DocumentItem {
+  return {
+    id: newId(),
+    title: "",
+    docType: "CERTIFICATE",
+    fileUrl: "",
+    mimeType: "",
+    uploading: false,
+    issuer: "",
+    testDate: "",
+    testType: "",
+    testScope: "",
+    summary: "",
+    isPublic: true,
+  };
 }
 
 export type ProductWizardInitialValues = {
@@ -79,6 +97,103 @@ type ProductWizardProps = {
   /** Defaults to "/brand/products" — where the wizard sends the browser after a successful submit. */
   redirectBasePath?: string;
 };
+
+/** Full editable field set for one document — reused for a claim's own documents and for unlinked ("Other") ones. */
+function DocumentFields({
+  doc,
+  onChange,
+  onFileSelect,
+  onRemove,
+}: {
+  doc: DocumentItem;
+  onChange: (patch: Partial<DocumentItem>) => void;
+  onFileSelect: (file: File | null) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="grid gap-3 rounded-lg border border-border bg-background p-4">
+      <div className="grid gap-3 md:grid-cols-[1fr_1fr_1.2fr_auto]">
+        <input
+          value={doc.title}
+          onChange={(event) => onChange({ title: event.target.value })}
+          placeholder="Document title"
+          className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+        />
+        <Select value={doc.docType} onValueChange={(value) => onChange({ docType: (value ?? "OTHER") as DocType })}>
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {DOC_TYPE_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <input
+          type="file"
+          accept="application/pdf,image/jpeg,image/png,image/webp"
+          onChange={(event) => onFileSelect(event.target.files?.[0] ?? null)}
+          className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm outline-none"
+        />
+        <Button type="button" variant="outline" onClick={onRemove}>
+          Remove
+        </Button>
+      </div>
+      {doc.uploading ? <p className="text-xs text-muted-foreground">Uploading...</p> : null}
+      {doc.fileUrl && !doc.uploading ? <p className="text-xs font-semibold text-primary">File attached</p> : null}
+
+      <div className="grid gap-3 border-t border-border pt-3 md:grid-cols-2">
+        <input
+          value={doc.issuer}
+          onChange={(event) => onChange({ issuer: event.target.value })}
+          placeholder="Testing organization (e.g. SGS India)"
+          className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+        />
+        <input
+          type="date"
+          value={doc.testDate}
+          onChange={(event) => onChange({ testDate: event.target.value })}
+          className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+        />
+        <input
+          value={doc.testType}
+          onChange={(event) => onChange({ testType: event.target.value })}
+          placeholder="Test type (e.g. In-vitro Study)"
+          className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+        />
+        <input
+          value={doc.testScope}
+          onChange={(event) => onChange({ testScope: event.target.value })}
+          placeholder="Test scope (e.g. Skin brightness evaluation)"
+          className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+        />
+        <textarea
+          value={doc.summary}
+          onChange={(event) => onChange({ summary: event.target.value })}
+          placeholder="Plain-language summary of the findings, shown on the public product page"
+          rows={2}
+          className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring md:col-span-2"
+        />
+        <label className="flex items-center gap-2 text-sm font-medium md:col-span-2">
+          <input
+            type="checkbox"
+            checked={doc.isPublic}
+            onChange={(event) => onChange({ isPublic: event.target.checked })}
+            className="size-4 rounded border-input"
+          />
+          <span>Public — let customers view/download the original file</span>
+        </label>
+        {!doc.isPublic ? (
+          <p className="text-xs text-muted-foreground md:col-span-2">
+            Private: customers only see the summary above, never the original file.
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
 
 export function ProductWizard({
   categoryOptions,
@@ -153,6 +268,44 @@ export function ProductWizard({
     }
   }
 
+  function updateDocument(docId: string, patch: Partial<DocumentItem>) {
+    setDocuments((prev) => prev.map((d) => (d.id === docId ? { ...d, ...patch } : d)));
+  }
+
+  function removeDocument(docId: string) {
+    setDocuments((prev) => prev.filter((d) => d.id !== docId));
+    setClaimCertificateLinks((prev) => {
+      const next: Record<string, string[]> = {};
+      for (const [claimId, docIds] of Object.entries(prev)) {
+        next[claimId] = docIds.filter((id) => id !== docId);
+      }
+      return next;
+    });
+  }
+
+  function linkDocToClaim(claimId: string, docId: string) {
+    setClaimCertificateLinks((prev) => ({ ...prev, [claimId]: [...(prev[claimId] ?? []), docId] }));
+  }
+
+  function unlinkDocFromClaim(claimId: string, docId: string) {
+    setClaimCertificateLinks((prev) => ({ ...prev, [claimId]: (prev[claimId] ?? []).filter((id) => id !== docId) }));
+  }
+
+  function addDocumentToClaim(claimId: string) {
+    const doc = blankDocument();
+    setDocuments((prev) => [...prev, doc]);
+    linkDocToClaim(claimId, doc.id);
+  }
+
+  function addUnlinkedDocument() {
+    setDocuments((prev) => [...prev, blankDocument()]);
+  }
+
+  /** The first claim (in order) a document is linked to — where its full editable form renders. */
+  function primaryClaimIndexFor(docId: string): number {
+    return claims.findIndex((c) => (claimCertificateLinks[c.id] ?? []).includes(docId));
+  }
+
   function validateStep(index: number): string | null {
     if (index === 0) {
       if (!name.trim()) return "Product name is required.";
@@ -160,7 +313,7 @@ export function ProductWizard({
       if (images.some((img) => img.uploading)) return "Please wait for photo uploads to finish.";
       if (images.filter((img) => img.url).length === 0) return "At least one product photo is required.";
     }
-    if (index === 3) {
+    if (index === 1) {
       if (documents.some((doc) => doc.uploading)) return "Please wait for document uploads to finish.";
     }
     return null;
@@ -367,33 +520,120 @@ export function ProductWizard({
       {step === 1 ? (
         <Card className="p-6">
           <p className="text-sm leading-relaxed text-muted-foreground">
-            List the claims you want to make about this product (e.g. &quot;Organic&quot;, &quot;Cruelty Free&quot;). Add a
-            short evidence note for each — TruOrigin reviews each claim against your supporting documents during review.
+            Add each claim you want to make about this product (e.g. &quot;Organic&quot;, &quot;Cruelty Free&quot;), then
+            attach the documents that support it directly below — upload a new one or link something you&apos;ve
+            already added elsewhere. TruOrigin reviews each claim against its attached evidence during review.
           </p>
-          <div className="mt-5 grid gap-3">
-            {claims.map((claim) => (
-              <div key={claim.id} className="grid gap-3 rounded-lg border border-border bg-muted/30 p-4 md:grid-cols-[1fr_1.4fr_auto]">
-                <input
-                  value={claim.label}
-                  onChange={(event) => setClaims((prev) => prev.map((c) => (c.id === claim.id ? { ...c, label: event.target.value } : c)))}
-                  placeholder="Claim (e.g. Organic)"
-                  className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
-                />
-                <input
-                  value={claim.evidence}
-                  onChange={(event) => setClaims((prev) => prev.map((c) => (c.id === claim.id ? { ...c, evidence: event.target.value } : c)))}
-                  placeholder="Evidence note (e.g. see attached lab report)"
-                  className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
-                />
-                <Button type="button" variant="outline" onClick={() => setClaims((prev) => prev.filter((c) => c.id !== claim.id))}>
-                  Remove
-                </Button>
-              </div>
-            ))}
+          <div className="mt-5 grid gap-5">
+            {claims.map((claim, claimIndex) => {
+              const linkedIds = claimCertificateLinks[claim.id] ?? [];
+              const ownDocs = documents.filter((d) => linkedIds.includes(d.id) && primaryClaimIndexFor(d.id) === claimIndex);
+              const alsoLinkedDocs = documents.filter((d) => linkedIds.includes(d.id) && primaryClaimIndexFor(d.id) !== claimIndex);
+              const linkableDocs = documents.filter((d) => !linkedIds.includes(d.id));
+
+              return (
+                <div key={claim.id} className="rounded-xl border border-border bg-muted/30 p-4">
+                  <div className="grid gap-3 md:grid-cols-[1fr_1.4fr_auto]">
+                    <input
+                      value={claim.label}
+                      onChange={(event) => setClaims((prev) => prev.map((c) => (c.id === claim.id ? { ...c, label: event.target.value } : c)))}
+                      placeholder="Claim (e.g. Organic)"
+                      className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+                    />
+                    <input
+                      value={claim.evidence}
+                      onChange={(event) => setClaims((prev) => prev.map((c) => (c.id === claim.id ? { ...c, evidence: event.target.value } : c)))}
+                      placeholder="Evidence note (shown if no documents are linked)"
+                      className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
+                    />
+                    <Button type="button" variant="outline" onClick={() => setClaims((prev) => prev.filter((c) => c.id !== claim.id))}>
+                      Remove
+                    </Button>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 border-t border-border pt-4">
+                    <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Supporting documents</p>
+
+                    {ownDocs.map((doc) => (
+                      <DocumentFields
+                        key={doc.id}
+                        doc={doc}
+                        onChange={(patch) => updateDocument(doc.id, patch)}
+                        onFileSelect={(file) => handleDocumentFileSelect(doc.id, file)}
+                        onRemove={() => removeDocument(doc.id)}
+                      />
+                    ))}
+
+                    {alsoLinkedDocs.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {alsoLinkedDocs.map((doc) => (
+                          <Badge key={doc.id} variant="outline" className="gap-1.5 pr-1">
+                            {doc.title || doc.docType}
+                            <button
+                              type="button"
+                              onClick={() => unlinkDocFromClaim(claim.id, doc.id)}
+                              aria-label={`Unlink ${doc.title || doc.docType} from this claim`}
+                              className="rounded-full p-0.5 hover:bg-muted"
+                            >
+                              <X size={10} />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : null}
+
+                    <div className="flex flex-wrap gap-2">
+                      <Button type="button" variant="outline" size="sm" onClick={() => addDocumentToClaim(claim.id)}>
+                        + Upload New Document
+                      </Button>
+                    </div>
+
+                    {linkableDocs.length > 0 ? (
+                      <details className="text-sm">
+                        <summary className="cursor-pointer text-xs font-semibold text-primary">Link an existing document</summary>
+                        <div className="mt-2 grid gap-1.5">
+                          {linkableDocs.map((doc) => (
+                            <div key={doc.id} className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-1.5 text-sm">
+                              <span>{doc.title || doc.docType}</span>
+                              <Button type="button" variant="outline" size="sm" onClick={() => linkDocToClaim(claim.id, doc.id)}>
+                                Link
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
           </div>
           <Button type="button" variant="outline" className="mt-3" onClick={() => setClaims((prev) => [...prev, { id: newId(), label: "", evidence: "" }])}>
             Add Claim
           </Button>
+
+          <div className="mt-8 border-t border-border pt-6">
+            <p className="text-sm font-semibold text-foreground">Other documents</p>
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+              Anything not tied to a specific claim yet — a general sourcing certificate, for instance.
+            </p>
+            <div className="mt-4 grid gap-4">
+              {documents
+                .filter((doc) => !Object.values(claimCertificateLinks).some((ids) => ids.includes(doc.id)))
+                .map((doc) => (
+                  <DocumentFields
+                    key={doc.id}
+                    doc={doc}
+                    onChange={(patch) => updateDocument(doc.id, patch)}
+                    onFileSelect={(file) => handleDocumentFileSelect(doc.id, file)}
+                    onRemove={() => removeDocument(doc.id)}
+                  />
+                ))}
+            </div>
+            <Button type="button" variant="outline" className="mt-3" onClick={addUnlinkedDocument}>
+              + Add Document
+            </Button>
+          </div>
         </Card>
       ) : null}
 
@@ -444,176 +684,6 @@ export function ProductWizard({
       ) : null}
 
       {step === 3 ? (
-        <Card className="p-6">
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            Attach certificates, lab reports, or sourcing documentation supporting your claims. Optional here — you can also
-            upload documents later from the Documents page. The details below appear on the public product page, so
-            customers can see what backs up your claims — an admin can refine any of it before your product goes live.
-          </p>
-          <div className="mt-5 grid gap-4">
-            {documents.map((doc) => (
-              <div key={doc.id} className="grid gap-3 rounded-lg border border-border bg-muted/30 p-4">
-                <div className="grid gap-3 md:grid-cols-[1fr_1fr_1.2fr_auto]">
-                  <input
-                    value={doc.title}
-                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, title: event.target.value } : d)))}
-                    placeholder="Document title"
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
-                  />
-                  <select
-                    value={doc.docType}
-                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, docType: event.target.value as DocType } : d)))}
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
-                  >
-                    {DOC_TYPE_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="file"
-                    accept="application/pdf,image/jpeg,image/png,image/webp"
-                    onChange={(event) => handleDocumentFileSelect(doc.id, event.target.files?.[0] ?? null)}
-                    className="rounded-lg border border-input bg-background px-3 py-1.5 text-sm outline-none"
-                  />
-                  <Button type="button" variant="outline" onClick={() => setDocuments((prev) => prev.filter((d) => d.id !== doc.id))}>
-                    Remove
-                  </Button>
-                </div>
-                {doc.uploading ? <p className="text-xs text-muted-foreground">Uploading...</p> : null}
-                {doc.fileUrl && !doc.uploading ? <p className="text-xs font-semibold text-primary">File attached</p> : null}
-
-                <div className="grid gap-3 border-t border-border pt-3 md:grid-cols-2">
-                  <input
-                    value={doc.issuer}
-                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, issuer: event.target.value } : d)))}
-                    placeholder="Testing organization (e.g. SGS India)"
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
-                  />
-                  <input
-                    type="date"
-                    value={doc.testDate}
-                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, testDate: event.target.value } : d)))}
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
-                  />
-                  <input
-                    value={doc.testType}
-                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, testType: event.target.value } : d)))}
-                    placeholder="Test type (e.g. In-vitro Study)"
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
-                  />
-                  <input
-                    value={doc.testScope}
-                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, testScope: event.target.value } : d)))}
-                    placeholder="Test scope (e.g. Skin brightness evaluation)"
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring"
-                  />
-                  <textarea
-                    value={doc.summary}
-                    onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, summary: event.target.value } : d)))}
-                    placeholder="Plain-language summary of the findings, shown on the public product page"
-                    rows={2}
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring md:col-span-2"
-                  />
-                  <label className="flex items-center gap-2 text-sm font-medium md:col-span-2">
-                    <input
-                      type="checkbox"
-                      checked={doc.isPublic}
-                      onChange={(event) => setDocuments((prev) => prev.map((d) => (d.id === doc.id ? { ...d, isPublic: event.target.checked } : d)))}
-                      className="size-4 rounded border-input"
-                    />
-                    <span>Public — let customers view/download the original file</span>
-                  </label>
-                  {!doc.isPublic ? (
-                    <p className="text-xs text-muted-foreground md:col-span-2">
-                      Private: customers only see the summary above, never the original file.
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-            ))}
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            className="mt-3"
-            onClick={() =>
-              setDocuments((prev) => [
-                ...prev,
-                {
-                  id: newId(),
-                  title: "",
-                  docType: "CERTIFICATE",
-                  fileUrl: "",
-                  mimeType: "",
-                  uploading: false,
-                  issuer: "",
-                  testDate: "",
-                  testType: "",
-                  testScope: "",
-                  summary: "",
-                  isPublic: true,
-                },
-              ])
-            }
-          >
-            Add Document
-          </Button>
-        </Card>
-      ) : null}
-
-      {step === 4 ? (
-        <Card className="p-6">
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            For each claim, pick which of the documents you just uploaded support it. Customers will see this link on
-            the product page — optional, but claims backed by a document are clearer to customers than a claim alone.
-          </p>
-          <div className="mt-5 grid gap-4">
-            {claims.filter((claim) => claim.label.trim()).length === 0 ? (
-              <p className="text-sm text-muted-foreground">Add a claim in the Claims step to link evidence to it.</p>
-            ) : null}
-            {claims
-              .filter((claim) => claim.label.trim())
-              .map((claim) => {
-                const attachedDocs = documents.filter((doc) => doc.fileUrl);
-                const linked = claimCertificateLinks[claim.id] ?? [];
-                return (
-                  <div key={claim.id} className="rounded-lg border border-border bg-muted/30 p-4">
-                    <p className="text-sm font-semibold text-foreground">{claim.label}</p>
-                    {attachedDocs.length === 0 ? (
-                      <p className="mt-2 text-xs text-muted-foreground">No documents uploaded yet — add one in the Documents step.</p>
-                    ) : (
-                      <div className="mt-2 grid gap-1.5">
-                        {attachedDocs.map((doc) => (
-                          <label key={doc.id} className="flex items-center gap-2 text-sm">
-                            <input
-                              type="checkbox"
-                              checked={linked.includes(doc.id)}
-                              onChange={(event) =>
-                                setClaimCertificateLinks((prev) => {
-                                  const current = prev[claim.id] ?? [];
-                                  const next = event.target.checked
-                                    ? [...current, doc.id]
-                                    : current.filter((id) => id !== doc.id);
-                                  return { ...prev, [claim.id]: next };
-                                })
-                              }
-                              className="size-4 rounded border-input"
-                            />
-                            <span>{doc.title || doc.docType}</span>
-                          </label>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-          </div>
-        </Card>
-      ) : null}
-
-      {step === 5 ? (
         <Card className="p-6">
           <p className="text-sm font-semibold text-foreground">Review before submitting</p>
           <div className="mt-4 grid gap-4">

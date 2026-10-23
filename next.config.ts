@@ -32,6 +32,12 @@ const nextConfig: NextConfig = {
         destination: "/for-products/how-it-works",
         permanent: true,
       },
+      {
+        // Documents merged into Claims & Evidence — see app/(public)/brand/claims/page.tsx.
+        source: "/brand/documents",
+        destination: "/brand/claims",
+        permanent: true,
+      },
     ];
   },
   images: {

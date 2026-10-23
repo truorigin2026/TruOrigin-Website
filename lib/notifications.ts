@@ -65,7 +65,7 @@ export async function getNeedsAttention(brandId: string): Promise<AttentionItem[
       id: `cert-${cert.id}`,
       message: `Certificate expires in ${days} day${days === 1 ? "" : "s"}`,
       detail: `${cert.title} • ${cert.product.name}`,
-      href: `/brand/documents`,
+      href: `/brand/claims`,
     });
   }
 
