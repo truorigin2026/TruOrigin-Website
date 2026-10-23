@@ -2,7 +2,10 @@
 
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2, X } from "lucide-react";
+import { Check, Loader2, X, GripVertical } from "lucide-react";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -195,6 +198,58 @@ function DocumentFields({
   );
 }
 
+/** One draggable photo thumbnail — keyed by the client-generated ImageItem.id, since no DB id exists yet at this point in the flow. */
+function SortableImageThumb({
+  image,
+  isMain,
+  onRemove,
+}: {
+  image: ImageItem;
+  isMain: boolean;
+  onRemove: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: image.id });
+  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 1 : undefined };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "relative aspect-square overflow-hidden rounded-lg border border-border bg-muted/40",
+        isDragging && "opacity-60",
+      )}
+    >
+      {image.uploading ? (
+        <div className="flex h-full items-center justify-center text-xs text-muted-foreground">Uploading...</div>
+      ) : (
+        <AssetImage src={image.url} alt={image.altText} fill sizes="200px" />
+      )}
+      {isMain && !image.uploading ? (
+        <span className="absolute left-1 top-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+          Main
+        </span>
+      ) : null}
+      <button
+        type="button"
+        onClick={onRemove}
+        className="absolute right-1 top-1 rounded-full bg-black/60 px-1.5 text-xs font-semibold text-white"
+      >
+        ×
+      </button>
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        aria-label="Drag to reorder"
+        className="absolute bottom-1 right-1 flex size-6 cursor-grab touch-none items-center justify-center rounded-full bg-black/60 text-white active:cursor-grabbing"
+      >
+        <GripVertical size={14} />
+      </button>
+    </div>
+  );
+}
+
 export function ProductWizard({
   categoryOptions,
   mode = "create",
@@ -207,6 +262,7 @@ export function ProductWizard({
   const { showToast } = useToast();
   const { uploadFile } = useFileUpload();
   const listId = useId();
+  const dragSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
   const [step, setStep] = useState(0);
   const [name, setName] = useState(initialValues?.name ?? "");
@@ -252,6 +308,17 @@ export function ProductWizard({
         setError(err instanceof Error ? err.message : "Image upload failed");
       }
     }
+  }
+
+  function handleImageDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setImages((prev) => {
+      const oldIndex = prev.findIndex((img) => img.id === active.id);
+      const newIndex = prev.findIndex((img) => img.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
   }
 
   async function handleDocumentFileSelect(docId: string, file: File | null) {
@@ -489,29 +556,23 @@ export function ProductWizard({
               />
             </div>
             {images.length > 0 ? (
-              <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-5">
-                {images.map((image, index) => (
-                  <div key={image.id} className="relative aspect-square overflow-hidden rounded-lg border border-border bg-muted/40">
-                    {image.uploading ? (
-                      <div className="flex h-full items-center justify-center text-xs text-muted-foreground">Uploading...</div>
-                    ) : (
-                      <AssetImage src={image.url} alt={image.altText} fill sizes="200px" />
-                    )}
-                    {index === 0 && !image.uploading ? (
-                      <span className="absolute left-1 top-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                        Main
-                      </span>
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={() => setImages((prev) => prev.filter((img) => img.id !== image.id))}
-                      className="absolute right-1 top-1 rounded-full bg-black/60 px-1.5 text-xs font-semibold text-white"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
+              <>
+                <p className="mt-3 text-xs text-muted-foreground">Drag a photo by its handle to reorder — the first one is used as the main image.</p>
+                <DndContext sensors={dragSensors} collisionDetection={closestCenter} onDragEnd={handleImageDragEnd}>
+                  <SortableContext items={images.map((img) => img.id)} strategy={rectSortingStrategy}>
+                    <div className="mt-2 grid grid-cols-3 gap-3 sm:grid-cols-5">
+                      {images.map((image, index) => (
+                        <SortableImageThumb
+                          key={image.id}
+                          image={image}
+                          isMain={index === 0}
+                          onRemove={() => setImages((prev) => prev.filter((img) => img.id !== image.id))}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              </>
             ) : null}
           </div>
         </Card>
