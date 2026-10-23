@@ -6,6 +6,7 @@ import { Loader2, Upload, Archive, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { useApiAction } from "@/components/dashboard/use-api-action";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type CmsFormProps = {
   mode: "create" | "edit";
@@ -76,18 +77,18 @@ export function CmsForm({ mode, initial }: CmsFormProps) {
         <div className="grid gap-4 md:grid-cols-2">
           <label className="grid gap-1.5 text-sm font-medium">
             <span>Type</span>
-            <select
-              name="type"
-              defaultValue={initial?.type ?? "CONTENT_BLOCK"}
-              disabled={mode === "edit"}
-              className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:border-ring disabled:opacity-60"
-            >
-              {TYPE_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option.replaceAll("_", " ")}
-                </option>
-              ))}
-            </select>
+            <Select name="type" defaultValue={initial?.type ?? "CONTENT_BLOCK"} disabled={mode === "edit"}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TYPE_OPTIONS.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option.replaceAll("_", " ")}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </label>
           <label className="grid gap-1.5 text-sm font-medium">
             <span>Slug</span>

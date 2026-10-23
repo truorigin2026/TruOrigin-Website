@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useApiAction } from "@/components/dashboard/use-api-action";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const ROLE_OPTIONS = ["ADMIN", "EDITOR", "VIEWER"] as const;
 
@@ -42,17 +43,18 @@ export function TeamInviteForm() {
       </label>
       <label className="grid gap-1.5 text-sm font-medium">
         <span>Role</span>
-        <select
-          value={brandRole}
-          onChange={(event) => setBrandRole(event.target.value as (typeof ROLE_OPTIONS)[number])}
-          className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:border-ring"
-        >
-          {ROLE_OPTIONS.map((role) => (
-            <option key={role} value={role}>
-              {role.charAt(0) + role.slice(1).toLowerCase()}
-            </option>
-          ))}
-        </select>
+        <Select value={brandRole} onValueChange={(value) => setBrandRole(value as (typeof ROLE_OPTIONS)[number])}>
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {ROLE_OPTIONS.map((role) => (
+              <SelectItem key={role} value={role}>
+                {role.charAt(0) + role.slice(1).toLowerCase()}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </label>
       <Button type="button" disabled={busy !== null} onClick={handleSubmit}>
         {busy !== null ? <Loader2 size={15} className="animate-spin" /> : null}

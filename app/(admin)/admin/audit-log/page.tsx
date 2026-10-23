@@ -3,6 +3,7 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { prisma } from "@/lib/prisma";
 import { requireAdminUser } from "@/lib/session";
 import type { Prisma } from "../../../../generated/prisma/client";
@@ -18,7 +19,7 @@ export default async function AdminAuditLogPage({ searchParams }: AuditLogPagePr
 
   const resolved = (await searchParams) ?? {};
   const actorEmail = typeof resolved.actor === "string" ? resolved.actor : "";
-  const targetType = typeof resolved.targetType === "string" ? resolved.targetType : "";
+  const targetType = typeof resolved.targetType === "string" && resolved.targetType !== "ALL" ? resolved.targetType : "";
   const action = typeof resolved.action === "string" ? resolved.action : "";
 
   const where: Prisma.AuditLogWhereInput = {
@@ -57,18 +58,19 @@ export default async function AdminAuditLogPage({ searchParams }: AuditLogPagePr
       <Card className="mb-5 p-4">
         <form method="GET" className="grid gap-3 md:grid-cols-4">
           <Input type="text" name="actor" defaultValue={actorEmail} placeholder="Filter by actor email..." />
-          <select
-            name="targetType"
-            defaultValue={targetType}
-            className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:border-ring"
-          >
-            <option value="">All target types</option>
-            {targetTypes.map((row) => (
-              <option key={row.targetType} value={row.targetType}>
-                {row.targetType}
-              </option>
-            ))}
-          </select>
+          <Select name="targetType" defaultValue={targetType || "ALL"}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="All target types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All target types</SelectItem>
+              {targetTypes.map((row) => (
+                <SelectItem key={row.targetType} value={row.targetType}>
+                  {row.targetType}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Input type="text" name="action" defaultValue={action} placeholder="Filter by action (e.g. brand.suspend)..." />
           <Button type="submit" variant="outline">
             Filter
