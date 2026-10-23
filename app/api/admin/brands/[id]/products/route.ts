@@ -52,26 +52,31 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: "fileUrl must point to an uploaded file" }, { status: 400 });
   }
 
-  const product = await createProductForBrand(brandId, {
-    name: body.name,
-    category: body.category,
-    subcategory: body.subcategory,
-    description: body.description,
-    images,
-    ingredients,
-    certificates,
-    claims,
-  });
+  try {
+    const product = await createProductForBrand(brandId, {
+      name: body.name,
+      category: body.category,
+      subcategory: body.subcategory,
+      description: body.description,
+      images,
+      ingredients,
+      certificates,
+      claims,
+    });
 
-  await logAudit({
-    actor: session,
-    action: AUDIT_ACTIONS.PRODUCT_ADMIN_CREATE,
-    targetType: "Product",
-    targetId: product.id,
-    targetLabel: product.name,
-    metadata: { brandId, brandName: brand.name },
-    request,
-  });
+    await logAudit({
+      actor: session,
+      action: AUDIT_ACTIONS.PRODUCT_ADMIN_CREATE,
+      targetType: "Product",
+      targetId: product.id,
+      targetLabel: product.name,
+      metadata: { brandId, brandName: brand.name },
+      request,
+    });
 
-  return NextResponse.json({ ok: true, product: { id: product.id, slug: product.slug } });
+    return NextResponse.json({ ok: true, product: { id: product.id, slug: product.slug } });
+  } catch (error) {
+    console.error("[POST /api/admin/brands/[id]/products]", error);
+    return NextResponse.json({ error: "Could not save product. Please try again." }, { status: 500 });
+  }
 }

@@ -41,9 +41,14 @@ export async function createCertificatesAndClaims(
   certificates: CertificateInput[],
   claims: ClaimInput[],
 ) {
-  const createdCertificates = await Promise.all(
-    certificates.map((cert) =>
-      tx.certificate.create({
+  // Sequential, not Promise.all: these queries run on the single reserved
+  // connection behind this interactive transaction (tx) — issuing them
+  // concurrently is a Prisma anti-pattern that gets more likely to fail
+  // the more documents/claims are being saved at once.
+  const createdCertificates: { id: string }[] = [];
+  for (const cert of certificates) {
+    createdCertificates.push(
+      await tx.certificate.create({
         data: {
           productId,
           title: clamp(cert.title, 300),
@@ -58,30 +63,28 @@ export async function createCertificatesAndClaims(
           isPublic: cert.isPublic ?? true,
         },
       }),
-    ),
-  );
+    );
+  }
 
   const localIdToRealId = new Map<string, string>();
   certificates.forEach((cert, index) => {
     if (cert.localId) localIdToRealId.set(cert.localId, createdCertificates[index].id);
   });
 
-  await Promise.all(
-    claims.map((claim) => {
-      const linkedIds = (claim.linkedDocumentIds ?? [])
-        .map((localId) => localIdToRealId.get(localId))
-        .filter((id): id is string => Boolean(id));
+  for (const claim of claims) {
+    const linkedIds = (claim.linkedDocumentIds ?? [])
+      .map((localId) => localIdToRealId.get(localId))
+      .filter((id): id is string => Boolean(id));
 
-      return tx.claim.create({
-        data: {
-          productId,
-          label: clamp(claim.label, 300),
-          evidence: claim.evidence?.trim() ? clamp(claim.evidence, 2000) : null,
-          ...(linkedIds.length > 0 ? { certificates: { connect: linkedIds.map((id) => ({ id })) } } : {}),
-        },
-      });
-    }),
-  );
+    await tx.claim.create({
+      data: {
+        productId,
+        label: clamp(claim.label, 300),
+        evidence: claim.evidence?.trim() ? clamp(claim.evidence, 2000) : null,
+        ...(linkedIds.length > 0 ? { certificates: { connect: linkedIds.map((id) => ({ id })) } } : {}),
+      },
+    });
+  }
 }
 
 export type ProductCreateInput = {
@@ -161,9 +164,10 @@ export async function createProductForBrand(brandId: string, input: ProductCreat
         await createCertificatesAndClaims(tx, created.id, input.certificates, input.claims);
 
         return created;
-      });
+      }, { timeout: 15000 });
     } catch (error) {
       if (isSlugConflict(error) && attempt < maxAttempts - 1) continue;
+      console.error("[createProductForBrand]", error);
       throw error;
     }
   }
