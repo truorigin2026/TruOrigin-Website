@@ -44,7 +44,9 @@ export function DashboardChrome({
             </div>
           </header>
           <ToastProvider>
-            <div className="min-w-0 flex-1 p-4 md:p-6">{children}</div>
+            <div className="min-w-0 flex-1 p-4 md:p-6">
+              <div className="mx-auto w-full max-w-[1600px]">{children}</div>
+            </div>
           </ToastProvider>
         </SidebarInset>
       </SidebarProvider>

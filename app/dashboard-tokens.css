@@ -177,6 +177,24 @@
   font-family: var(--font-sans);
 }
 
+/* Scroll-shadow cue for horizontally-scrollable tables — DataTable's
+   overflow-x-auto wrapper gives no visual hint there are more columns off-
+   screen. Pure-CSS "cover + shadow" layers: the cover layers (local
+   attachment) scroll with content and hide the shadow once you reach an
+   edge; the shadow layers (scroll attachment) stay viewport-relative so
+   they're visible until that edge is reached. */
+[data-dashboard] .table-scroll-shadows {
+  background:
+    linear-gradient(to right, var(--card) 30%, rgba(0, 0, 0, 0)),
+    linear-gradient(to left, var(--card) 30%, rgba(0, 0, 0, 0)) 100% 0,
+    linear-gradient(to right, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0)),
+    linear-gradient(to left, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0)) 100% 0;
+  background-repeat: no-repeat;
+  background-color: var(--card);
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+
 [data-dashboard] ::selection {
   background: var(--primary);
   color: var(--primary-foreground);
