@@ -155,6 +155,18 @@ model Brand {
   suspendedAt     DateTime?
   suspendedReason String?
   deletedAt       DateTime?
+
+  // Serial number scheme: TRU + 4-digit brandNumber + 3-digit (auto-
+  // widening past 999) productSequence, e.g. "TRU1200045" — see
+  // lib/serial.ts. brandNumber is assigned once, permanently, via a
+  // one-time backfill migration (existing brands, createdAt order,
+  // starting at 1001) and at creation for new brands going forward.
+  // productSequence is incremented atomically (Brand.update with
+  // {increment: 1}) inside the same transaction that writes a product's
+  // serialNumber, so the read-then-write-elsewhere race that affected
+  // the old global-count scheme can't happen here.
+  brandNumber     Int?            @unique
+  productSequence Int             @default(0)
   users           User[]
   products        Product[]
   subscriptions   Subscription[]

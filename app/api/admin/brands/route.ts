@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
 import { isStrongPassword, normalizeEmail, PASSWORD_REQUIREMENTS_MESSAGE, slugify } from "@/lib/auth";
+import { isBrandNumberConflict, nextBrandNumberGuess } from "@/lib/serial";
 
 async function uniqueBrandSlug(baseSlug: string) {
   const seed = baseSlug || "brand";
@@ -47,28 +48,51 @@ export async function POST(request: NextRequest) {
   const brandSlug = await uniqueBrandSlug(slugify(brandName));
   const passwordHash = await bcrypt.hash(password, 12);
 
-  const result = await prisma.$transaction(async (tx) => {
-    const brand = await tx.brand.create({
-      data: {
-        name: brandName,
-        slug: brandSlug,
-        summary: `${brandName} brand workspace on TruOrigin`,
-      },
-    });
+  // brandNumber is assigned via MAX+1 and retried on a unique-constraint
+  // collision (same spirit as this codebase's existing slug-retry pattern
+  // in lib/product-submission.ts) rather than a dedicated atomic counter —
+  // brand creation is a rare, deliberate, admin-only action, not a
+  // concurrent hot path, so a short retry loop is proportionate.
+  const maxAttempts = 5;
+  let result: { brand: { id: string; name: string }; user: { id: string; email: string } } | null = null;
 
-    const user = await tx.user.create({
-      data: {
-        email,
-        passwordHash,
-        role: "BRAND",
-        brand: { connect: { id: brand.id } },
-        brandRole: "OWNER",
-        mustChangePassword: true,
-      },
-    });
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const brandNumber = await nextBrandNumberGuess();
+    try {
+      result = await prisma.$transaction(async (tx) => {
+        const brand = await tx.brand.create({
+          data: {
+            name: brandName,
+            slug: brandSlug,
+            summary: `${brandName} brand workspace on TruOrigin`,
+            brandNumber,
+          },
+        });
 
-    return { brand, user };
-  });
+        const user = await tx.user.create({
+          data: {
+            email,
+            passwordHash,
+            role: "BRAND",
+            brand: { connect: { id: brand.id } },
+            brandRole: "OWNER",
+            mustChangePassword: true,
+          },
+        });
+
+        return { brand, user };
+      });
+      break;
+    } catch (error) {
+      if (isBrandNumberConflict(error) && attempt < maxAttempts - 1) continue;
+      console.error("[POST /api/admin/brands]", error);
+      return NextResponse.json({ error: "Could not create brand. Please try again." }, { status: 500 });
+    }
+  }
+
+  if (!result) {
+    return NextResponse.json({ error: "Could not assign a brand number. Please try again." }, { status: 500 });
+  }
 
   await logAudit({
     actor: session,

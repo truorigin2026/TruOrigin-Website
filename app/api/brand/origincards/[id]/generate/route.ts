@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireBrandSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
 import { generateQrDataUrl } from "@/lib/qr";
-import { nextSerialNumber } from "@/lib/serial";
+import { nextSerialNumberForBrand } from "@/lib/serial";
 
 /**
  * Self-heal path only: OriginCard generation is normally an automatic side
@@ -36,23 +36,32 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: "This product already has an OriginCard." }, { status: 400 });
   }
 
-  const serialNumber = product.serialNumber ?? (await nextSerialNumber());
-  const qrCodeUrl = product.qrCodeUrl ?? (await generateQrDataUrl(serialNumber));
+  try {
+    const { updatedProduct, card } = await prisma.$transaction(async (tx) => {
+      const serialNumber = product.serialNumber ?? (await nextSerialNumberForBrand(tx, product.brandId));
+      const qrCodeUrl = product.qrCodeUrl ?? (await generateQrDataUrl(serialNumber));
 
-  const [updatedProduct, card] = await prisma.$transaction([
-    prisma.product.update({ where: { id: productId }, data: { serialNumber, qrCodeUrl } }),
-    prisma.originCard.create({ data: { product: { connect: { id: productId } }, title: product.name, status: "DRAFT" } }),
-  ]);
+      const updatedProduct = await tx.product.update({ where: { id: productId }, data: { serialNumber, qrCodeUrl } });
+      const card = await tx.originCard.create({
+        data: { product: { connect: { id: productId } }, title: product.name, status: "DRAFT" },
+      });
 
-  await logAudit({
-    actor: session,
-    action: AUDIT_ACTIONS.ORIGINCARD_SELF_HEAL_GENERATE,
-    targetType: "OriginCard",
-    targetId: card.id,
-    targetLabel: product.name,
-    metadata: { serialNumber },
-    request,
-  });
+      return { updatedProduct, card };
+    });
 
-  return NextResponse.json({ ok: true, product: updatedProduct, card });
+    await logAudit({
+      actor: session,
+      action: AUDIT_ACTIONS.ORIGINCARD_SELF_HEAL_GENERATE,
+      targetType: "OriginCard",
+      targetId: card.id,
+      targetLabel: product.name,
+      metadata: { serialNumber: updatedProduct.serialNumber },
+      request,
+    });
+
+    return NextResponse.json({ ok: true, product: updatedProduct, card });
+  } catch (error) {
+    console.error("[POST /api/brand/origincards/[id]/generate]", error);
+    return NextResponse.json({ error: "Could not generate OriginCard. Please try again." }, { status: 500 });
+  }
 }

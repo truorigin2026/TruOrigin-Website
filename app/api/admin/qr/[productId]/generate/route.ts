@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
 import { generateQrDataUrl } from "@/lib/qr";
-import { nextSerialNumber } from "@/lib/serial";
+import { nextSerialNumberForBrand } from "@/lib/serial";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ productId: string }> }) {
   const session = await requireAdminSession(request);
@@ -21,23 +21,30 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: "Only approved products can have a QR generated" }, { status: 400 });
   }
 
-  const serialNumber = product.serialNumber ?? (await nextSerialNumber());
-  const qrCodeUrl = await generateQrDataUrl(serialNumber);
+  try {
+    const updated = await prisma.$transaction(async (tx) => {
+      const serialNumber = product.serialNumber ?? (await nextSerialNumberForBrand(tx, product.brandId));
+      const qrCodeUrl = await generateQrDataUrl(serialNumber);
 
-  const updated = await prisma.product.update({
-    where: { id: productId },
-    data: { serialNumber, qrCodeUrl },
-  });
+      return tx.product.update({
+        where: { id: productId },
+        data: { serialNumber, qrCodeUrl },
+      });
+    });
 
-  await logAudit({
-    actor: session,
-    action: AUDIT_ACTIONS.QR_GENERATE,
-    targetType: "Product",
-    targetId: productId,
-    targetLabel: product.name,
-    metadata: { serialNumber },
-    request,
-  });
+    await logAudit({
+      actor: session,
+      action: AUDIT_ACTIONS.QR_GENERATE,
+      targetType: "Product",
+      targetId: productId,
+      targetLabel: product.name,
+      metadata: { serialNumber: updated.serialNumber },
+      request,
+    });
 
-  return NextResponse.json({ ok: true, product: updated });
+    return NextResponse.json({ ok: true, product: updated });
+  } catch (error) {
+    console.error("[POST /api/admin/qr/[productId]/generate]", error);
+    return NextResponse.json({ error: "Could not generate QR code. Please try again." }, { status: 500 });
+  }
 }
