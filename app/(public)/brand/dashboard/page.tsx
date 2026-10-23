@@ -6,6 +6,7 @@ import { StatGrid, StatCard } from "@/components/dashboard/stat-card";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/dashboard/data-table";
+import { ActivityList, ActivityRow } from "@/components/dashboard/activity-list";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { requireBrandUser } from "@/lib/session";
@@ -102,20 +103,15 @@ export default async function BrandDashboardPage() {
               Needs Attention
             </CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-2.5">
+          <CardContent>
             {needsAttention.length === 0 ? (
               <p className="text-sm text-muted-foreground">Nothing needs your attention right now.</p>
             ) : (
-              needsAttention.slice(0, 6).map((item) => (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className="block rounded-lg bg-muted px-3.5 py-3 text-sm leading-relaxed text-foreground transition-colors hover:bg-muted/70"
-                >
-                  <p className="font-medium">{item.message}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{item.detail}</p>
-                </Link>
-              ))
+              <ActivityList>
+                {needsAttention.slice(0, 6).map((item) => (
+                  <ActivityRow key={item.id} title={item.message} detail={item.detail} href={item.href} />
+                ))}
+              </ActivityList>
             )}
           </CardContent>
         </Card>
@@ -126,19 +122,20 @@ export default async function BrandDashboardPage() {
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-2.5">
+          <CardContent>
             {recentActivity.length === 0 ? (
               <p className="text-sm text-muted-foreground">No activity yet.</p>
             ) : (
-              recentActivity.map((item) => (
-                <div key={item.id} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 px-3.5 py-2.5 text-sm">
-                  <div>
-                    <p className="font-medium text-foreground">{item.message}</p>
-                    <p className="text-xs text-muted-foreground">{item.detail}</p>
-                  </div>
-                  <span className="shrink-0 text-xs text-muted-foreground">{item.createdAt.toLocaleDateString()}</span>
-                </div>
-              ))
+              <ActivityList>
+                {recentActivity.map((item) => (
+                  <ActivityRow
+                    key={item.id}
+                    title={item.message}
+                    detail={item.detail}
+                    meta={item.createdAt.toLocaleDateString()}
+                  />
+                ))}
+              </ActivityList>
             )}
           </CardContent>
         </Card>

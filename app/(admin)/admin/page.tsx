@@ -14,6 +14,7 @@ import { StatGrid, StatCard } from "@/components/dashboard/stat-card";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/dashboard/data-table";
+import { ActivityList, ActivityRow } from "@/components/dashboard/activity-list";
 import { Badge } from "@/components/ui/badge";
 import { ScanActivityChart } from "@/components/dashboard/scan-activity-chart";
 import { prisma } from "@/lib/prisma";
@@ -108,16 +109,16 @@ export default async function AdminDashboardPage() {
           <CardHeader>
             <CardTitle>Owner Actions</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-2.5">
-            {[
-              "Open a product submission and approve or reject it.",
-              "Generate the serial number and QR once the product is approved.",
-              "Check which brands are active and which are still pending review.",
-            ].map((item) => (
-              <div key={item} className="rounded-lg bg-muted px-3.5 py-3 text-sm leading-relaxed text-foreground">
-                {item}
-              </div>
-            ))}
+          <CardContent>
+            <ActivityList>
+              {[
+                "Open a product submission and approve or reject it.",
+                "Generate the serial number and QR once the product is approved.",
+                "Check which brands are active and which are still pending review.",
+              ].map((item) => (
+                <ActivityRow key={item} title={item} />
+              ))}
+            </ActivityList>
           </CardContent>
         </Card>
       </div>

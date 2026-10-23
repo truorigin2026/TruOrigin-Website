@@ -7,6 +7,7 @@ import { getNeedsAttention } from "@/lib/notifications";
 import { MountFadeIn } from "@/components/motion";
 import { StatGrid, StatCard } from "@/components/dashboard/stat-card";
 import { DataTable, type TableRowData } from "@/components/dashboard/data-table";
+import { ActivityList, ActivityRow } from "@/components/dashboard/activity-list";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -127,17 +128,12 @@ export default async function AccountPage() {
                   Needs Attention
                 </CardTitle>
               </CardHeader>
-              <CardContent className="grid gap-2.5">
-                {needsAttention.slice(0, 3).map((item) => (
-                  <Link
-                    key={item.id}
-                    href={item.href}
-                    className="block rounded-lg bg-muted px-3.5 py-3 text-sm leading-relaxed text-foreground transition-colors hover:bg-muted/70"
-                  >
-                    <p className="font-medium">{item.message}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{item.detail}</p>
-                  </Link>
-                ))}
+              <CardContent>
+                <ActivityList>
+                  {needsAttention.slice(0, 3).map((item) => (
+                    <ActivityRow key={item.id} title={item.message} detail={item.detail} href={item.href} />
+                  ))}
+                </ActivityList>
               </CardContent>
             </Card>
           </MountFadeIn>
