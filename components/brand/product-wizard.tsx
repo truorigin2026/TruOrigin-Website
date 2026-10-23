@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useFileUpload } from "@/components/dashboard/use-file-upload";
 import { useToast } from "@/components/dashboard/toast";
+import { AssetImage } from "@/components/brands/asset-image";
 import { cn } from "@/lib/utils/cn";
 
 type ImageItem = { id: string; url: string; altText: string; uploading: boolean };
@@ -341,8 +342,7 @@ export function ProductWizard({
                     {image.uploading ? (
                       <div className="flex h-full items-center justify-center text-xs text-muted-foreground">Uploading...</div>
                     ) : (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={image.url} alt={image.altText} className="h-full w-full object-cover" />
+                      <AssetImage src={image.url} alt={image.altText} fill sizes="200px" />
                     )}
                     {index === 0 && !image.uploading ? (
                       <span className="absolute left-1 top-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">

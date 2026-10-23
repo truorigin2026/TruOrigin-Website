@@ -18,9 +18,18 @@ const ALLOWED_TYPES = new Set([
   "application/pdf",
 ]);
 
-// Raster formats sharp can safely re-encode as WebP. GIF is excluded so animated
-// GIFs aren't flattened into a static image.
-const WEBP_CONVERTIBLE_TYPES = new Set(["image/jpeg", "image/png"]);
+// Raster formats sharp can safely resize/re-encode as WebP. GIF is excluded
+// so animated GIFs aren't flattened into a static image. WebP inputs are
+// included (not just jpeg/png) so an already-WebP upload still gets
+// downsized if it arrived oversized — only the re-encode is skippable, not
+// the resize.
+const RESIZABLE_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+// Comfortably larger than any on-site display size (next.config.ts's image
+// config never serves larger than this), while cutting multi-MB phone-
+// camera originals down substantially. Storage is Vercel Blob, not
+// Postgres, but quota/bandwidth there is still a real limited resource.
+const MAX_IMAGE_DIMENSION = 2000;
 
 // The browser-reported File.type is client-supplied and trivially spoofable, so it's only
 // a first-pass filter. matchesMagicBytes() checks the actual file signature (first bytes)
@@ -106,9 +115,12 @@ export async function uploadFile(file: File, folder: string) {
   let contentType = file.type;
   let filename = file.name;
 
-  if (WEBP_CONVERTIBLE_TYPES.has(file.type)) {
+  if (RESIZABLE_IMAGE_TYPES.has(file.type)) {
     const original = Buffer.from(await file.arrayBuffer());
-    body = await sharp(original).webp({ quality: 82 }).toBuffer();
+    body = await sharp(original)
+      .resize({ width: MAX_IMAGE_DIMENSION, height: MAX_IMAGE_DIMENSION, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toBuffer();
     contentType = "image/webp";
     filename = filename.replace(/\.[^.]+$/, "") + ".webp";
   }
