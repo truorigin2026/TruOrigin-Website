@@ -72,12 +72,7 @@ export default async function AdminQrDetailPage({ params }: { params: Promise<{ 
 
         <Card className="p-5 md:p-6">
           {product.qrCodeUrl ? (
-            <BrandTagPreview
-              serialNumber={product.serialNumber}
-              qrDataUrl={product.qrCodeUrl}
-              productName={product.name}
-              brandName={product.brand.name}
-            />
+            <BrandTagPreview serialNumber={product.serialNumber} qrDataUrl={product.qrCodeUrl} />
           ) : (
             <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
               No QR generated yet. Use &quot;Generate QR&quot; to create one for this product.

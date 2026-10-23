@@ -31,8 +31,11 @@ const QR_REGION = { left: 798, top: 669, size: 794 };
 
 // Measured from the template's opaque white strip (starts at y=1766, card
 // spans roughly x:105-2296). Text is centered within a safe inset box that
-// avoids the bottom rounded corners.
-const SERIAL_STRIP = { left: 300, top: 1800, width: 1799, height: 320 };
+// avoids the bottom rounded corners. (top was previously 1800 — a 34px
+// drift from this comment's own measurement, confirmed and corrected via a
+// direct pixel scan of the template: the strip's real near-white pixels
+// begin exactly at y=1766.)
+const SERIAL_STRIP = { left: 300, top: 1766, width: 1799, height: 320 };
 
 function serialTextSvg(serialNumber: string, region: typeof SERIAL_STRIP) {
   const { width, height } = region;
