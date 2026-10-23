@@ -228,6 +228,14 @@ model ProductImage {
   url       String
   altText   String?
   position  Int     @default(0)
+  // Non-destructive crop: where the important part of the photo is, and
+  // how zoomed in — applied via CSS (object-position + transform: scale)
+  // wherever the photo is displayed. Defaults are dead-center/no-zoom, so
+  // every existing row renders identically to today until a brand
+  // actively sets one. See lib/.../asset-image.tsx.
+  focalX    Float   @default(0.5)
+  focalY    Float   @default(0.5)
+  zoom      Float   @default(1)
 }
 
 enum ClaimStatus {
