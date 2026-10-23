@@ -319,6 +319,50 @@ async function getProductBySerialUncached(serial: string): Promise<ProductRecord
 /** Returns a single product by its public-facing serial number. */
 export const getProductBySerial = cache(getProductBySerialUncached);
 
+export type BrandProductPreview = {
+  product: ProductRecord;
+  status: string;
+  submittedAt: string | null;
+  reviewedAt: string | null;
+  approvedAt: string | null;
+  rejectionNote: string | null;
+};
+
+/**
+ * Returns a single product for its OWNING BRAND to preview, regardless of
+ * approval status (DRAFT/SUBMITTED/IN_REVIEW/REJECTED/APPROVED) — unlike
+ * getProductBySlug/getProductBySerial above, which only ever resolve
+ * APPROVED, non-hidden products (the public contract). Ownership is
+ * enforced by brandId, not just existence, so one brand can never preview
+ * another's unapproved product. Returns null if the product doesn't exist
+ * or doesn't belong to this brand — never throws, callers should 404.
+ *
+ * Returns the public-shaped ProductRecord (for reuse with ProductDetailTabs)
+ * alongside the operational fields (status, review dates, rejection note)
+ * that aren't part of the public product shape but a brand needs to see on
+ * their own product — rather than polluting ProductRecord itself, which is
+ * used across the public site, with brand-only fields.
+ */
+export async function getProductForBrandPreview(id: string, brandId: string): Promise<BrandProductPreview | null> {
+  const product = (await prisma.product.findUnique({
+    where: { id },
+    include: productInclude,
+  })) as DbProduct | null;
+
+  if (!product || product.brandId !== brandId) {
+    return null;
+  }
+
+  return {
+    product: mapDbProduct(product),
+    status: product.status,
+    submittedAt: product.submittedAt ? formatDate(product.submittedAt) : null,
+    reviewedAt: product.reviewedAt ? formatDate(product.reviewedAt) : null,
+    approvedAt: product.approvedAt ? formatDate(product.approvedAt) : null,
+    rejectionNote: product.rejectionNote,
+  };
+}
+
 /** Returns every distinct product category. */
 export async function getCategories(): Promise<string[]> {
   const categories = await prisma.category.findMany({

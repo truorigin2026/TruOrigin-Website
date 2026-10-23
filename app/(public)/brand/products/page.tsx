@@ -1,8 +1,7 @@
 import { Search } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { FilterTabs } from "@/components/dashboard/filter-tabs";
-import { DataTable } from "@/components/dashboard/data-table";
-import { Badge, type BadgeVariant } from "@/components/ui/badge";
+import { ProductGridCard } from "@/components/brand/product-grid-card";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,15 +15,6 @@ type ProductsPageProps = {
 };
 
 const STATUS_TABS = ["ALL", "DRAFT", "SUBMITTED", "IN_REVIEW", "APPROVED", "REJECTED"] as const;
-const TABLE_HEADERS = ["Product", "Category", "Serial", "Status", "Updated"];
-
-const STATUS_VARIANT: Record<string, BadgeVariant> = {
-  APPROVED: "success",
-  REJECTED: "destructive",
-  IN_REVIEW: "info",
-  SUBMITTED: "warning",
-  DRAFT: "outline",
-};
 
 export default async function BrandProductsPage({ searchParams }: ProductsPageProps) {
   const user = await requireBrandUser();
@@ -51,28 +41,16 @@ export default async function BrandProductsPage({ searchParams }: ProductsPagePr
   const products = await prisma.product.findMany({
     where,
     orderBy: { updatedAt: "desc" },
-    include: { category: true },
+    include: { category: true, images: { orderBy: { position: "asc" }, take: 1 } },
     take: 100,
   });
-
-  const rows = products.map((p) => ({
-    key: p.id,
-    href: `/brand/products/${p.id}`,
-    cells: [
-      <span key="product" className="font-medium">{p.name}</span>,
-      p.category.name,
-      <span key="serial" className="text-muted-foreground">{p.serialNumber ?? "Pending"}</span>,
-      <Badge key="status" variant={STATUS_VARIANT[p.status] ?? "outline"}>{p.status.replaceAll("_", " ")}</Badge>,
-      p.updatedAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-    ],
-  }));
 
   return (
     <>
       <PageHeader
         eyebrow="Products"
         title="Manage the products and information reviewed through TruOrigin."
-        description="Search your catalog, track review status, and open a product to edit its details, claims, and documents."
+        description="Search your catalog, track review status, and open a product to preview and edit its details, claims, and documents."
         actions={
           <Button render={<Link href="/brand/products/new" />} nativeButton={false}>
             Add Product
@@ -103,11 +81,25 @@ export default async function BrandProductsPage({ searchParams }: ProductsPagePr
         </div>
       </Card>
 
-      <DataTable
-        headers={TABLE_HEADERS}
-        rows={rows}
-        emptyMessage="No products match this filter."
-      />
+      {products.length === 0 ? (
+        <div className="rounded-xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
+          No products match this filter.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {products.map((product) => (
+            <ProductGridCard
+              key={product.id}
+              id={product.id}
+              name={product.name}
+              category={product.category.name}
+              status={product.status}
+              serialNumber={product.serialNumber}
+              imageUrl={product.images[0]?.url ?? null}
+            />
+          ))}
+        </div>
+      )}
     </>
   );
 }
