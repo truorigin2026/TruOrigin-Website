@@ -38,6 +38,7 @@ export default async function BrandDocumentsPage({ searchParams }: DocumentsPage
       where: certificateWhere,
       orderBy: { createdAt: "desc" },
       include: { product: true },
+      take: 100,
     }),
   ]);
 

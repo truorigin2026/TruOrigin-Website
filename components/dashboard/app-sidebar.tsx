@@ -13,7 +13,7 @@ export function AppSidebar({ area, email }: { area: "admin" | "brand"; email: st
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<Link prefetch={false} href={area === "admin" ? "/admin" : "/brand/dashboard"} />}>
+            <SidebarMenuButton size="lg" render={<Link href={area === "admin" ? "/admin" : "/brand/dashboard"} />}>
               <img src={favicon.src} alt="" className="size-7 shrink-0 rounded-full" />
               <span className="font-semibold text-base">{area === "admin" ? "Admin" : "Brand Portal"}</span>
             </SidebarMenuButton>

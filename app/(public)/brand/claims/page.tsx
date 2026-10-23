@@ -24,6 +24,7 @@ export default async function BrandClaimsPage() {
     where,
     include: { product: true },
     orderBy: { createdAt: "desc" },
+    take: 100,
   });
 
   const rows = claims.map((claim) => ({

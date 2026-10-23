@@ -25,7 +25,7 @@ function NavRow({ link, pathname }: { link: NavLink; pathname: string }) {
   const active = isLinkActive(pathname, link.href);
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton tooltip={link.label} isActive={active} render={<Link prefetch={false} href={link.href} />}>
+      <SidebarMenuButton tooltip={link.label} isActive={active} render={<Link href={link.href} />}>
         <Icon />
         <span>{link.label}</span>
       </SidebarMenuButton>

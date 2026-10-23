@@ -205,6 +205,8 @@ model Product {
 
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
+
+  @@index([brandId, status])
 }
 
 model ProductImage {
@@ -232,6 +234,8 @@ model Claim {
   evidence     String? // supplementary free text note; used as a fallback display when no certificates are linked
   certificates Certificate[]
   createdAt    DateTime      @default(now())
+
+  @@index([productId])
 }
 
 model Certificate {
@@ -252,6 +256,8 @@ model Certificate {
   testScope  String?
   claims     Claim[]
   createdAt  DateTime           @default(now())
+
+  @@index([productId])
 }
 
 model Ingredient {
