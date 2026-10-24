@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Pencil } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ProductEditActions } from "@/components/brand/product-edit-actions";
 import { ProductDetailTabs } from "@/components/products/product-detail-tabs";
 import { AssetImage } from "@/components/brands/asset-image";
@@ -68,10 +71,19 @@ export default async function BrandProductDetailPage({ params }: { params: Promi
           focalY={product.heroFocalPoint?.y}
           zoom={product.heroFocalPoint?.zoom}
         />
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute right-2 top-2 z-10 bg-background/90 backdrop-blur"
+          render={<Link href={`/brand/products/${id}/edit?step=0`} aria-label="Edit photos" />}
+          nativeButton={false}
+        >
+          <Pencil size={14} />
+        </Button>
       </div>
 
       <div className="product-detail-page">
-        <ProductDetailTabs product={product} />
+        <ProductDetailTabs product={product} productId={id} showEditControls />
       </div>
     </>
   );

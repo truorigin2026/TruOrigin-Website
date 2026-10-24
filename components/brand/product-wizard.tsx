@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Check, Loader2, X, GripVertical } from "lucide-react";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
@@ -272,12 +272,15 @@ export function ProductWizard({
   redirectBasePath = "/brand/products",
 }: ProductWizardProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { showToast } = useToast();
   const { uploadFile } = useFileUpload();
   const listId = useId();
   const dragSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
-  const [step, setStep] = useState(0);
+  const requestedStep = Number(searchParams.get("step"));
+  const initialStep = Number.isInteger(requestedStep) ? Math.min(Math.max(requestedStep, 0), STEPS.length - 1) : 0;
+  const [step, setStep] = useState(initialStep);
   const [name, setName] = useState(initialValues?.name ?? "");
   const [category, setCategory] = useState(initialValues?.category ?? "");
   const [subcategory, setSubcategory] = useState(initialValues?.subcategory ?? "");

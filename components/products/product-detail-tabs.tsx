@@ -1,17 +1,49 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, Download, ExternalLink, FileText, ShieldCheck } from "lucide-react";
+import { ChevronRight, Download, ExternalLink, FileText, Pencil, ShieldCheck } from "lucide-react";
 import { ProductRecord, ProductClaim, ProductCertificate, statusConfig, certificateDocTypeLabels } from "@/lib/data/site-data";
 import { Badge } from "@/components/ui/badge";
 import { TrackInView } from "@/components/analytics/scan-tracking";
 
 type ProductDetailTabsProps = {
   product: ProductRecord;
+  /** Brand-dashboard preview only — never passed on the real public product page. */
+  productId?: string;
+  showEditControls?: boolean;
 };
 
 type TabKey = "overview" | "claims" | "ingredients" | "documents";
+
+/** A section's <h2> with an optional "Edit" link jumping into the wizard at the matching step — brand preview only. */
+function SectionHeading({
+  children,
+  productId,
+  step,
+}: {
+  children: React.ReactNode;
+  productId?: string;
+  step?: number;
+}) {
+  if (productId === undefined || step === undefined) {
+    return <h2>{children}</h2>;
+  }
+
+  return (
+    <div className="mb-4 flex items-center justify-between gap-3">
+      <h2 style={{ margin: 0 }}>{children}</h2>
+      <Link
+        href={`/brand/products/${productId}/edit?step=${step}`}
+        className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-primary hover:underline"
+      >
+        <Pencil size={12} />
+        Edit
+      </Link>
+    </div>
+  );
+}
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "overview", label: "Overview" },
@@ -261,7 +293,8 @@ function ClaimRow({
   );
 }
 
-export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
+export function ProductDetailTabs({ product, productId, showEditControls }: ProductDetailTabsProps) {
+  const editProductId = showEditControls ? productId : undefined;
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [selectedCertificateId, setSelectedCertificateId] = useState<string | null>(null);
   const ingredients = product.ingredients ?? [];
@@ -316,7 +349,7 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
         >
           {activeTab === "overview" ? (
             <div className="detail-section-card detail-section-overview">
-              <h2>Overview</h2>
+              <SectionHeading productId={editProductId} step={0}>Overview</SectionHeading>
               <p>{product.summary}</p>
               {showOverviewNote ? <p className="detail-muted">{product.productNote}</p> : null}
               <dl className="detail-dl">
@@ -350,7 +383,7 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
 
           {activeTab === "claims" && !selectedCertificate ? (
             <div className="detail-section-card">
-              <h2>Claims</h2>
+              <SectionHeading productId={editProductId} step={1}>Claims</SectionHeading>
               <div className="claim-list">
                 {product.claims.map((claim) => (
                   <ClaimRow
@@ -366,7 +399,7 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
 
           {activeTab === "ingredients" ? (
             <div className="detail-section-card">
-              <h2>Ingredients</h2>
+              <SectionHeading productId={editProductId} step={2}>Ingredients</SectionHeading>
               {ingredients.length > 0 ? (
                 <ul className="ingredient-list">
                   {ingredients.map((ingredient) => (
@@ -384,7 +417,7 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
 
           {activeTab === "documents" ? (
             <div className="detail-section-card">
-              <h2>Documents</h2>
+              <SectionHeading productId={editProductId} step={1}>Documents</SectionHeading>
               {certificates.length > 0 ? (
                 <ul className="detail-cert-summary-list">
                   {certificates.map((certificate) => (

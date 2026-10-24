@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { ProductWizard } from "@/components/brand/product-wizard";
@@ -32,6 +33,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         title={product.name}
         description="Update your product details, claims, and documents, then resubmit for review."
       />
+      <Suspense fallback={null}>
       <ProductWizard
         categoryOptions={categories.map((c) => c.name)}
         mode="edit"
@@ -63,6 +65,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           ),
         }}
       />
+      </Suspense>
     </>
   );
 }
