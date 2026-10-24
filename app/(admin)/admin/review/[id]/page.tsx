@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ReviewActions } from "@/components/admin/review-actions";
+import { AssetImage } from "@/components/brands/asset-image";
 import { prisma } from "@/lib/prisma";
 import { requireAdminUser } from "@/lib/session";
 
@@ -119,13 +120,17 @@ export default async function ReviewDetailPage({ params }: { params: Promise<{ i
               {product.images.length > 0 ? (
                 <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                   {product.images.map((image) => (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      key={image.id}
-                      src={image.url}
-                      alt={image.altText ?? product.name}
-                      className="aspect-square w-full rounded-lg border border-border object-cover"
-                    />
+                    <div key={image.id} className="relative aspect-square w-full overflow-hidden rounded-lg border border-border">
+                      <AssetImage
+                        src={image.url}
+                        alt={image.altText ?? product.name}
+                        fill
+                        sizes="200px"
+                        focalX={image.focalX}
+                        focalY={image.focalY}
+                        zoom={image.zoom}
+                      />
+                    </div>
                   ))}
                 </div>
               ) : (

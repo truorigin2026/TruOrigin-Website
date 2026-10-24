@@ -9,15 +9,28 @@ type ProductCardProps = {
   brandLogoUrl?: string | null;
   category: string;
   image: string;
+  focalPoint?: { x: number; y: number; zoom: number };
   delay?: number;
 };
 
-export function ProductCard({ code, name, brand, brandLogoUrl, category, image, delay = 0 }: ProductCardProps) {
+export function ProductCard({ code, name, brand, brandLogoUrl, category, image, focalPoint, delay = 0 }: ProductCardProps) {
   return (
     <FadeIn delay={delay}>
       <Link href={`/p/${code}`} className="product-card">
         <div className="product-card-image-wrap">
-          <Image src={image} alt={name} fill className="product-card-image" sizes="(max-width:768px) 100vw, 25vw" />
+          <Image
+            src={image}
+            alt={name}
+            fill
+            className="product-card-image"
+            sizes="(max-width:768px) 100vw, 25vw"
+            style={{
+              objectPosition: `${(focalPoint?.x ?? 0.5) * 100}% ${(focalPoint?.y ?? 0.5) * 100}%`,
+              ...(focalPoint && focalPoint.zoom !== 1
+                ? { transform: `scale(${focalPoint.zoom})`, transformOrigin: `${focalPoint.x * 100}% ${focalPoint.y * 100}%` }
+                : {}),
+            }}
+          />
           {brandLogoUrl ? (
             <div className="product-card-mark">
               <span className="product-card-brand-logo">

@@ -96,6 +96,7 @@ export default async function BrandProductsPage({ searchParams }: ProductsPagePr
               status={product.status}
               serialNumber={product.serialNumber}
               imageUrl={product.images[0]?.url ?? null}
+              focalPoint={product.images[0] ? { x: product.images[0].focalX, y: product.images[0].focalY, zoom: product.images[0].zoom } : undefined}
             />
           ))}
         </div>

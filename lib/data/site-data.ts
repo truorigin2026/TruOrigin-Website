@@ -85,6 +85,10 @@ export type ProductRecord = {
   slug: string;
   scanCode: string;
   imageGallery: string[];
+  // Non-destructive crop for imageGallery[0] -- the only index any
+  // consumer actually displays (no gallery/carousel exists anywhere).
+  // Undefined means dead-center/no-zoom, same as today's behavior.
+  heroFocalPoint?: { x: number; y: number; zoom: number };
   name: string;
   brand: string;
   brandSlug: string;

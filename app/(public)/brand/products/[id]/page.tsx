@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { ProductEditActions } from "@/components/brand/product-edit-actions";
 import { ProductDetailTabs } from "@/components/products/product-detail-tabs";
+import { AssetImage } from "@/components/brands/asset-image";
 import { requireBrandUser } from "@/lib/session";
 import { getProductForBrandPreview } from "@/lib/data/repository";
 
@@ -56,6 +57,18 @@ export default async function BrandProductDetailPage({ params }: { params: Promi
           <p className="mt-1">{rejectionNote}</p>
         </div>
       ) : null}
+
+      <div className="relative mb-6 aspect-square w-full max-w-xs overflow-hidden rounded-xl border border-border bg-muted">
+        <AssetImage
+          src={product.imageGallery[0]}
+          alt={product.name}
+          fill
+          sizes="320px"
+          focalX={product.heroFocalPoint?.x}
+          focalY={product.heroFocalPoint?.y}
+          zoom={product.heroFocalPoint?.zoom}
+        />
+      </div>
 
       <div className="product-detail-page">
         <ProductDetailTabs product={product} />

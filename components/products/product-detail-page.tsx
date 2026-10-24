@@ -35,6 +35,15 @@ export function ProductDetailPage({
                   className="product-detail-image"
                   priority
                   sizes="(max-width: 1024px) 100vw, 50vw"
+                  style={{
+                    objectPosition: `${(product.heroFocalPoint?.x ?? 0.5) * 100}% ${(product.heroFocalPoint?.y ?? 0.5) * 100}%`,
+                    ...(product.heroFocalPoint && product.heroFocalPoint.zoom !== 1
+                      ? {
+                          transform: `scale(${product.heroFocalPoint.zoom})`,
+                          transformOrigin: `${product.heroFocalPoint.x * 100}% ${product.heroFocalPoint.y * 100}%`,
+                        }
+                      : {}),
+                  }}
                 />
               </div>
             </HeroReveal>

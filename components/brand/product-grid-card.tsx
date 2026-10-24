@@ -18,6 +18,7 @@ export function ProductGridCard({
   status,
   serialNumber,
   imageUrl,
+  focalPoint,
 }: {
   id: string;
   name: string;
@@ -25,13 +26,23 @@ export function ProductGridCard({
   status: string;
   serialNumber: string | null;
   imageUrl: string | null;
+  focalPoint?: { x: number; y: number; zoom: number };
 }) {
   return (
     <Link href={`/brand/products/${id}`} className="block">
       <Card className="h-full gap-0 overflow-hidden p-0 transition-shadow hover:shadow-md">
-        <div className="relative aspect-[4/3] w-full bg-muted">
+        {/* Square, matching the crop tool's fixed 1:1 target and the rest of the site (public catalog card, product hero) -- was 4:3, which didn't match what a brand actually crops. */}
+        <div className="relative aspect-square w-full bg-muted">
           {imageUrl ? (
-            <AssetImage src={imageUrl} alt={name} fill sizes="(max-width: 768px) 100vw, 25vw" />
+            <AssetImage
+              src={imageUrl}
+              alt={name}
+              fill
+              sizes="(max-width: 768px) 100vw, 25vw"
+              focalX={focalPoint?.x}
+              focalY={focalPoint?.y}
+              zoom={focalPoint?.zoom}
+            />
           ) : (
             <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No photo</div>
           )}

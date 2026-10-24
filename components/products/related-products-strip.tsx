@@ -63,6 +63,7 @@ export function RelatedProductsStrip({ products }: RelatedProductsStripProps) {
               brandLogoUrl={product.brandLogoUrl}
               category={product.category}
               image={product.imageGallery[0]}
+              focalPoint={product.heroFocalPoint}
               delay={index * 0.05}
             />
           </div>

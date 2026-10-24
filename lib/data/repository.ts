@@ -72,10 +72,10 @@ function formatDate(value: Date | null | undefined): string {
 }
 
 function mapDbProduct(product: DbProduct): ProductRecord {
-  const imageGallery = product.images
-    .slice()
-    .sort((a, b) => a.position - b.position)
-    .map((image) => image.url);
+  const sortedImages = product.images.slice().sort((a, b) => a.position - b.position);
+  const imageGallery = sortedImages.map((image) => image.url);
+  const heroImage = sortedImages[0];
+  const heroFocalPoint = heroImage ? { x: heroImage.focalX, y: heroImage.focalY, zoom: heroImage.zoom } : undefined;
 
   const claims = product.claims.map((claim) => ({
     id: claim.id,
@@ -127,6 +127,7 @@ function mapDbProduct(product: DbProduct): ProductRecord {
     slug: product.slug,
     scanCode: product.serialNumber ?? product.slug.toUpperCase(),
     imageGallery: imageGallery.length > 0 ? imageGallery : ["/images/hero.webp"],
+    heroFocalPoint,
     name: product.name,
     brand: product.brand.name,
     brandSlug: product.brand.slug,
@@ -155,10 +156,10 @@ function mapDbProduct(product: DbProduct): ProductRecord {
 }
 
 function mapDbProductSummary(product: DbProductSummary): ProductRecord {
-  const imageGallery = product.images
-    .slice()
-    .sort((a, b) => a.position - b.position)
-    .map((image) => image.url);
+  const sortedImages = product.images.slice().sort((a, b) => a.position - b.position);
+  const imageGallery = sortedImages.map((image) => image.url);
+  const heroImage = sortedImages[0];
+  const heroFocalPoint = heroImage ? { x: heroImage.focalX, y: heroImage.focalY, zoom: heroImage.zoom } : undefined;
 
   const claims = product.claims.map((claim) => ({
     id: claim.id,
@@ -174,6 +175,7 @@ function mapDbProductSummary(product: DbProductSummary): ProductRecord {
     slug: product.slug,
     scanCode: product.serialNumber ?? product.slug.toUpperCase(),
     imageGallery: imageGallery.length > 0 ? imageGallery : ["/images/hero.webp"],
+    heroFocalPoint,
     name: product.name,
     brand: product.brand.name,
     brandSlug: product.brand.slug,

@@ -207,6 +207,7 @@ export function ProductsContent({
                 brandLogoUrl={product.brandLogoUrl}
                 category={mapCategoryToFilter(product.category, product.subcategory)}
                 image={product.imageGallery[0]}
+                focalPoint={product.heroFocalPoint}
                 delay={index * 0.04}
               />
             ))}
