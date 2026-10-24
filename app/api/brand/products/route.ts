@@ -9,7 +9,7 @@ type SubmitBody = {
   category?: string;
   subcategory?: string;
   description?: string;
-  images?: { url: string; altText?: string }[];
+  images?: { url: string; altText?: string; focalX?: number; focalY?: number; zoom?: number }[];
   claims?: ClaimInput[];
   ingredients?: { name: string; note?: string }[];
   certificates?: CertificateInput[];
@@ -45,25 +45,30 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "fileUrl must point to an uploaded file" }, { status: 400 });
   }
 
-  const product = await createProductForBrand(session.brandId, {
-    name: body.name,
-    category: body.category,
-    subcategory: body.subcategory,
-    description: body.description,
-    images,
-    ingredients,
-    certificates,
-    claims,
-  });
+  try {
+    const product = await createProductForBrand(session.brandId, {
+      name: body.name,
+      category: body.category,
+      subcategory: body.subcategory,
+      description: body.description,
+      images,
+      ingredients,
+      certificates,
+      claims,
+    });
 
-  await logAudit({
-    actor: session,
-    action: AUDIT_ACTIONS.PRODUCT_SUBMIT,
-    targetType: "Product",
-    targetId: product.id,
-    targetLabel: product.name,
-    request,
-  });
+    await logAudit({
+      actor: session,
+      action: AUDIT_ACTIONS.PRODUCT_SUBMIT,
+      targetType: "Product",
+      targetId: product.id,
+      targetLabel: product.name,
+      request,
+    });
 
-  return NextResponse.json({ ok: true, product: { id: product.id, slug: product.slug } });
+    return NextResponse.json({ ok: true, product: { id: product.id, slug: product.slug } });
+  } catch (error) {
+    console.error("[POST /api/brand/products]", error);
+    return NextResponse.json({ error: "Could not save product. Please try again." }, { status: 500 });
+  }
 }
