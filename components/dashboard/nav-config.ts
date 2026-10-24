@@ -17,6 +17,7 @@ import {
   History,
   PlusCircle,
   ShieldCheck,
+  MessageCircle,
 } from "lucide-react";
 
 export type NavLink = { href: string; label: string; icon: LucideIcon };
@@ -41,6 +42,7 @@ export const adminNavGroups: NavGroup[] = [
     ],
   },
   { group: "Analytics", links: [{ href: "/admin/analytics", label: "Analytics", icon: BarChart3 }] },
+  { group: "Messages", links: [{ href: "/admin/messages", label: "Inbox", icon: MessageCircle }] },
   {
     group: "Billing",
     links: [
@@ -65,6 +67,7 @@ export const brandNavLinks: NavLink[] = [
   { href: "/brand/products", label: "Products", icon: Package },
   { href: "/brand/products/new", label: "Add Product", icon: PlusCircle },
   { href: "/brand/claims", label: "Evidence", icon: ShieldCheck },
+  { href: "/brand/messages", label: "Messages", icon: MessageCircle },
   { href: "/brand/origincards", label: "OriginCards", icon: IdCard },
   { href: "/brand/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/brand/team", label: "Team", icon: Users },
