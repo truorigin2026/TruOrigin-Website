@@ -42,7 +42,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           category: product.category.name,
           subcategory: product.subcategory ?? "",
           description: product.description ?? "",
-          images: product.images.map((img) => ({ id: img.id, url: img.url, altText: img.altText ?? "" })),
+          images: product.images.map((img) => ({ id: img.id, url: img.url, altText: img.altText ?? "", focalX: img.focalX, focalY: img.focalY, zoom: img.zoom })),
           claims: product.claims.map((c) => ({ id: c.id, label: c.label, evidence: c.evidence ?? "" })),
           ingredients: product.ingredients.map((i) => ({ id: i.id, name: i.name, note: i.note ?? "" })),
           documents: product.certificates.map((c) => ({

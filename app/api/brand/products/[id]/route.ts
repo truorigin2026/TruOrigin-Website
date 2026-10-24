@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireBrandSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
 import { isTrustedBlobUrl } from "@/lib/blob";
-import { createCertificatesAndClaims, type CertificateInput, type ClaimInput } from "@/lib/product-submission";
+import { createCertificatesAndClaims, clampNumber, type CertificateInput, type ClaimInput } from "@/lib/product-submission";
 import { revalidatePublicProduct } from "@/lib/revalidate";
 
 type PatchBody = {
@@ -11,7 +11,7 @@ type PatchBody = {
   category?: string;
   subcategory?: string;
   description?: string;
-  images?: { url: string; altText?: string }[];
+  images?: { url: string; altText?: string; focalX?: number; focalY?: number; zoom?: number }[];
   claims?: ClaimInput[];
   ingredients?: { name: string; note?: string }[];
   certificates?: CertificateInput[];
@@ -91,6 +91,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             url: image.url,
             altText: image.altText?.trim() ? clamp(image.altText, 300) : null,
             position: index,
+            focalX: clampNumber(image.focalX, 0.5, 0, 1),
+            focalY: clampNumber(image.focalY, 0.5, 0, 1),
+            zoom: clampNumber(image.zoom, 1, 1, 3),
           })),
         },
         ingredients: {

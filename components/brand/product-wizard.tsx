@@ -13,9 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useFileUpload } from "@/components/dashboard/use-file-upload";
 import { useToast } from "@/components/dashboard/toast";
 import { AssetImage } from "@/components/brands/asset-image";
+import { ImageCropDialog } from "@/components/brand/image-crop-dialog";
 import { cn } from "@/lib/utils/cn";
 
-type ImageItem = { id: string; url: string; altText: string; uploading: boolean };
+type ImageItem = { id: string; url: string; altText: string; uploading: boolean; focalX: number; focalY: number; zoom: number };
 type ClaimItem = { id: string; label: string; evidence: string };
 type IngredientItem = { id: string; name: string; note: string };
 type DocType = "CERTIFICATE" | "LAB_REPORT" | "INGREDIENT_LIST" | "SOURCING_PROOF" | "OTHER";
@@ -71,7 +72,7 @@ export type ProductWizardInitialValues = {
   category: string;
   subcategory: string;
   description: string;
-  images: { id: string; url: string; altText: string }[];
+  images: { id: string; url: string; altText: string; focalX?: number; focalY?: number; zoom?: number }[];
   claims: { id: string; label: string; evidence: string }[];
   ingredients: { id: string; name: string; note: string }[];
   documents: {
@@ -203,10 +204,12 @@ function SortableImageThumb({
   image,
   isMain,
   onRemove,
+  onEditCrop,
 }: {
   image: ImageItem;
   isMain: boolean;
   onRemove: () => void;
+  onEditCrop: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: image.id });
   const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 1 : undefined };
@@ -223,12 +226,22 @@ function SortableImageThumb({
       {image.uploading ? (
         <div className="flex h-full items-center justify-center text-xs text-muted-foreground">Uploading...</div>
       ) : (
-        <AssetImage src={image.url} alt={image.altText} fill sizes="200px" />
+        <AssetImage src={image.url} alt={image.altText} fill sizes="200px" focalX={image.focalX} focalY={image.focalY} zoom={image.zoom} />
       )}
       {isMain && !image.uploading ? (
         <span className="absolute left-1 top-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
           Main
         </span>
+      ) : null}
+      {!image.uploading ? (
+        <button
+          type="button"
+          onClick={onEditCrop}
+          aria-label="Position this photo"
+          className="absolute bottom-1 left-1 rounded-full bg-black/60 px-2 py-1 text-[10px] font-semibold text-white"
+        >
+          Position
+        </button>
       ) : null}
       <button
         type="button"
@@ -270,7 +283,13 @@ export function ProductWizard({
   const [subcategory, setSubcategory] = useState(initialValues?.subcategory ?? "");
   const [description, setDescription] = useState(initialValues?.description ?? "");
   const [images, setImages] = useState<ImageItem[]>(
-    (initialValues?.images ?? []).map((img) => ({ ...img, uploading: false })),
+    (initialValues?.images ?? []).map((img) => ({
+      ...img,
+      uploading: false,
+      focalX: img.focalX ?? 0.5,
+      focalY: img.focalY ?? 0.5,
+      zoom: img.zoom ?? 1,
+    })),
   );
   const [claims, setClaims] = useState<ClaimItem[]>(
     initialValues?.claims && initialValues.claims.length > 0 ? initialValues.claims : [{ id: newId(), label: "", evidence: "" }],
@@ -292,6 +311,8 @@ export function ProductWizard({
     initialValues?.claimCertificateLinks ?? {},
   );
   const [submitting, setSubmitting] = useState(false);
+  const [cropImageId, setCropImageId] = useState<string | null>(null);
+  const cropImage = images.find((img) => img.id === cropImageId) ?? null;
   const [error, setError] = useState<string | null>(null);
 
   async function handleImageSelect(fileList: FileList | null) {
@@ -299,7 +320,7 @@ export function ProductWizard({
     const files = Array.from(fileList).slice(0, 10 - images.length);
     for (const file of files) {
       const id = newId();
-      setImages((prev) => [...prev, { id, url: "", altText: file.name, uploading: true }]);
+      setImages((prev) => [...prev, { id, url: "", altText: file.name, uploading: true, focalX: 0.5, focalY: 0.5, zoom: 1 }]);
       try {
         const { url } = await uploadFile(file);
         setImages((prev) => prev.map((img) => (img.id === id ? { ...img, url, uploading: false } : img)));
@@ -417,7 +438,7 @@ export function ProductWizard({
       category,
       subcategory,
       description,
-      images: readyImages.map((img) => ({ url: img.url, altText: img.altText })),
+      images: readyImages.map((img) => ({ url: img.url, altText: img.altText, focalX: img.focalX, focalY: img.focalY, zoom: img.zoom })),
       claims: claims
         .filter((claim) => claim.label.trim())
         .map((claim) => ({
@@ -567,6 +588,7 @@ export function ProductWizard({
                           image={image}
                           isMain={index === 0}
                           onRemove={() => setImages((prev) => prev.filter((img) => img.id !== image.id))}
+                          onEditCrop={() => setCropImageId(image.id)}
                         />
                       ))}
                     </div>
@@ -809,6 +831,20 @@ export function ProductWizard({
           </Button>
         )}
       </div>
+
+      {cropImage ? (
+        <ImageCropDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) setCropImageId(null);
+          }}
+          imageUrl={cropImage.url}
+          initialZoom={cropImage.zoom}
+          onSave={({ focalX, focalY, zoom }) =>
+            setImages((prev) => prev.map((img) => (img.id === cropImage.id ? { ...img, focalX, focalY, zoom } : img)))
+          }
+        />
+      ) : null}
     </div>
   );
 }
