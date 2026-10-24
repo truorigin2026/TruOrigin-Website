@@ -72,6 +72,17 @@ enum NotificationType {
   PRODUCT_REJECTED
   PRODUCT_APPROVED
   ADMIN_MESSAGE
+  NEW_MESSAGE
+}
+
+enum NotificationAudience {
+  BRAND
+  ADMIN
+}
+
+enum MessageSenderType {
+  BRAND
+  ADMIN
 }
 
 enum SubscriptionStatus {
@@ -173,6 +184,7 @@ model Brand {
   invoices        Invoice[]
   supportTickets  SupportTicket[]
   notifications   Notification[]
+  conversation    Conversation?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 }
@@ -252,6 +264,7 @@ model Claim {
   label        String // e.g. "Organic", "Cruelty Free", "Lab Tested"
   status       ClaimStatus   @default(UNVERIFIED)
   evidence     String? // supplementary free text note; used as a fallback display when no certificates are linked
+  reviewNote   String? // admin's note on approve/deny — distinct from the brand's own `evidence`, never mixed into it
   certificates Certificate[]
   createdAt    DateTime      @default(now())
 
@@ -355,18 +368,46 @@ model AuditLog {
 }
 
 model Notification {
-  id        String           @id @default(cuid())
-  brandId   String
-  brand     Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  id        String               @id @default(cuid())
+  audience  NotificationAudience @default(BRAND)
+  brandId   String? // required in practice when audience = BRAND; null when audience = ADMIN
+  brand     Brand?               @relation(fields: [brandId], references: [id], onDelete: Cascade)
   type      NotificationType
   message   String
   detail    String?
   href      String?
-  read      Boolean          @default(false)
-  createdAt DateTime         @default(now())
+  read      Boolean              @default(false)
+  createdAt DateTime             @default(now())
 
   @@index([brandId, createdAt])
   @@index([brandId, read])
+  @@index([audience, createdAt])
+  @@index([audience, read])
+}
+
+/// One conversation per brand with the TruOrigin admin team.
+model Conversation {
+  id            String    @id @default(cuid())
+  brand         Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brandId       String    @unique
+  lastMessageAt DateTime?
+  messages      Message[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Message {
+  id             String            @id @default(cuid())
+  conversation   Conversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId String
+  senderType     MessageSenderType
+  senderUserId   String? // User.id of whoever sent it; no FK, mirrors AuditLog.actorId's spirit without forcing onDelete semantics
+  body           String
+  readAt         DateTime?
+  createdAt      DateTime          @default(now())
+
+  @@index([conversationId, createdAt])
+  @@index([conversationId, senderType, readAt])
 }
 
 model Plan {
