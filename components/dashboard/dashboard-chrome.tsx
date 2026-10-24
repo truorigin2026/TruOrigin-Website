@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
+import { NotificationBell } from "@/components/dashboard/notification-bell";
 import { ToastProvider } from "@/components/dashboard/toast";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
@@ -40,6 +41,19 @@ export function DashboardChrome({
             <Separator orientation="vertical" className="mx-1 h-4" />
             <p className="text-sm font-semibold">{area === "admin" ? "Admin Panel" : "Brand Portal"}</p>
             <div className="ml-auto flex items-center gap-2">
+              {area === "brand" ? (
+                <NotificationBell
+                  fetchUrl="/api/brand/notifications"
+                  markReadUrl={(id) => `/api/brand/notifications/${id}`}
+                  markAllReadUrl="/api/brand/notifications/mark-all-read"
+                />
+              ) : (
+                <NotificationBell
+                  fetchUrl="/api/admin/notifications"
+                  markReadUrl={(id) => `/api/admin/notifications/${id}`}
+                  markAllReadUrl="/api/admin/notifications/mark-all-read"
+                />
+              )}
               <ThemeToggle />
             </div>
           </header>

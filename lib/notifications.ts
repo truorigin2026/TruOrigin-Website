@@ -171,3 +171,49 @@ export async function markAllNotificationsRead(brandId: string): Promise<void> {
     data: { read: true },
   });
 }
+
+/**
+ * Admin-side mirror of the brand notification functions above, sharing the
+ * same Notification table via the `audience` column (brand rows always
+ * have `brandId` set; admin rows always have it null). One shared inbox for
+ * the whole admin team -- there's no per-admin-user read state anywhere
+ * else in this app to justify more.
+ */
+export async function createAdminNotification(params: {
+  type: NotificationType;
+  message: string;
+  detail?: string;
+  href?: string;
+}): Promise<void> {
+  await prisma.notification.create({
+    data: {
+      audience: "ADMIN",
+      type: params.type,
+      message: params.message,
+      detail: params.detail,
+      href: params.href,
+    },
+  });
+}
+
+export async function getAdminNotifications(limit = 20): Promise<Notification[]> {
+  return prisma.notification.findMany({
+    where: { audience: "ADMIN" },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+}
+
+export async function markAdminNotificationRead(id: string): Promise<void> {
+  await prisma.notification.updateMany({
+    where: { id, audience: "ADMIN" },
+    data: { read: true },
+  });
+}
+
+export async function markAllAdminNotificationsRead(): Promise<void> {
+  await prisma.notification.updateMany({
+    where: { audience: "ADMIN", read: false },
+    data: { read: true },
+  });
+}
