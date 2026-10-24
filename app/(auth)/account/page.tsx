@@ -8,6 +8,7 @@ import { MountFadeIn } from "@/components/motion";
 import { ActivityList, ActivityRow } from "@/components/dashboard/activity-list";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 
 export default async function AccountPage() {
   const user = await getCurrentUser();
@@ -39,12 +40,15 @@ export default async function AccountPage() {
       <div className="mx-auto max-w-2xl px-4 py-10 md:px-8 md:py-16">
         <MountFadeIn className="flex items-center justify-between gap-4">
           <p className="text-sm font-semibold tracking-tight text-foreground">TruOrigin</p>
-          <form action="/api/auth/logout" method="post">
-            <Button variant="ghost" size="sm" type="submit">
-              <LogOut size={14} />
-              Log out
-            </Button>
-          </form>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <form action="/api/auth/logout" method="post">
+              <Button variant="ghost" size="sm" type="submit">
+                <LogOut size={14} />
+                Log out
+              </Button>
+            </form>
+          </div>
         </MountFadeIn>
 
         <MountFadeIn delay={0.08} className="mt-10 text-center">
