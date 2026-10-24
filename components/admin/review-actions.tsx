@@ -13,6 +13,7 @@ type ReviewClaim = {
   label: string;
   status: ClaimStatus;
   evidence: string | null;
+  reviewNote: string | null;
 };
 
 type ReviewProduct = {
@@ -29,6 +30,9 @@ type ReviewProduct = {
 export function ReviewActions({ product }: { product: ReviewProduct }) {
   const { run, busy, isBusy } = useApiAction();
   const [note, setNote] = useState(product.rejectionNote ?? "");
+  const [claimNotes, setClaimNotes] = useState<Record<string, string>>(() =>
+    Object.fromEntries(product.claims.map((claim) => [claim.id, claim.reviewNote ?? ""])),
+  );
 
   function approveProduct() {
     run("product-approve", `/api/admin/products/${product.id}/decision`, { decision: "APPROVE" }, { successMessage: "Product approved." });
@@ -37,10 +41,20 @@ export function ReviewActions({ product }: { product: ReviewProduct }) {
     run("product-deny", `/api/admin/products/${product.id}/decision`, { decision: "REJECT", note }, { successMessage: "Product rejected." });
   }
   function approveClaim(claimId: string) {
-    run(`claim-approve-${claimId}`, `/api/admin/claims/${claimId}/decision`, { decision: "APPROVE" }, { successMessage: "Claim approved." });
+    run(
+      `claim-approve-${claimId}`,
+      `/api/admin/claims/${claimId}/decision`,
+      { decision: "APPROVE", note: claimNotes[claimId] },
+      { successMessage: "Claim approved." },
+    );
   }
   function denyClaim(claimId: string) {
-    run(`claim-deny-${claimId}`, `/api/admin/claims/${claimId}/decision`, { decision: "DENY", note }, { successMessage: "Claim denied." });
+    run(
+      `claim-deny-${claimId}`,
+      `/api/admin/claims/${claimId}/decision`,
+      { decision: "DENY", note: claimNotes[claimId] },
+      { successMessage: "Claim denied." },
+    );
   }
 
   return (
@@ -79,9 +93,21 @@ export function ReviewActions({ product }: { product: ReviewProduct }) {
               <div>
                 <h3 className="text-sm font-semibold text-foreground">{claim.label}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{claim.evidence || "No evidence note added yet."}</p>
+                {claim.reviewNote ? (
+                  <p className="mt-1 text-sm text-destructive">Your note: {claim.reviewNote}</p>
+                ) : null}
               </div>
               <Badge variant="outline">{claim.status.replaceAll("_", " ").toLowerCase()}</Badge>
             </div>
+            <label className="mt-3 grid gap-1.5 text-xs font-medium text-muted-foreground">
+              <span>Note for this claim (shown to the brand if denied)</span>
+              <textarea
+                value={claimNotes[claim.id] ?? ""}
+                onChange={(event) => setClaimNotes((prev) => ({ ...prev, [claim.id]: event.target.value }))}
+                rows={2}
+                className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring"
+              />
+            </label>
             <div className="mt-3 flex flex-wrap gap-2.5">
               <Button size="sm" onClick={() => approveClaim(claim.id)} disabled={busy !== null}>
                 {isBusy(`claim-approve-${claim.id}`) ? <Loader2 size={14} className="animate-spin" /> : null}

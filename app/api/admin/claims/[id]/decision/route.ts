@@ -32,7 +32,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     where: { id },
     data: {
       status: nextStatus,
-      evidence: body.note?.trim() ? `${claim.evidence ?? ""}${claim.evidence ? " " : ""}${body.note.trim()}` : claim.evidence,
+      reviewNote: body.note?.trim() ? body.note.trim() : claim.reviewNote,
     },
   });
 
