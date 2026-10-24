@@ -30,12 +30,15 @@ export default async function AdminUsersPage({ searchParams }: UsersPageProps) {
     ...(search ? { email: { contains: search, mode: "insensitive" } } : {}),
   };
 
-  const users = await prisma.user.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    include: { brand: true },
-    take: 100,
-  });
+  const [users, plans] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      include: { brand: true },
+      take: 100,
+    }),
+    prisma.plan.findMany({ where: { isActive: true }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
+  ]);
 
   const rows = users.map((user) => ({
     key: user.id,
@@ -70,7 +73,7 @@ export default async function AdminUsersPage({ searchParams }: UsersPageProps) {
         <CardHeader>
           <CardTitle>{tab === "ADMIN" ? "Create Admin User" : "Create Brand Account"}</CardTitle>
         </CardHeader>
-        <CardContent>{tab === "ADMIN" ? <CreateAdminUserForm /> : <CreateBrandForm />}</CardContent>
+        <CardContent>{tab === "ADMIN" ? <CreateAdminUserForm /> : <CreateBrandForm plans={plans} />}</CardContent>
       </Card>
 
       <Card className="mb-5 p-4">

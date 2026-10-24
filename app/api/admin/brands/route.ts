@@ -26,12 +26,13 @@ export async function POST(request: NextRequest) {
   }
 
   const body = (await request.json().catch(() => null)) as
-    | { brandName?: string; email?: string; password?: string }
+    | { brandName?: string; email?: string; password?: string; planId?: string }
     | null;
 
   const brandName = body?.brandName?.trim() ?? "";
   const email = normalizeEmail(body?.email ?? "");
   const password = body?.password ?? "";
+  const planId = body?.planId?.trim() || null;
 
   if (!brandName || !email || !isStrongPassword(password)) {
     return NextResponse.json(
@@ -43,6 +44,13 @@ export async function POST(request: NextRequest) {
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
     return NextResponse.json({ error: "A user with this email already exists" }, { status: 409 });
+  }
+
+  if (planId) {
+    const plan = await prisma.plan.findUnique({ where: { id: planId }, select: { id: true, isActive: true } });
+    if (!plan || !plan.isActive) {
+      return NextResponse.json({ error: "Selected plan is not available" }, { status: 400 });
+    }
   }
 
   const brandSlug = await uniqueBrandSlug(slugify(brandName));
@@ -79,6 +87,22 @@ export async function POST(request: NextRequest) {
             mustChangePassword: true,
           },
         });
+
+        if (planId) {
+          const now = new Date();
+          const periodEnd = new Date(now);
+          periodEnd.setMonth(periodEnd.getMonth() + 1);
+
+          await tx.subscription.create({
+            data: {
+              brandId: brand.id,
+              planId,
+              status: "ACTIVE",
+              currentPeriodStart: now,
+              currentPeriodEnd: periodEnd,
+            },
+          });
+        }
 
         return { brand, user };
       });

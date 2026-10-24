@@ -95,7 +95,19 @@ export default async function BrandSettingsPage() {
         canEditProfile={user.brandRole === "OWNER" || user.brandRole === "ADMIN"}
         canManageTeam={canManageTeam}
         teamRows={teamRows}
-        subscription={subscription ? { planName: subscription.plan.name, status: subscription.status } : null}
+        subscription={
+          subscription
+            ? {
+                planName: subscription.plan.name,
+                status: subscription.status,
+                currentPeriodEnd: subscription.currentPeriodEnd,
+                priceMonthly: subscription.plan.priceMonthly,
+                priceYearly: subscription.plan.priceYearly,
+                currency: subscription.plan.currency,
+                features: subscription.plan.features,
+              }
+            : null
+        }
         invoiceRows={invoiceRows}
         notifications={notifications}
       />
