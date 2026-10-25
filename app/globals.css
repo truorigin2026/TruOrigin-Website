@@ -10360,68 +10360,6 @@ a.contact-method-value:hover {
   transform: translateY(-1px);
 }
 
-/* Dark mode — .page-shell is only ever used by the auth forms (login,
-   admin login, forgot/reset password), so this is scoped to them, not
-   the rest of the marketing site. --foreground/--muted/--line/--brand
-   stay fixed to their light values here (they're unscoped :root tokens,
-   same as the rest of this file), so every color actually used against
-   a dark background gets its own explicit override below. */
-.dark .page-shell {
-  background: #0a0a0a;
-}
-
-.dark .login-card {
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
-}
-
-.dark .login-panel-form {
-  background: #171717;
-}
-
-.dark .login-title,
-.dark .login-remember,
-.dark .login-signup-btn {
-  color: #fafafa;
-}
-
-.dark .login-field-icon,
-.dark .login-input::placeholder,
-.dark .login-divider {
-  color: #9a9a9a;
-}
-
-.dark .login-input {
-  background: #262626;
-  color: #fafafa;
-}
-
-.dark .login-input:focus {
-  background: #2e2e2e;
-}
-
-.dark .login-divider::before,
-.dark .login-divider::after {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.dark .login-forgot {
-  color: #35c374;
-}
-
-.dark .login-signup-btn {
-  background: #262626;
-}
-
-.dark .login-signup-btn:hover {
-  background: #2e2e2e;
-}
-
-.dark .login-error {
-  border-color: rgba(240, 96, 96, 0.4);
-  background: rgba(240, 96, 96, 0.14);
-  color: #ff9a9a;
-}
-
 @media (max-width: 860px) {
   .login-card {
     grid-template-columns: 1fr;

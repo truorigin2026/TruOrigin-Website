@@ -3,7 +3,6 @@ import { Poppins, Playfair_Display, Inter, DM_Serif_Display, Sora } from "next/f
 import "./globals.css";
 import favicon from "@/favicon.png";
 import { SiteChrome } from "@/components/site-chrome";
-import { ThemeProvider } from "@/components/dashboard/theme-provider";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
@@ -105,13 +104,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={fontVariables}>
+    <html lang="en" className={fontVariables}>
       <body>
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={websiteJsonLd()} />
-        <ThemeProvider>
-          <SiteChrome>{children}</SiteChrome>
-        </ThemeProvider>
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

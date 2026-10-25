@@ -6,7 +6,6 @@ import { useState } from "react";
 import { ArrowRight, Lock, Mail } from "lucide-react";
 import { AssetImage } from "@/components/brands/asset-image";
 import { PasswordInput } from "@/components/ui/password-input";
-import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 
 export function BrandLoginForm() {
   const [email, setEmail] = useState("");
@@ -47,13 +46,6 @@ export function BrandLoginForm() {
 
   return (
     <div className="page-shell overflow-hidden">
-      {/* data-dashboard: ThemeToggle's Button uses the dashboard's
-          bg-background/border-border tokens (dashboard-tokens.css),
-          which only exist inside this scope — outside it they're
-          undefined and the button renders with no visible fill/border. */}
-      <div data-dashboard className="fixed right-4 top-4 z-10 rounded-lg">
-        <ThemeToggle />
-      </div>
       <section className="container-shell page-section">
         <div className="login-card">
           <div className="login-panel-art">

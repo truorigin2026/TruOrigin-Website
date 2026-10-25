@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { NotificationBell } from "@/components/dashboard/notification-bell";
 import { ToastProvider } from "@/components/dashboard/toast";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -54,7 +53,6 @@ export function DashboardChrome({
                   markAllReadUrl="/api/admin/notifications/mark-all-read"
                 />
               )}
-              <ThemeToggle />
             </div>
           </header>
           <ToastProvider>
