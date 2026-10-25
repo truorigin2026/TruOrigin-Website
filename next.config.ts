@@ -25,6 +25,11 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // pdf-parse (PDF->image rendering, used by lib/pdf-compress.ts) and its
+  // @napi-rs/canvas dependency ship native/WASM binaries that break if
+  // Next bundles them — keep them external so Vercel includes their
+  // node_modules as-is in the deployed function instead.
+  serverExternalPackages: ["pdf-parse", "@napi-rs/canvas"],
   async redirects() {
     return [
       {

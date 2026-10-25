@@ -3,6 +3,11 @@ import { getCurrentUser } from "@/lib/session";
 import { uploadFile } from "@/lib/blob";
 import { isSameOriginRequest } from "@/lib/csrf";
 
+// PDF uploads render every page to an image and rebuild the PDF (see
+// lib/pdf-compress.ts) — give that real headroom beyond the platform
+// default. Harmless on plans/runtimes that cap lower than this.
+export const maxDuration = 60;
+
 /** Brand-only file upload — used by the Add Product and Documents forms. */
 export async function POST(request: NextRequest) {
   if (!isSameOriginRequest(request)) {

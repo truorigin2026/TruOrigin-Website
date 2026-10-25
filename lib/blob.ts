@@ -7,6 +7,7 @@
 
 import { put } from "@vercel/blob";
 import sharp from "sharp";
+import { compressPdf } from "./pdf-compress";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10MB
 
@@ -123,6 +124,17 @@ export async function uploadFile(file: File, folder: string) {
       .toBuffer();
     contentType = "image/webp";
     filename = filename.replace(/\.[^.]+$/, "") + ".webp";
+  } else if (file.type === "application/pdf") {
+    // Best-effort: re-renders each page as a recompressed image and rebuilds
+    // the PDF from those (see lib/pdf-compress.ts for why — no Ghostscript-
+    // class binary is available here). Never blocks the upload: on any
+    // failure, or if it doesn't actually come out smaller, the original
+    // file is stored untouched.
+    const original = Buffer.from(await file.arrayBuffer());
+    const compressed = await compressPdf(original);
+    if (compressed) {
+      body = compressed;
+    }
   }
 
   const safeName = filename.replace(/[^a-zA-Z0-9.\-_]/g, "_");
