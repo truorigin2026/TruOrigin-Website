@@ -30,6 +30,22 @@ const nextConfig: NextConfig = {
   // Next bundles them — keep them external so Vercel includes their
   // node_modules as-is in the deployed function instead.
   serverExternalPackages: ["pdf-parse", "@napi-rs/canvas"],
+  // Confirmed live (2026-10-27, Vercel runtime logs): serverExternalPackages
+  // alone wasn't enough — @napi-rs/canvas picks its actual native binary at
+  // runtime from a platform-specific optional dependency
+  // (@napi-rs/canvas-linux-x64-gnu on Vercel's Node runtime), and Vercel's
+  // automatic file tracing doesn't reliably follow that runtime-resolved
+  // require() the way it does a plain static one, so the binary was
+  // missing from the deployed function (PDF compression was silently
+  // falling back to storing the original file every time). Force both the
+  // glibc and musl Linux x64 variants in, since either is a realistic
+  // Vercel Node runtime.
+  outputFileTracingIncludes: {
+    "/api/upload": [
+      "./node_modules/@napi-rs/canvas-linux-x64-gnu/**/*",
+      "./node_modules/@napi-rs/canvas-linux-x64-musl/**/*",
+    ],
+  },
   async redirects() {
     return [
       {

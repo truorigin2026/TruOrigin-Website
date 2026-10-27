@@ -123,13 +123,30 @@ export function clampNumber(value: number | undefined, fallback: number, min: nu
   return Math.min(max, Math.max(min, value));
 }
 
+/**
+ * Confirmed live (2026-10-27): a real slug collision on resubmitting a
+ * product with the same name bypassed this check entirely and failed the
+ * whole save instead of retrying with a `-2` suffix, because
+ * @prisma/adapter-pg's P2002 translation doesn't reliably populate
+ * `meta.target` as an array here (it extracts the field list from the raw
+ * Postgres error's `.detail` text via regex, which can come back empty
+ * depending on exactly how the error surfaces through the pooler) — so
+ * `Array.isArray(meta.target)` was false even for a genuine slug conflict.
+ * Checks every shape `meta.target` is known to take (array, bare string)
+ * before falling back to scanning the error's own message text — "slug"
+ * is specific enough to never false-match Product's other unique
+ * constraints (brandNumber, serialNumber, etc.), and erring toward
+ * over-matching P2002 here is far safer than silently failing a save
+ * again the next time the shape differs.
+ */
 function isSlugConflict(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002" &&
-    Array.isArray((error.meta as { target?: unknown })?.target) &&
-    ((error.meta as { target?: unknown[] }).target ?? []).includes("slug")
-  );
+  if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== "P2002") return false;
+
+  const target = (error.meta as { target?: unknown } | undefined)?.target;
+  if (Array.isArray(target)) return target.includes("slug");
+  if (typeof target === "string") return target.toLowerCase().includes("slug");
+
+  return error.message.toLowerCase().includes("slug");
 }
 
 /**
