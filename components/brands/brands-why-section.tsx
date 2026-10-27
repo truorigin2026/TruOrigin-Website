@@ -8,10 +8,34 @@ type WhyPoint = {
   description: string;
 };
 
+// Mirrors .brands-why-card's `top: calc(220px + var(--why-index, 0) * 18px)`
+// in app/globals.css — a pure index-based pixel formula with no viewport
+// units, so it's always known ahead of time and never needs a style
+// recalculation to read back.
+const WHY_CARD_TOP_BASE = 220;
+const WHY_CARD_TOP_STEP = 18;
+
 export function BrandsWhySection({ points }: { points: readonly WhyPoint[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const cardRefs = useRef<Array<HTMLElement | null>>([]);
+  const inViewRef = useRef(false);
   const { scrollY } = useScroll();
+
+  // The expensive part of this (a getBoundingClientRect() read per card)
+  // used to run unconditionally on every scroll tick of the entire page —
+  // including while the user was still scrolling through the hero above
+  // this section. Gate it to only do that work while the section is
+  // actually anywhere near the viewport.
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      inViewRef.current = entry.isIntersecting;
+    }, { rootMargin: "200px 0px 200px 0px" });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   // Each card is `position: sticky`, higher-indexed cards stacking on top
   // of earlier ones via z-index. A sticky element's rendered top can never
@@ -28,13 +52,14 @@ export function BrandsWhySection({ points }: { points: readonly WhyPoint[] }) {
     cardRefs.current.forEach((el, i) => {
       if (!el) return;
       const rectTop = el.getBoundingClientRect().top;
-      const cssTop = parseFloat(getComputedStyle(el).top) || 0;
+      const cssTop = WHY_CARD_TOP_BASE + i * WHY_CARD_TOP_STEP;
       if (rectTop <= cssTop + 1) next = i;
     });
     return next;
   }
 
   useMotionValueEvent(scrollY, "change", () => {
+    if (!inViewRef.current) return;
     setActiveIndex(resolveActiveIndex());
   });
 
@@ -51,7 +76,7 @@ export function BrandsWhySection({ points }: { points: readonly WhyPoint[] }) {
   };
 
   return (
-    <section id="why-truorigin" className="brands-section brands-section-cream brands-why-shell">
+    <section ref={sectionRef} id="why-truorigin" className="brands-section brands-section-cream brands-why-shell">
       <div className="container-shell">
         <div className="brands-why-layout">
           <div className="brands-why-nav">
