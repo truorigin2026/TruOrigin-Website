@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { FadeIn, HeroReveal } from "@/components/motion";
 import { ShaderErrorBoundary } from "@/components/gateway/shader-error-boundary";
+import { useBfcacheRemountKey } from "@/lib/use-bfcache-remount";
 import logo from "../../public/images/logos/truorigin-logo.svg";
 
 const GatewayShaderBackground = dynamic(
@@ -15,11 +16,12 @@ const GatewayShaderBackground = dynamic(
 
 export function SiteGateway() {
   const [bgRevealed, setBgRevealed] = useState(false);
+  const bfcacheKey = useBfcacheRemountKey();
 
   return (
     <div className="gateway-page">
       <div className={`gateway-shader-bg${bgRevealed ? " is-revealed" : ""}`} aria-hidden="true">
-        <ShaderErrorBoundary>
+        <ShaderErrorBoundary key={bfcacheKey}>
           <GatewayShaderBackground onReady={() => setBgRevealed(true)} />
         </ShaderErrorBoundary>
       </div>

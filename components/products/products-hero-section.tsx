@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { MoltenMetal } from "@/components/brands/molten-metal";
+import { useBfcacheRemountKey } from "@/lib/use-bfcache-remount";
 
 const scatterTags = [
   { text: "Backed by documentation", className: "products-hero-tag products-hero-tag-1" },
@@ -18,6 +19,7 @@ const scatterTags = [
 export function ProductsHeroSection() {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
+  const bfcacheKey = useBfcacheRemountKey();
 
   const createHref = (search: string) => {
     const params = new URLSearchParams();
@@ -34,6 +36,7 @@ export function ProductsHeroSection() {
   return (
     <section className="products-hero-shell">
       <MoltenMetal
+        key={bfcacheKey}
         className="products-hero-bg"
         color1="#081b12"
         color2="#164a2e"

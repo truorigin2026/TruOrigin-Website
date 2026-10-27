@@ -4565,9 +4565,17 @@ a.contact-method-value:hover {
   transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
 
-.product-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 32px rgba(15, 30, 21, 0.12);
+/* (hover: hover) and (pointer: fine): a genuine mouse, not a touchscreen.
+   Touch devices (notably iOS Safari) can apply a tapped/scrolled-past
+   element's :hover state and leave it "stuck" there with no mouseleave
+   event to ever clear it -- which on a product grid looked like cards
+   randomly enlarging while scrolling. Hover-only lift/zoom effects must
+   never be reachable by touch at all. */
+@media (hover: hover) and (pointer: fine) {
+  .product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(15, 30, 21, 0.12);
+  }
 }
 
 .product-card-image-wrap {
@@ -5997,6 +6005,21 @@ a.contact-method-value:hover {
   box-shadow: 0 20px 44px rgba(10, 21, 17, 0.18);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+}
+
+@media (max-width: 768px) {
+  /* backdrop-filter: blur() over a continuously-rendering WebGL hero
+     (ColorBends/MoltenMetal) is one of the most GPU-expensive compositing
+     operations a browser can do, and mobile GPUs feel that far more than
+     desktop does — this header sits fixed on top of that canvas for the
+     whole scroll-through-the-hero window. A lighter blur, with slightly
+     more background opacity to keep text contrast reasonable without it,
+     costs a fraction as much to composite every frame. */
+  .hero-glass-header-inner {
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
 }
 
 .site-static-header-inner {
@@ -11491,14 +11514,23 @@ a.contact-method-value:hover {
   pointer-events: none;
 }
 
-.product-card:hover {
-  transform: translateY(-8px);
-  border-color: rgba(76, 175, 80, 0.24);
-  box-shadow: 0 28px 42px rgba(15, 30, 21, 0.11);
-}
+/* See the (hover: hover) note on the other .product-card:hover block above
+   — same reasoning, this is the duplicate ruleset for a different grid
+   layout (later in the cascade, same shared ProductCard component). */
+@media (hover: hover) and (pointer: fine) {
+  .product-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(76, 175, 80, 0.24);
+    box-shadow: 0 28px 42px rgba(15, 30, 21, 0.11);
+  }
 
-.product-card:hover::before {
-  opacity: 1;
+  .product-card:hover::before {
+    opacity: 1;
+  }
+
+  .product-card:hover .product-card-image {
+    transform: scale(1.03);
+  }
 }
 
 .product-card-image-wrap {
@@ -11508,10 +11540,6 @@ a.contact-method-value:hover {
 
 .product-card-image {
   transition: transform 0.3s ease;
-}
-
-.product-card:hover .product-card-image {
-  transform: scale(1.03);
 }
 
 .product-card-chip {

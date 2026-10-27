@@ -5,17 +5,20 @@ import { HeroReveal } from "@/components/motion";
 import { ButtonFillSweep } from "@/components/ui/button-fill-sweep";
 import { ButtonHoverUnderline } from "@/components/ui/button-hover-underline";
 import { ShaderErrorBoundary } from "@/components/gateway/shader-error-boundary";
+import { useBfcacheRemountKey } from "@/lib/use-bfcache-remount";
 
 // Pulls in three.js — code-split the same way the homepage's shader
 // background already is, so it doesn't block hydration of this page.
 const ColorBends = dynamic(() => import("@/components/brands/color-bends"), { ssr: false });
 
 export function BrandsHeroSection() {
+  const bfcacheKey = useBfcacheRemountKey();
+
   return (
     <section id="what-is-origincard" className="brands-hero-shell">
       <div className="container-shell">
         <div className="brands-hero-card">
-          <ShaderErrorBoundary>
+          <ShaderErrorBoundary key={bfcacheKey}>
             <ColorBends
               className="brands-hero-bg"
               colors={["#0d4a28", "#1a7a44", "#4caf50", "#7bd682"]}
