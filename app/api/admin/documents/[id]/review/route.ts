@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminSession } from "@/lib/api-auth";
 import { AUDIT_ACTIONS, logAudit } from "@/lib/audit";
+import { parseSaneDate } from "@/lib/product-submission";
 
 type Body = {
   verified?: boolean;
@@ -37,7 +38,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       reviewNote: body?.reviewNote?.trim() ? clamp(body.reviewNote, 2000) : null,
       isPublic: body?.isPublic ?? certificate.isPublic,
       issuer: body?.issuer?.trim() ? clamp(body.issuer, 200) : null,
-      testDate: body?.testDate ? new Date(body.testDate) : null,
+      testDate: parseSaneDate(body?.testDate),
       testType: body?.testType?.trim() ? clamp(body.testType, 200) : null,
       testScope: body?.testScope?.trim() ? clamp(body.testScope, 300) : null,
     },

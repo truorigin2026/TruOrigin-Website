@@ -35,6 +35,26 @@ function clamp(value: string, maxLength: number) {
   return value.trim().slice(0, maxLength);
 }
 
+/**
+ * A native <input type="date"> can be coaxed into submitting a malformed
+ * year (e.g. "62026" instead of "2026" — some browsers don't cap the year
+ * segment's digit count), which `new Date(...)` happily turns into a
+ * technically-valid-but-absurd Date rather than throwing. Left unchecked,
+ * that date gets stored, and crashes any page that later formats it
+ * (Intl.DateTimeFormat throws on anything genuinely invalid; this catches
+ * the "valid but nonsense" case that slips past that check). Clamping to a
+ * generous-but-sane range turns a bad keystroke into "ignored", not a 500
+ * on every future page view.
+ */
+export function parseSaneDate(value: string | undefined): Date | null {
+  if (!value?.trim()) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  const year = date.getUTCFullYear();
+  if (year < 1900 || year > 2200) return null;
+  return date;
+}
+
 export async function createCertificatesAndClaims(
   tx: Prisma.TransactionClient,
   productId: string,
@@ -56,7 +76,7 @@ export async function createCertificatesAndClaims(
           docType: cert.docType as never,
           mimeType: cert.mimeType || null,
           issuer: cert.issuer?.trim() ? clamp(cert.issuer, 200) : null,
-          testDate: cert.testDate ? new Date(cert.testDate) : null,
+          testDate: parseSaneDate(cert.testDate),
           testType: cert.testType?.trim() ? clamp(cert.testType, 200) : null,
           testScope: cert.testScope?.trim() ? clamp(cert.testScope, 300) : null,
           reviewNote: cert.reviewNote?.trim() ? clamp(cert.reviewNote, 2000) : null,

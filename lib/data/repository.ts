@@ -64,6 +64,14 @@ type DbProductSummary = Prisma.ProductGetPayload<{ include: typeof productSummar
 
 function formatDate(value: Date | null | undefined): string {
   const date = value ?? new Date();
+  // A bad upstream value (e.g. a malformed native date-input year, or any
+  // other garbage that slipped into a DateTime column) must never crash
+  // an entire page render — Intl.DateTimeFormat throws RangeError on a
+  // NaN-time Date, so guard it the same way a null/undefined input already is.
+  if (Number.isNaN(date.getTime())) {
+    console.error("[formatDate] received an invalid Date value:", value);
+    return "Unknown date";
+  }
   return new Intl.DateTimeFormat("en-US", {
     month: "long",
     day: "numeric",
