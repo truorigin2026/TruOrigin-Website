@@ -12531,7 +12531,11 @@ a.contact-method-value:hover {
 
 .filter-modal-content {
   width: 100%;
-  max-height: 90vh;
+  /* Confirmed live on a real phone: at 90vh the sheet's top edge (where the
+     close button sits) reaches up behind the fixed site header. Capping it
+     against the header's own height instead of the viewport keeps the top
+     of the sheet below the header on every screen. */
+  max-height: calc(100vh - 110px);
   background: #ffffff;
   border-radius: 20px 20px 0 0;
   overflow-y: auto;
