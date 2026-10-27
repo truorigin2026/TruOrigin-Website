@@ -7,7 +7,6 @@
 
 import { put } from "@vercel/blob";
 import sharp from "sharp";
-import { compressPdf } from "./pdf-compress";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10MB
 
@@ -124,18 +123,19 @@ export async function uploadFile(file: File, folder: string) {
       .toBuffer();
     contentType = "image/webp";
     filename = filename.replace(/\.[^.]+$/, "") + ".webp";
-  } else if (file.type === "application/pdf") {
-    // Best-effort: re-renders each page as a recompressed image and rebuilds
-    // the PDF from those (see lib/pdf-compress.ts for why — no Ghostscript-
-    // class binary is available here). Never blocks the upload: on any
-    // failure, or if it doesn't actually come out smaller, the original
-    // file is stored untouched.
-    const original = Buffer.from(await file.arrayBuffer());
-    const compressed = await compressPdf(original);
-    if (compressed) {
-      body = compressed;
-    }
   }
+  // PDF compression (compressPdf, lib/pdf-compress.ts) is disabled as of
+  // 2026-10-27 — confirmed live that @napi-rs/canvas renders every
+  // non-text element correctly (table borders, fills, header shading) but
+  // silently drops ALL text, because Vercel's serverless Linux container
+  // has no system fonts installed for it to draw glyphs with. It was
+  // genuinely destroying real certificate/compliance document content,
+  // not just failing safe. DO NOT re-enable by calling compressPdf() here
+  // again without first bundling + explicitly registering a font file via
+  // @napi-rs/canvas's GlobalFonts API and verifying actual rendered text
+  // in a real Vercel deployment (not just local dev — local testing is
+  // exactly what missed this the first time, since a dev machine has
+  // system fonts a serverless container doesn't).
 
   const safeName = filename.replace(/[^a-zA-Z0-9.\-_]/g, "_");
   const pathname = `${folder}/${Date.now()}-${safeName}`;
