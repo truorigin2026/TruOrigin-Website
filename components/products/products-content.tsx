@@ -16,7 +16,6 @@ type ProductsContentProps = {
   selectedCategory: string;
   selectedBrand: string;
   selectedCertification: string;
-  selectedOrigin: string;
   selectedSearch: string;
   selectedSort: "latest" | "name";
   currentPage: number;
@@ -28,7 +27,6 @@ function filterProducts(
   category: string,
   brand: string,
   certification: string,
-  origin: string,
   search: string,
 ) {
   const normalizedSearch = search.trim().toLowerCase();
@@ -38,7 +36,6 @@ function filterProducts(
     const categoryMatch = category === "All Products" || mapped === category;
     const brandMatch = !brand || product.brand === brand;
     const certMatch = !certification || product.claims.some((c) => c.status === certification);
-    const originMatch = !origin;
     const searchMatch =
       !normalizedSearch ||
       product.name.toLowerCase().includes(normalizedSearch) ||
@@ -46,7 +43,7 @@ function filterProducts(
       mapped.toLowerCase().includes(normalizedSearch) ||
       product.subcategory.toLowerCase().includes(normalizedSearch);
 
-    return categoryMatch && brandMatch && certMatch && originMatch && searchMatch;
+    return categoryMatch && brandMatch && certMatch && searchMatch;
   });
 }
 
@@ -64,7 +61,6 @@ export function ProductsContent({
   selectedCategory,
   selectedBrand,
   selectedCertification,
-  selectedOrigin,
   selectedSearch,
   selectedSort,
   currentPage,
@@ -76,6 +72,18 @@ export function ProductsContent({
   const searchAnchorRef = useRef<HTMLDivElement | null>(null);
   const isFirstRender = useRef(true);
 
+  // searchValue starts as a *copy* of the selectedSearch prop (useState's
+  // initializer only runs once, on mount) and otherwise only changes via
+  // the input's own onChange — so a URL-only change to `search` (e.g. the
+  // empty-state's "Clear Filters" link, a plain navigation back to the
+  // bare catalog URL) updated the prop but left this stale, and since
+  // `filtered` below is computed from searchValue, the catalog stayed
+  // stuck showing the old (zero) results even once the URL had no search
+  // param left. Re-sync whenever the URL's own search value changes.
+  useEffect(() => {
+    setSearchValue(selectedSearch);
+  }, [selectedSearch]);
+
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -86,21 +94,13 @@ export function ProductsContent({
     selectedCategory,
     selectedBrand,
     selectedCertification,
-    selectedOrigin,
     selectedSearch,
     selectedSort,
     currentPage,
   ]);
 
   const filtered = sortProducts(
-    filterProducts(
-      allProducts,
-      selectedCategory,
-      selectedBrand,
-      selectedCertification,
-      selectedOrigin,
-      searchValue,
-    ),
+    filterProducts(allProducts, selectedCategory, selectedBrand, selectedCertification, searchValue),
     selectedSort,
   );
 
@@ -117,7 +117,6 @@ export function ProductsContent({
 
   const brands = [...new Set(allProducts.map((p) => p.brand))].sort();
   const certifications = ["Evidence Available", "Limited Evidence", "No Evidence Submitted"];
-  const origins = ["United States", "Canada", "United Kingdom", "Germany", "France"];
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PRODUCTS_PER_PAGE));
   const validCurrentPage =
@@ -131,7 +130,6 @@ export function ProductsContent({
     category?: string;
     brand?: string;
     certification?: string;
-    origin?: string;
     search?: string;
     sort?: string;
     page?: number;
@@ -143,8 +141,6 @@ export function ProductsContent({
     if (br) params.set("brand", br);
     const cert = filters.certification ?? selectedCertification;
     if (cert) params.set("certification", cert);
-    const orig = filters.origin ?? selectedOrigin;
-    if (orig) params.set("origin", orig);
     const search = filters.search ?? selectedSearch;
     if (search) params.set("search", search);
     const sort = filters.sort ?? selectedSort;
@@ -162,12 +158,10 @@ export function ProductsContent({
           selectedCategory={selectedCategory}
           selectedBrand={selectedBrand}
           selectedCertification={selectedCertification}
-          selectedOrigin={selectedOrigin}
           selectedSearch={selectedSearch}
           selectedSort={selectedSort}
           brands={brands}
           certifications={certifications}
-          origins={origins}
           createHref={createHref}
         />
 

@@ -5,17 +5,14 @@ type FilterSidebarProps = {
   selectedCategory: string;
   selectedBrand?: string;
   selectedCertification?: string;
-  selectedOrigin?: string;
   selectedSearch?: string;
   selectedSort?: string;
   brands: string[];
   certifications: string[];
-  origins: string[];
   createHref: (filters: {
     category?: string;
     brand?: string;
     certification?: string;
-    origin?: string;
     search?: string;
     sort?: string;
     page?: number;
@@ -60,12 +57,10 @@ export function FilterSidebar({
   selectedCategory,
   selectedBrand = "",
   selectedCertification = "",
-  selectedOrigin = "",
   selectedSearch = "",
   selectedSort = "latest",
   brands,
   certifications,
-  origins,
   createHref,
 }: FilterSidebarProps) {
   return (
@@ -83,7 +78,6 @@ export function FilterSidebar({
                 category,
                 brand: selectedBrand,
                 certification: selectedCertification,
-                origin: selectedOrigin,
                 search: selectedSearch,
                 sort: selectedSort,
                 page: 1,
@@ -102,7 +96,6 @@ export function FilterSidebar({
               href={createHref({
                 category: selectedCategory,
                 certification: selectedCertification,
-                origin: selectedOrigin,
                 search: selectedSearch,
                 sort: selectedSort,
                 page: 1,
@@ -117,7 +110,6 @@ export function FilterSidebar({
                   category: selectedCategory,
                   brand,
                   certification: selectedCertification,
-                  origin: selectedOrigin,
                   search: selectedSearch,
                   sort: selectedSort,
                   page: 1,
@@ -137,7 +129,6 @@ export function FilterSidebar({
               href={createHref({
                 category: selectedCategory,
                 brand: selectedBrand,
-                origin: selectedOrigin,
                 search: selectedSearch,
                 sort: selectedSort,
                 page: 1,
@@ -152,42 +143,6 @@ export function FilterSidebar({
                   category: selectedCategory,
                   brand: selectedBrand,
                   certification: cert,
-                  origin: selectedOrigin,
-                  search: selectedSearch,
-                  sort: selectedSort,
-                  page: 1,
-                })}
-              />
-            ))}
-          </div>
-        </FilterGroup>
-      ) : null}
-
-      {origins.length > 0 ? (
-        <FilterGroup title="Country of Origin">
-          <div className="filter-sidebar-list">
-            <FilterOption
-              label="All Origins"
-              active={!selectedOrigin}
-              href={createHref({
-                category: selectedCategory,
-                brand: selectedBrand,
-                certification: selectedCertification,
-                search: selectedSearch,
-                sort: selectedSort,
-                page: 1,
-              })}
-            />
-            {origins.map((origin) => (
-              <FilterOption
-                key={origin}
-                label={origin}
-                active={selectedOrigin === origin}
-                href={createHref({
-                  category: selectedCategory,
-                  brand: selectedBrand,
-                  certification: selectedCertification,
-                  origin,
                   search: selectedSearch,
                   sort: selectedSort,
                   page: 1,

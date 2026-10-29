@@ -103,37 +103,46 @@ test.describe("products catalog: filters, search, sort, pagination, empty states
     assertNoUnexpectedErrors(tracker);
   });
 
-  test("CONFIRMED DEFECT: \"Clear Filters\" resets the URL but not the search box, so the catalog stays stuck at zero results", async ({
-    page,
-    baseURL,
-  }) => {
-    // Root cause (components/products/products-content.tsx): `filtered`
-    // is computed from `searchValue`, a LOCAL useState seeded once from
-    // the URL (`useState(selectedSearch)`) — not from the `selectedSearch`
-    // prop itself. "Clear Filters" is a plain <Link> back to the bare
-    // /for-products/products URL; it updates the URL and the
-    // `selectedSearch` prop, but nothing re-syncs the already-initialized
-    // `searchValue` state, so the stale search term keeps filtering out
-    // every product even though the address bar shows no search param.
-    // Reproduced directly: searching for a nonsense term, clicking "Clear
-    // Filters", and reading the search input's value afterward shows it
-    // still holds the old query. This test encodes the CORRECT behavior
-    // and is marked test.fail() because it currently doesn't hold — remove
-    // test.fail() once the component re-syncs searchValue (e.g. a
-    // key={selectedSearch} remount, or a useEffect watching the prop).
-    test.fail(true, "Known defect — see comment above. Should start unexpectedly passing once fixed.");
-
+  test("FIXED: \"Clear Filters\" resets the URL, the search box, and restores the catalog", async ({ page, baseURL }) => {
+    // Was a confirmed defect (components/products/products-content.tsx):
+    // `filtered` is computed from `searchValue`, a LOCAL useState seeded
+    // once from the URL (`useState(selectedSearch)`) — not from the
+    // `selectedSearch` prop itself, which React's useState initializer
+    // only reads on mount. "Clear Filters" is a plain <Link> back to the
+    // bare /for-products/products URL; it updated the URL and the
+    // `selectedSearch` prop, but nothing re-synced the already-initialized
+    // `searchValue` state, so the stale search term kept filtering out
+    // every product even though the address bar showed no search param.
+    // Fixed with a useEffect that re-syncs searchValue whenever the URL's
+    // own selectedSearch prop changes — covers "Clear Filters" and any
+    // other navigation that changes the search param out from under the
+    // local input (e.g. a direct URL edit, browser back/forward).
     const tracker = trackPageHealth(page, baseURL);
     await page.goto("/for-products/products");
     await page.waitForLoadState("networkidle");
 
-    await page.getByPlaceholder("Search products, brands, or categories").fill("zzzznonexistentproductqueryxyz123");
+    const searchInput = page.getByPlaceholder("Search products, brands, or categories");
+    await searchInput.fill("zzzznonexistentproductqueryxyz123");
     await page.getByRole("button", { name: "Search" }).click();
+
+    // Wait for the search navigation to actually commit (URL carries the
+    // search param) before clicking Clear Filters — "No products match"
+    // appears instantly from local component state regardless of whether
+    // the underlying client-side navigation has finished, and firing a
+    // second navigation (Clear Filters) while the first is still in
+    // flight can make Next's router treat it as a no-op against a URL it
+    // hasn't finished committing to yet. That's a separate, narrower
+    // navigation race (not this test's subject) worth knowing about, but
+    // isn't the bug this test is pinning down.
+    await expect(page).toHaveURL(/search=/);
     await expect(page.getByText("No products match your filters.")).toBeVisible();
 
     await page.getByRole("link", { name: "Clear Filters" }).click();
     await expect(page).toHaveURL(/\/for-products\/products$/);
 
+    // The input's own value must be cleared, not just the product grid —
+    // this is the exact state that was stale before the fix.
+    await expect(searchInput).toHaveValue("");
     await expect(page.locator('a.product-card[href^="/p/"]')).not.toHaveCount(0);
 
     assertNoUnexpectedErrors(tracker);
@@ -190,39 +199,31 @@ test.describe("products catalog: filters, search, sort, pagination, empty states
     assertNoUnexpectedErrors(tracker);
   });
 
-  test("CONFIRMED DEFECT: selecting any Country of Origin filter always empties the results, regardless of the product's actual origin", async ({
-    page,
-    baseURL,
-  }, testInfo) => {
-    // Root cause (components/products/products-content.tsx,
-    // filterProducts()): `const originMatch = !origin;` ignores the
-    // product's own origin field entirely — it's only ever true when NO
-    // origin filter is selected, so picking *any* origin value makes every
-    // product fail the match. Reproduced directly: selecting "Canada"
-    // against the live catalog shows zero results even though valid
-    // products exist. This test encodes the CORRECT behavior (selecting
-    // an origin should narrow, not always empty, the results) and is
-    // marked test.fail() because it currently doesn't hold — remove
-    // test.fail() once filterProducts() is fixed to actually compare
-    // against each product's origin. Desktop-only for the same reason as
-    // the category filter test above.
+  test("FIXED: the Country of Origin filter is gone, not silently broken", async ({ page, baseURL }, testInfo) => {
+    // Was a confirmed defect (components/products/products-content.tsx,
+    // filterProducts()): `const originMatch = !origin;` ignored the
+    // product's own origin field entirely — it was only ever true when no
+    // origin was selected, so picking *any* origin value failed every
+    // product. Root cause turned out to be deeper than a bad comparison,
+    // though: there is no country-of-origin field anywhere in the data
+    // model (checked prisma/schema.prisma's Product model, the
+    // ProductRecord type, and the repository layer — none of them have
+    // one). The sidebar's five origin options were hardcoded strings never
+    // wired to any real product data, so there was never anything correct
+    // to match against. Fixing the comparison alone would have been a
+    // superficial workaround (it'd need to fabricate data or always match
+    // true); removing the filter is the actual fix. This test exists so
+    // the broken filter can't silently come back without this test being
+    // updated to re-add real coverage for it.
     test.skip(testInfo.project.name !== "Desktop Chrome", "Filter sidebar is desktop-only UI.");
-    test.fail(true, "Known defect — see comment above. Should start unexpectedly passing once filterProducts() is fixed.");
 
     const tracker = trackPageHealth(page, baseURL);
     await page.goto("/for-products/products");
 
     const sidebar = page.locator(".filter-sidebar-desktop");
-    const originGroup = sidebar.locator(".filter-sidebar-group", { hasText: "Country of Origin" });
-    if ((await originGroup.count()) === 0) {
-      test.skip(true, "No Country of Origin filter group rendered.");
-    }
-
-    const firstRealOrigin = originGroup.locator(".filter-sidebar-option").nth(1); // index 0 is "All Origins"
-    await firstRealOrigin.click();
-    await expect(firstRealOrigin).toHaveClass(/is-active/);
-
-    await expect(page.locator('a.product-card[href^="/p/"]')).not.toHaveCount(0);
+    await expect(sidebar.getByRole("heading", { name: "Categories" })).toBeVisible();
+    await expect(sidebar.locator(".filter-sidebar-group", { hasText: "Country of Origin" })).toHaveCount(0);
+    await expect(page.getByText("Country of Origin")).toHaveCount(0);
 
     assertNoUnexpectedErrors(tracker);
   });

@@ -147,8 +147,10 @@ On failure, a screenshot and video are attached automatically
   investigation).
 - `filters-and-search.spec.ts` — category filters, search (match + empty
   state), sort order, pagination (skips if unreachable — see COVERAGE.md),
-  rapid repeated filter clicks, and two confirmed defects (origin filter,
-  "Clear Filters").
+  rapid repeated filter clicks, and regression coverage for two app
+  defects found and fixed during this suite's work (origin filter removed
+  for lack of any backing data, "Clear Filters" now actually resets the
+  search box).
 - `api-failures.spec.ts` — the contact form's handling of a 500, a dropped
   connection, and a slow response (no double-submit).
 - `tests/e2e-dbfree/static-pages.spec.ts` — `/terms`, `/privacy`,
@@ -180,10 +182,11 @@ Full detail in COVERAGE.md; summary:
   interaction), but no safe *minimal* fix exists without trading away
   either new-product visibility or page-caching performance. Left as-is;
   see COVERAGE.md for the full investigation and the options considered.
-- **Two confirmed app defects** found while writing the filter tests (the
-  Country of Origin filter, and "Clear Filters" not actually clearing) —
-  encoded as `test.fail()`-marked regression tests, not fixed here (out of
-  this task's scope). See COVERAGE.md.
+- **Two confirmed app defects found while writing the filter tests are now
+  fixed and verified** (Country of Origin filter removed entirely — there
+  was no backing data for it anywhere in the schema; "Clear Filters" now
+  actually resets the search box via a prop-sync `useEffect`). See
+  COVERAGE.md for the root causes and what changed.
 - **The shared database occasionally drops connections under concurrent
   load.** Confirmed directly (real Prisma `ECONNRESET` / `P1017` errors in
   the server log). `playwright.config.ts` runs fully serial (`workers: 1`)

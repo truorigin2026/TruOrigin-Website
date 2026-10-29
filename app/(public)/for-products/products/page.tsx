@@ -21,7 +21,6 @@ export default async function ForProductsProductsPage({ searchParams }: Products
   const selectedBrand = typeof resolved.brand === "string" ? resolved.brand : "";
   const selectedCertification =
     typeof resolved.certification === "string" ? resolved.certification : "";
-  const selectedOrigin = typeof resolved.origin === "string" ? resolved.origin : "";
   const selectedSearch = typeof resolved.search === "string" ? resolved.search : "";
   const selectedSort =
     typeof resolved.sort === "string" && resolved.sort === "name" ? "name" : "latest";
@@ -42,7 +41,6 @@ export default async function ForProductsProductsPage({ searchParams }: Products
         selectedCategory={selectedCategory}
         selectedBrand={selectedBrand}
         selectedCertification={selectedCertification}
-        selectedOrigin={selectedOrigin}
         selectedSearch={selectedSearch}
         selectedSort={selectedSort as "latest" | "name"}
         currentPage={requestedPage}

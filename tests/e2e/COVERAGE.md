@@ -116,37 +116,70 @@ Full list (`grep -rn "test.skip(" tests/`):
 
 ## Confirmed defects found during this audit
 
-Both encoded as tests marked `test.fail()` — they run, are expected to
-fail, and would flip to an *unexpected pass* (a visible signal) if fixed
-without updating the test:
+**Both of the filter defects below are now fixed and verified** (a
+separate pass from the one that found them) — kept here for the record of
+what was wrong and why, with the fix noted at the end of each.
 
-1. **Country of Origin filter always empties the results.**
+1. **~~Country of Origin filter always empties the results.~~ FIXED by
+   removal, not by "correct" matching.**
    `components/products/products-content.tsx`, `filterProducts()`:
-   `const originMatch = !origin;` never actually compares against a
-   product's own origin — it's only true when no origin is selected, so
-   picking *any* origin value fails every product. Reproduced directly
-   (selecting "Canada" against the live catalog → 0 results, confirmed via
-   a throwaway diagnostic before writing the test).
-   Test: `filters-and-search.spec.ts` → "CONFIRMED DEFECT: selecting any
-   Country of Origin filter...".
+   `const originMatch = !origin;` never actually compared against a
+   product's own origin — it was only true when no origin was selected, so
+   picking *any* origin value failed every product. Investigating the fix
+   turned up something bigger than a bad comparison: **there is no
+   country-of-origin field anywhere in the data model** — checked
+   `prisma/schema.prisma`'s `Product` model, the `ProductRecord` type, and
+   the repository layer that feeds the catalog; none of them have one. The
+   sidebar's five origin options (`"United States"`, `"Canada"`, ...) were
+   hardcoded strings in `products-content.tsx`, never wired to any real
+   product data — there was never anything correct to match against.
+   Fixing the comparison alone would have been the superficial workaround
+   (fabricate data, or make the control a silent no-op); the actual fix,
+   confirmed with the user, was removing the filter entirely —
+   `components/ui/filter-sidebar.tsx` (the "Country of Origin" group),
+   `components/ui/filter-sidebar-mobile.tsx` and `products-content.tsx`
+   (the `origin`/`selectedOrigin`/`origins` plumbing), and
+   `app/(public)/for-products/products/page.tsx` (the server-side `origin`
+   search-param read). If a real country-of-origin field is ever added to
+   the schema, the filter can come back wired to it.
+   Test: `filters-and-search.spec.ts` → "FIXED: the Country of Origin
+   filter is gone, not silently broken" (verified passing on all 3
+   projects).
 
-2. **"Clear Filters" doesn't actually clear a search.** Same file:
-   `searchValue` is a local `useState(selectedSearch)` — seeded once at
-   mount, never re-synced when the URL's `search` param changes (e.g. via
-   the "Clear Filters" link, a plain `<Link>` back to the bare catalog
-   URL). After a no-results search, clicking "Clear Filters" resets the
-   URL but the search box — and the filtering, which reads local state,
-   not the prop — still holds the old query, so the catalog stays stuck
-   at zero results. Reproduced directly: searched a nonsense term, clicked
-   Clear Filters, read the search input's value back — still the nonsense
-   query, 0 cards. This is the more user-visible of the two: it's the
-   explicit recovery action for someone who just hit a dead end, and it
-   doesn't work.
-   Test: `filters-and-search.spec.ts` → "CONFIRMED DEFECT: \"Clear
-   Filters\" resets the URL but not the search box...".
+2. **~~"Clear Filters" doesn't actually clear a search.~~ FIXED.**
+   `components/products/products-content.tsx`: `searchValue` is a local
+   `useState(selectedSearch)` — seeded once at mount (React's `useState`
+   initializer only runs once), never re-synced when the URL's `search`
+   param changed via a *client-side* navigation (e.g. the "Clear Filters"
+   link, a plain `<Link>` back to the bare catalog URL). The filtering
+   itself reads `searchValue`, not the `selectedSearch` prop, so the
+   catalog stayed stuck at zero results even once the address bar showed
+   no search param. Fixed with a `useEffect(() => setSearchValue(selectedSearch), [selectedSearch])`
+   — re-syncs the local copy whenever the URL's own search value changes,
+   covering "Clear Filters" and any other navigation that changes the
+   search param out from under the input (a direct URL edit, browser
+   back/forward). No other local state needed the same treatment — every
+   other filter (category/brand/certification/sort/page) is read straight
+   from props each render, with no local copy to desync.
+   Test: `filters-and-search.spec.ts` → "FIXED: \"Clear Filters\" resets
+   the URL, the search box, and restores the catalog" (verified passing on
+   all 3 projects) — now also asserts the search input's own value is
+   cleared, not just that products reappear, since the stale input value
+   was the actual defect.
+   **Related finding, not fixed (separate, narrower issue):** while
+   verifying this fix, found that firing a second client-side navigation
+   (e.g. clicking "Clear Filters") before a prior one (the search
+   submission) has fully committed can make Next's router treat the
+   second navigation as a no-op against a URL it hasn't finished
+   transitioning to yet — a real user clicking very fast could hit a
+   similar stuck state. Out of scope for this fix (the regression test
+   now waits for the search navigation to actually commit before clicking
+   Clear Filters, to test the intended defect in isolation from this
+   separate race) but worth tracking if it turns out to affect other
+   rapid-navigation flows in this app.
 
-3. **`/p/[slug]` soft-404** (investigated per item 6, not fixed — see
-   below).
+3. **`/p/[slug]` soft-404** (investigated per item 6 of the prior audit,
+   not fixed — out of scope for this round too, see below).
 
 ## The soft-404 investigation (item 6)
 

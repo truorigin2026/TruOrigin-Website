@@ -7,17 +7,14 @@ type FilterSidebarMobileProps = {
   selectedCategory: string;
   selectedBrand?: string;
   selectedCertification?: string;
-  selectedOrigin?: string;
   selectedSearch?: string;
   selectedSort?: string;
   brands: string[];
   certifications: string[];
-  origins: string[];
   createHref: (filters: {
     category?: string;
     brand?: string;
     certification?: string;
-    origin?: string;
     search?: string;
     sort?: string;
     page?: number;
