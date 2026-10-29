@@ -148,6 +148,60 @@ test.describe("products catalog: filters, search, sort, pagination, empty states
     assertNoUnexpectedErrors(tracker);
   });
 
+  test("FIXED: clicking \"Clear Filters\" immediately after submitting a search (before that navigation lands) still restores the catalog", async ({
+    page,
+    baseURL,
+  }) => {
+    // Regression test for a second, separate confirmed defect found while
+    // verifying the fix above — reproduced directly against this exact
+    // production build, consistently, on both Chromium and WebKit:
+    //
+    // Submitting the search form calls router.push() (wrapped in
+    // startTransition, for the pending-button UI). That push triggers an
+    // async RSC fetch. If "Clear Filters" is clicked before that fetch
+    // lands — genuinely reachable by a real user, since "No products
+    // match" appears instantly from local state regardless of whether the
+    // search's own navigation has actually committed server-side — Next's
+    // router can apply Clear Filters' URL change without ever delivering
+    // fresh props back to this component. Before the fix, that meant the
+    // address bar looked completely clean (no search param) while the
+    // catalog stayed stuck showing "No products match your filters." with
+    // zero cards — arguably worse than the first defect, since the URL no
+    // longer even hinted that anything was wrong.
+    //
+    // Fixed by having "Clear Filters" reset `searchValue` directly in its
+    // own onClick, synchronously — independent of whether the
+    // selectedSearch-prop-sync effect (the fix for the other defect) ever
+    // gets the chance to run. See the onClick on the "Clear Filters" Link
+    // in components/products/products-content.tsx for the full note.
+    //
+    // A related, narrower issue was found during this same investigation
+    // and is NOT fixed here, by design: submitting the identical search
+    // twice in immediate succession (not racing a different action, just
+    // resubmitting) can make the second submission lose to the first.
+    // That requires double-clicking the Search button faster than React
+    // can apply its own `disabled` attribute after the first click — a
+    // real but very narrow window a genuine user is extremely unlikely to
+    // hit, bounded by that same disabled state. See COVERAGE.md.
+    const tracker = trackPageHealth(page, baseURL);
+    await page.goto("/for-products/products");
+    await page.waitForLoadState("networkidle");
+
+    const searchInput = page.getByPlaceholder("Search products, brands, or categories");
+    await searchInput.fill("zzzzracecondition");
+    await page.getByRole("button", { name: "Search" }).click();
+    // No wait here — on purpose. Clicking immediately is the whole point
+    // of this test; see the comment above for why it's realistic.
+    await page.getByRole("link", { name: "Clear Filters" }).click();
+
+    await expect(page).toHaveURL(/\/for-products\/products$/);
+    await expect(searchInput).toHaveValue("");
+    await expect(page.getByText("No products match your filters.")).not.toBeVisible();
+    await expect(page.locator('a.product-card[href^="/p/"]')).not.toHaveCount(0);
+
+    assertNoUnexpectedErrors(tracker);
+  });
+
   test("sort order actually changes result order (no UI control exists for this today — verified via the URL param the app already reads)", async ({
     page,
     baseURL,

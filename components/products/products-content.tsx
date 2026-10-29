@@ -80,6 +80,16 @@ export function ProductsContent({
   // `filtered` below is computed from searchValue, the catalog stayed
   // stuck showing the old (zero) results even once the URL had no search
   // param left. Re-sync whenever the URL's own search value changes.
+  //
+  // This alone isn't enough, though — confirmed live that firing another
+  // navigation (this effect's own trigger) while the search's router.push
+  // is still in flight can leave the component never receiving fresh
+  // props at all, so this effect never re-fires and searchValue never
+  // resets. That's why "Clear Filters" below ALSO resets searchValue
+  // directly, synchronously, independent of this effect ever running
+  // again — this effect remains the correct behavior for every case where
+  // the round trip does land normally (including browser back/forward and
+  // direct URL edits, which have no click handler to hook into).
   useEffect(() => {
     setSearchValue(selectedSearch);
   }, [selectedSearch]);
@@ -210,7 +220,21 @@ export function ProductsContent({
           {filtered.length === 0 ? (
             <div className="products-empty">
               <p>No products match your filters.</p>
-              <Link href={basePath} scroll={false} className="saas-btn-outline">
+              {/* Also resets searchValue synchronously here, not only via
+                  the selectedSearch-prop-sync effect above: that effect
+                  only fires once this Link's own navigation has actually
+                  landed with fresh props, and confirmed live that firing
+                  this navigation while a just-submitted search's own
+                  navigation is still in flight can leave the component
+                  never receiving fresh props at all — Next's router ends
+                  up applying this click's URL change without ever
+                  re-rendering the page with the new searchParams. Setting
+                  the state directly here makes the one thing the user
+                  actually sees (the search box, and the filtering it
+                  drives) correct immediately and unconditionally,
+                  regardless of whether that navigation's data round-trip
+                  ever lands. */}
+              <Link href={basePath} scroll={false} className="saas-btn-outline" onClick={() => setSearchValue("")}>
                 Clear Filters
               </Link>
             </div>

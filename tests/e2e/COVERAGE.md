@@ -166,20 +166,128 @@ what was wrong and why, with the fix noted at the end of each.
    all 3 projects) — now also asserts the search input's own value is
    cleared, not just that products reappear, since the stale input value
    was the actual defect.
-   **Related finding, not fixed (separate, narrower issue):** while
-   verifying this fix, found that firing a second client-side navigation
-   (e.g. clicking "Clear Filters") before a prior one (the search
-   submission) has fully committed can make Next's router treat the
-   second navigation as a no-op against a URL it hasn't finished
-   transitioning to yet — a real user clicking very fast could hit a
-   similar stuck state. Out of scope for this fix (the regression test
-   now waits for the search navigation to actually commit before clicking
-   Clear Filters, to test the intended defect in isolation from this
-   separate race) but worth tracking if it turns out to affect other
-   rapid-navigation flows in this app.
+   **Related finding from the same investigation, now ALSO fixed** — see
+   "The navigation race investigation" below for the full writeup.
 
 3. **`/p/[slug]` soft-404** (investigated per item 6 of the prior audit,
    not fixed — out of scope for this round too, see below).
+
+## The navigation race investigation (third round)
+
+A separate, narrower issue surfaced while verifying the Clear Filters fix:
+firing a second client-side navigation before a prior one has committed
+could sometimes be treated as a no-op by Next's router. Investigated
+properly this round rather than left as a side note.
+
+**Classification: a genuine, confirmed, reproducible application defect**
+— not merely an inherent/unavoidable characteristic of Next.js's router,
+and not a test-synchronization artifact. It's a real consequence of how
+this one component uses the router, reachable by a real user action
+sequence, with a real user-visible broken state as the result.
+
+**Reproduction**, against a real production build (`next build && next
+start`), in real browser engines (Chromium and WebKit via Playwright),
+with zero artificial delay between the two actions — not a contrived
+timing window, see "does this explain the unresponsive-page reports?"
+below for why zero delay is realistic here specifically:
+
+1. Submit a search (fills the box, clicks Search — calls
+   `startTransition(() => router.push(...))`).
+2. Immediately click "Clear Filters" (a plain `<Link>`), before the
+   search's own navigation has delivered fresh props back to the
+   component.
+
+Result before the fix, consistent across both browser engines, repeated
+runs: the address bar ends up clean (matching Clear Filters' target —
+Next does apply *that* click's URL), but `ProductsContent` never actually
+re-renders with the corresponding fresh `selectedSearch` prop. Since
+`searchValue` (the state that actually drives what's filtered/displayed)
+only gets reset by an effect watching that prop, and the component is
+stuck on old props, the catalog stays showing "No products match your
+filters." with zero cards — while the URL shows nothing wrong at all.
+Confirmed strictly worse than the original Clear Filters defect in one
+way: at least that one left `?search=...` visible in the address bar as
+a clue; this one doesn't.
+
+**Examined and ruled out as the/a primary cause:**
+- `useTransition`/`startTransition` specifically — removing it
+  (replacing `isPending` with a manually-managed boolean) did **not**
+  fix the reproduction case above, and introduced a new, worse, easily-
+  reachable regression of its own: resubmitting the *same* search term
+  (e.g. clicking Search again without changing the input) left the
+  button permanently stuck disabled/"Searching...", because resetting
+  the manual flag was tied to a `selectedSearch` prop *change* that
+  never happens when the value is already the same. Reverted; the
+  original `useTransition` doesn't have this problem, since React
+  resolves `isPending` to `false` on transition completion regardless of
+  whether any watched value actually changed.
+- Plain `<Link>`-to-`<Link>` rapid navigation (no `router.push`/
+  transition involved at all) — confirmed fine, repeatedly, both ad hoc
+  and via the existing "rapid repeated category-filter clicks" test,
+  which continues to pass. The race is specific to a `router.push()`
+  navigation being interrupted, not "any two fast navigations."
+- A second, narrower variant — submitting the identical search term
+  twice in a row, racing the button's own `disabled` state rather than a
+  different element — reproduces consistently (3/3) but requires beating
+  React's own render cycle to re-click a button that's about to become
+  (and almost immediately does become) disabled. **Not fixed**: the
+  practical reachability for a real user is low (bounded by that
+  disabled state), and a real fix would mean understanding/changing how
+  Next's router queues/supersedes in-flight `router.push()` calls, which
+  is exactly the "rewrite the routing architecture" this task says not
+  to do for a sub-defect of this severity. Documented, not pursued.
+
+**Fix implemented** (`components/products/products-content.tsx`): "Clear
+Filters" now resets `searchValue` directly in its own `onClick`,
+synchronously, instead of relying solely on the prop-sync effect:
+
+```tsx
+<Link href={basePath} scroll={false} className="saas-btn-outline" onClick={() => setSearchValue("")}>
+  Clear Filters
+</Link>
+```
+
+This makes the one thing the user actually sees (the search box, and the
+filtering it drives) correct immediately and unconditionally, regardless
+of whether the earlier search's own navigation ever delivers fresh props.
+The prop-sync effect from the first fix is unchanged and still the
+correct mechanism for every case that isn't this exact race (browser
+back/forward, a direct URL edit, a settled normal Clear Filters click —
+none of those have a click handler to hook into, and all of them
+continue to work via the effect). `useTransition` is unchanged from
+before this investigation.
+
+Regression test: `filters-and-search.spec.ts` → "FIXED: clicking \"Clear
+Filters\" immediately after submitting a search (before that navigation
+lands) still restores the catalog" — no artificial delay between the two
+actions, by design. Passed 9/9 (3 runs × 3 projects) during verification.
+
+**Does this explain the originally-reported unresponsive-page symptoms?**
+No. Two independent reasons:
+1. `startTransition`/`useTransition` is used in exactly one place in the
+   entire codebase — this component (confirmed: `grep -r
+   "startTransition|useTransition"` across every `.tsx` file matches only
+   `products-content.tsx`). The original reports were site-wide, across
+   pages (home pages, product pages) that never touch this code at all.
+2. The original symptom (already fixed earlier — see
+   `components/site-chrome.tsx`'s `PageTransitionPane`) was a stuck
+   `AnimatePresence` exit layer keyed on `pathname`, a completely
+   different mechanism triggered by *cross-page* navigation. This race is
+   about same-page, search-param-only navigation never reaching a
+   `startTransition`-wrapped `router.push()`'s target component with
+   fresh props. Different trigger, different code path, different pages.
+
+The zero-delay reproduction above is realistic specifically *for this
+component* because "No products match your filters." (and the "Clear
+Filters" link's appearance) is driven entirely by local `searchValue`
+state — it shows up the instant the button is clicked, with no
+dependency on the network at all, so a user can genuinely react to it
+and click Clear Filters before the actual server round-trip has
+returned. On a real deployment the RSC fetch latency is also almost
+certainly higher than this local dev/production-build setup (and this
+app's shared database has independently shown real fragility under
+load, elsewhere in this project's history), which if anything widens
+this exact window rather than narrows it.
 
 ## The soft-404 investigation (item 6)
 
@@ -313,6 +421,64 @@ any safety net:
   does) or requires a user action this suite never performs (submitting a
   form, logging in). No test in this suite logs in or submits a form other
   than the deliberately-intercepted contact form.
+
+## Investigating the two documented intermittent flakes (fourth round)
+
+Per instruction, evidence was gathered **before** changing either test —
+neither was touched on the basis of a guess.
+
+**The WebKit search-timing flake** (`filters-and-search.spec.ts` →
+"searching for nonsense shows the explicit empty state"): could not be
+freshly reproduced this round despite real effort —
+- 5/5 clean running it alone, repeatedly, against a fresh server each time.
+- 10 full-suite runs this round (6 plain + 4 with `--trace=on` forced on
+  specifically to capture maximum diagnostic data if it occurred), all
+  55/55 passing, 0 failures.
+- A dedicated ordering experiment: ran Mobile Safari's full project
+  against a long-lived server fresh, then again after Desktop Chrome's
+  and Mobile Chrome's full projects had already run ~80 requests against
+  that same server (testing "does whichever project runs last in the
+  sequence degrade, regardless of engine" vs. "is it specifically
+  WebKit") — clean both times. The persistent server's own log carried
+  zero DB/connection errors across the whole exercise, in contrast to the
+  real `ECONNRESET`/`P1017` errors caught directly earlier in this
+  project's work.
+
+No code or test change was made for this one — there's nothing here to
+act on beyond what's already documented (a rare, environment-dependent
+flake, most plausibly tied to this shared database's occasional
+real-world connection fragility under sustained load, which this round's
+attempts simply didn't happen to trigger). Left exactly as-is.
+
+**The scroll-height measurement flake** (`navigation.spec.ts` →
+"repeated back/forward navigation never leaves a stuck overlay..."):
+also not freshly reproduced this round (same 10 full-suite runs above
+all passed this test too). The evidence here is different in kind,
+though, and was judged sufficient to act on without a fresh catch:
+
+1. The prior session's actual failure output is still in this
+   conversation's history — concrete measured values (a ~9000px and a
+   ~6763px gap) on a test that measures a ~0px gap on a direct,
+   un-navigated load of the same page once settled. That's a real,
+   previously-observed defect in the test's own timing, not a one-off
+   fluke of the number.
+2. Playwright's own documentation explicitly advises against relying on
+   `waitForLoadState("networkidle")` for pages with any ongoing
+   background activity, which `/for-brands/home` has plenty of
+   (`whileInView` fade-ins, lazy images, Next prefetching every link
+   already in the initial viewport). A "quiet" 500ms window can land
+   before the last bit of that has actually finished affecting layout —
+   this is a structural weakness in the WAIT strategy, not the assertion.
+
+Given that, the test's synchronization was strengthened: the fixed
+`waitForTimeout(500)` + one-shot measurement was replaced with
+`expect.poll()` on the actual `scrollHeight - footerBottom` value,
+converging for up to 10s instead of guessing a fixed delay. The
+correctness threshold itself (`< 50px`) is **unchanged** — this is a
+synchronization improvement, not a weakened assertion; if the stuck-layer
+bug this test guards against ever reoccurs, polling for up to 10s makes
+it *more* likely to be caught (a transient layout glitch has 10s to
+resolve before the test gives up), not less.
 
 ## CI and the database (item 8)
 

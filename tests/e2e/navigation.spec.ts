@@ -110,20 +110,38 @@ test.describe("product ↔ brand navigation", () => {
     // "load" event already fired once for the session's original page
     // load and won't fire again for an SPA transition, so waiting on it
     // here is a no-op. Wait for network activity (images etc.) to settle
-    // instead, otherwise an in-progress layout mid-load looks identical to
-    // the stuck-layer bug this is actually checking for. A direct,
-    // un-navigated load of this page measures a ~0px gap once settled;
-    // that's the real baseline.
+    // as a first pass, otherwise an in-progress layout mid-load looks
+    // identical to the stuck-layer bug this is actually checking for. A
+    // direct, un-navigated load of this page measures a ~0px gap once
+    // settled; that's the real baseline.
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(500);
+
+    const footer = page.locator("footer.saas-footer");
+    await expect(footer).toBeVisible();
 
     // The document's scrollable area must end at (or very near) the real
     // footer, not extend into blank space left by a stuck taller layer.
-    const footer = page.locator("footer.saas-footer");
-    await expect(footer).toBeVisible();
-    const scrollHeight = await page.evaluate(() => document.documentElement.scrollHeight);
-    const footerBottom = await footer.evaluate((el) => el.getBoundingClientRect().bottom + window.scrollY);
-    expect(scrollHeight - footerBottom).toBeLessThan(50);
+    // Measured with expect.poll() rather than a fixed wait + one-shot
+    // snapshot: Playwright's own docs call out networkidle as unreliable
+    // for pages with any ongoing background activity, and this one has
+    // plenty (whileInView fade-ins, lazy images, Next's own link
+    // prefetching of everything already in the viewport) — a "quiet"
+    // window can land before the last bit of that has actually finished
+    // affecting layout. Polling the real measurement until it settles (or
+    // the timeout below expires) waits exactly as long as the page
+    // actually needs, instead of guessing a fixed delay — this is a
+    // synchronization improvement only; the correctness threshold itself
+    // (<50px) is unchanged from before.
+    await expect
+      .poll(
+        async () => {
+          const scrollHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+          const footerBottom = await footer.evaluate((el) => el.getBoundingClientRect().bottom + window.scrollY);
+          return scrollHeight - footerBottom;
+        },
+        { timeout: 10_000 },
+      )
+      .toBeLessThan(50);
 
     assertNoUnexpectedErrors(tracker);
   });

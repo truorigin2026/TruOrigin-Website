@@ -147,10 +147,14 @@ On failure, a screenshot and video are attached automatically
   investigation).
 - `filters-and-search.spec.ts` — category filters, search (match + empty
   state), sort order, pagination (skips if unreachable — see COVERAGE.md),
-  rapid repeated filter clicks, and regression coverage for two app
+  rapid repeated filter clicks, and regression coverage for three app
   defects found and fixed during this suite's work (origin filter removed
   for lack of any backing data, "Clear Filters" now actually resets the
-  search box).
+  search box, and a related navigation race where clicking "Clear
+  Filters" immediately after submitting a search — before that search's
+  own navigation lands — could leave the catalog stuck despite a clean
+  URL; see COVERAGE.md's "navigation race investigation" for the full
+  root cause).
 - `api-failures.spec.ts` — the contact form's handling of a 500, a dropped
   connection, and a slow response (no double-submit).
 - `tests/e2e-dbfree/static-pages.spec.ts` — `/terms`, `/privacy`,
