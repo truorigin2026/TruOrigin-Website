@@ -8,3 +8,9 @@ generated/
 *.p12
 *.pfx
 .vercel/
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/blob-report/
