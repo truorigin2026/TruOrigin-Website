@@ -5,22 +5,13 @@ on:
     branches: [main]
   pull_request:
 
-# This project has no separate test/staging database — the build and the
-# server these tests drive both read the same Postgres instance production
-# uses. The Playwright setup (tests/e2e/fixtures.ts) keeps every test
-# read-only against real data: no logins, no form submissions, and the
-# public product page's analytics beacons are intercepted so test traffic
-# never pollutes real view-count analytics. Required repo secret:
-# DATABASE_URL. See tests/e2e/README.md for the full list and rationale.
 jobs:
-  e2e:
+  # Runs on every push/PR, no secrets required at all. Covers the pages
+  # confirmed to need no database anywhere in their render path. See
+  # tests/e2e-dbfree/static-pages.spec.ts and playwright.dbfree.config.ts.
+  e2e-dbfree:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3100
-      PLAYWRIGHT_SKIP_BUILD: "1"
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -32,10 +23,65 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run database-free smoke tests
+        run: npx playwright test --config=playwright.dbfree.config.ts
+
+      - name: Upload database-free report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-dbfree
+          path: playwright-report-dbfree/
+          retention-days: 14
+
+  # The full suite needs real product/brand data, so it needs a real
+  # database — DELIBERATELY NEVER the production database. This job only
+  # runs when a STAGING_DATABASE_URL repository secret is configured,
+  # pointing at a dedicated staging/test database (same schema, disposable
+  # data). Without that secret, this job is skipped with a clear message
+  # rather than silently failing or — worse — being wired to production.
+  # See tests/e2e/README.md "CI and the database" for what a staging
+  # database needs and why production is off the table here.
+  e2e-full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3100
+      PLAYWRIGHT_SKIP_BUILD: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for a staging database
+        id: staging-db
+        run: |
+          if [ -z "${{ secrets.STAGING_DATABASE_URL }}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::STAGING_DATABASE_URL is not set — skipping the full e2e suite (navigation, filters, search, mobile layout, etc). This suite is deliberately never run against production. See tests/e2e/README.md for what a staging database needs."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.staging-db.outputs.configured == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.staging-db.outputs.configured == 'true'
+        run: npm ci
+
       - name: Install Playwright browsers
+        if: steps.staging-db.outputs.configured == 'true'
         run: npx playwright install --with-deps chromium webkit
 
       - name: Build (with retry for a known transient DB connection flake)
+        if: steps.staging-db.outputs.configured == 'true'
         run: |
           for attempt in 1 2 3; do
             if npm run build; then
@@ -49,10 +95,11 @@ jobs:
           exit 1
 
       - name: Run Playwright tests
+        if: steps.staging-db.outputs.configured == 'true'
         run: npx playwright test
 
       - name: Upload Playwright report
-        if: always()
+        if: always() && steps.staging-db.outputs.configured == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
@@ -60,7 +107,7 @@ jobs:
           retention-days: 14
 
       - name: Upload test traces/screenshots/videos (on failure)
-        if: failure()
+        if: failure() && steps.staging-db.outputs.configured == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: test-results
