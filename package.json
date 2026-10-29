@@ -59,6 +59,7 @@
     "typescript": "^5.8.2"
   },
   "overrides": {
-    "zod": "^4.6.6"
+    "zod": "^4.6.6",
+    "postcss": "^8.5.28"
   }
 }
