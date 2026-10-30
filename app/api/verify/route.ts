@@ -14,7 +14,7 @@ import { recordScanEvent } from "@/lib/analytics";
 import { checkRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
-  const rateLimit = checkRateLimit(`verify:${getClientIp(request)}`, 30, 60 * 1000);
+  const rateLimit = await checkRateLimit(`verify:${getClientIp(request)}`, 30, 60 * 1000, "fail-open");
   if (!rateLimit.allowed) {
     return rateLimitResponse(rateLimit.retryAfterSeconds);
   }

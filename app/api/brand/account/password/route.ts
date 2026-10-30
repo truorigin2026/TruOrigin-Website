@@ -12,7 +12,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const rateLimit = checkRateLimit(`brand-password-change:${getClientIp(request)}`, 10, 60 * 60 * 1000);
+  const rateLimit = await checkRateLimit(`brand-password-change:${getClientIp(request)}`, 10, 60 * 60 * 1000, "fail-closed");
   if (!rateLimit.allowed) {
     return rateLimitResponse(rateLimit.retryAfterSeconds);
   }

@@ -30,7 +30,7 @@ function confirmationIntro(source: ReturnType<typeof resolveSource>): string {
 }
 
 export async function POST(request: NextRequest) {
-  const rateLimit = checkRateLimit(`contact:${getClientIp(request)}`, 5, 60 * 60 * 1000);
+  const rateLimit = await checkRateLimit(`contact:${getClientIp(request)}`, 5, 60 * 60 * 1000, "fail-open");
   if (!rateLimit.allowed) {
     return rateLimitResponse(rateLimit.retryAfterSeconds);
   }

@@ -12,7 +12,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const rateLimit = checkRateLimit(`admin-reset-password:${session.sub}`, 10, 60 * 60 * 1000);
+  const rateLimit = await checkRateLimit(`admin-reset-password:${session.sub}`, 10, 60 * 60 * 1000, "fail-closed");
   if (!rateLimit.allowed) {
     return rateLimitResponse(rateLimit.retryAfterSeconds);
   }

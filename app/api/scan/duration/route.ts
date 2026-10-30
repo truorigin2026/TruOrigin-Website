@@ -3,7 +3,7 @@ import { recordViewDuration } from "@/lib/analytics";
 import { checkRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
-  const rateLimit = checkRateLimit(`scan-duration:${getClientIp(request)}`, 60, 60 * 1000);
+  const rateLimit = await checkRateLimit(`scan-duration:${getClientIp(request)}`, 60, 60 * 1000, "fail-open");
   if (!rateLimit.allowed) {
     return rateLimitResponse(rateLimit.retryAfterSeconds);
   }

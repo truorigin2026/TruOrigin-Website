@@ -5,7 +5,7 @@ import { hashResetToken, isStrongPassword, PASSWORD_REQUIREMENTS_MESSAGE } from 
 import { checkRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
-  const rateLimit = checkRateLimit(`reset-password:${getClientIp(request)}`, 10, 60 * 60 * 1000);
+  const rateLimit = await checkRateLimit(`reset-password:${getClientIp(request)}`, 10, 60 * 60 * 1000, "fail-closed");
   if (!rateLimit.allowed) {
     return rateLimitResponse(rateLimit.retryAfterSeconds);
   }

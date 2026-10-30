@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const rateLimit = checkRateLimit(`team-invite:${session.brandId}`, 10, 60 * 60 * 1000);
+  const rateLimit = await checkRateLimit(`team-invite:${session.brandId}`, 10, 60 * 60 * 1000, "fail-open");
   if (!rateLimit.allowed) {
     return rateLimitResponse(rateLimit.retryAfterSeconds);
   }

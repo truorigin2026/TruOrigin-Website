@@ -539,3 +539,20 @@ model ApiKey {
   revokedAt   DateTime?
   createdAt   DateTime  @default(now())
 }
+
+// Backs lib/rate-limit.ts's distributed, fixed-window rate limiter — shared
+// across every independent serverless instance via Postgres instead of
+// per-process memory. `key` is a SHA-256 hash of the caller's composed
+// identifier (e.g. "login:<ip>" or "forgot-password:email:<email>"), never
+// the raw IP/email itself — see lib/rate-limit.ts's hashKey(). Uses the key
+// itself as the primary key (not a separate cuid) since every operation on
+// this table is a lookup/upsert by that exact value; a surrogate id would
+// just need its own unique index on the same column for no benefit.
+model RateLimitBucket {
+  key       String   @id
+  count     Int      @default(1)
+  resetAt   DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([resetAt])
+}

@@ -11,7 +11,7 @@ function isTrackableEventType(value: unknown): value is TrackableEventType {
 }
 
 export async function POST(request: NextRequest) {
-  const rateLimit = checkRateLimit(`scan:${getClientIp(request)}`, 60, 60 * 1000);
+  const rateLimit = await checkRateLimit(`scan:${getClientIp(request)}`, 60, 60 * 1000, "fail-open");
   if (!rateLimit.allowed) {
     return rateLimitResponse(rateLimit.retryAfterSeconds);
   }

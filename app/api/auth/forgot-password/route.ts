@@ -10,7 +10,7 @@ const GENERIC_RESPONSE = {
 };
 
 export async function POST(request: NextRequest) {
-  const ipLimit = checkRateLimit(`forgot-password:ip:${getClientIp(request)}`, 5, 60 * 60 * 1000);
+  const ipLimit = await checkRateLimit(`forgot-password:ip:${getClientIp(request)}`, 5, 60 * 60 * 1000, "fail-closed");
   if (!ipLimit.allowed) {
     return rateLimitResponse(ipLimit.retryAfterSeconds);
   }
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Email is required." }, { status: 400 });
   }
 
-  const emailLimit = checkRateLimit(`forgot-password:email:${email}`, 3, 60 * 60 * 1000);
+  const emailLimit = await checkRateLimit(`forgot-password:email:${email}`, 3, 60 * 60 * 1000, "fail-closed");
   if (!emailLimit.allowed) {
     return NextResponse.json(GENERIC_RESPONSE);
   }

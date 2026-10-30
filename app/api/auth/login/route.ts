@@ -17,7 +17,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "";
 const ADMIN_PASSWORD_HASH = ADMIN_PASSWORD ? bcrypt.hashSync(ADMIN_PASSWORD, 12) : null;
 
 export async function POST(request: NextRequest) {
-  const rateLimit = checkRateLimit(`login:${getClientIp(request)}`, 10, 10 * 60 * 1000);
+  const rateLimit = await checkRateLimit(`login:${getClientIp(request)}`, 10, 10 * 60 * 1000, "fail-closed");
   if (!rateLimit.allowed) {
     return rateLimitResponse(rateLimit.retryAfterSeconds);
   }
