@@ -78,7 +78,7 @@ export function ImageCropDialog({
             onChange={(event) => setZoom(Number(event.target.value))}
           />
         </label>
-        <p className="text-xs text-muted-foreground">Drag the photo to reposition it within the frame — this is how it will be cropped wherever it's shown.</p>
+        <p className="text-xs text-muted-foreground">Drag the photo to reposition it within the frame — this is how it will be cropped wherever it&apos;s shown.</p>
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

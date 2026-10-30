@@ -213,7 +213,7 @@ export default function PrivacyPage() {
           independently.
         </p>
 
-        <h2>12. Children's Privacy</h2>
+        <h2>12. Children&apos;s Privacy</h2>
         <p>
           TruOrigin services are not directed toward children under the age of 13. We do not
           knowingly collect personal information from children.
