@@ -142,7 +142,18 @@ export function BrandsQuickVerifySection({ steps }: { steps: readonly QuickStep[
 
           {isMobile ? (
             <>
-              <div className="brands-verify-carousel" ref={carouselRef}>
+              {/* tabIndex + role/aria-label: axe-core confirmed this
+                  horizontally-scrolling carousel had no way for a keyboard
+                  user to focus it and scroll through its content -- a
+                  focused, non-zero-sized overflow container is natively
+                  scrollable with arrow keys. */}
+              <div
+                className="brands-verify-carousel"
+                ref={carouselRef}
+                tabIndex={0}
+                role="region"
+                aria-label="How verification works, step by step"
+              >
                 {steps.map((step, index) => (
                   <article key={step.title} className="brands-verify-card">
                     <div className="brands-verify-card-image">

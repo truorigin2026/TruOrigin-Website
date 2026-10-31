@@ -99,15 +99,27 @@ export function ContactForm({
           <input type="text" name="website" tabIndex={-1} autoComplete="off" />
         </label>
 
-        <button type="submit" disabled={status === "sending"} className="saas-btn-primary contact-form-submit disabled:opacity-70">
+        <button
+          type="submit"
+          disabled={status === "sending"}
+          aria-live="polite"
+          className="saas-btn-primary contact-form-submit disabled:opacity-70"
+        >
           {status === "sending" ? "Sending..." : submitLabel}
         </button>
-        {status === "sent" ? (
-          <p className="contact-form-status contact-form-status-success">Thank you! Your message has been received. Our team will get back to you shortly.</p>
-        ) : null}
-        {status === "error" ? (
-          <p className="contact-form-status contact-form-status-error">Something went wrong. Please try again.</p>
-        ) : null}
+        {/* A persistent live region (not conditionally mounted) so assistive
+            tech picks it up on first render, not only once content first
+            appears inside it. */}
+        <div role="status" aria-live="polite">
+          {status === "sent" ? (
+            <p className="contact-form-status contact-form-status-success">Thank you! Your message has been received. Our team will get back to you shortly.</p>
+          ) : null}
+        </div>
+        <div role="alert" aria-live="assertive">
+          {status === "error" ? (
+            <p className="contact-form-status contact-form-status-error">Something went wrong. Please try again.</p>
+          ) : null}
+        </div>
       </form>
     </FadeIn>
   );

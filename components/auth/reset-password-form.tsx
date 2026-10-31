@@ -86,6 +86,8 @@ export function ResetPasswordForm({ token }: { token: string }) {
                       autoComplete="new-password"
                       minLength={8}
                       required
+                      aria-invalid={error ? "true" : undefined}
+                      aria-describedby={error ? "reset-password-error" : undefined}
                       className="w-full rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--brand)]"
                     />
                   </label>
@@ -98,12 +100,14 @@ export function ResetPasswordForm({ token }: { token: string }) {
                       autoComplete="new-password"
                       minLength={8}
                       required
+                      aria-invalid={error ? "true" : undefined}
+                      aria-describedby={error ? "reset-password-error" : undefined}
                       className="w-full rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none transition focus:border-[color:var(--brand)]"
                     />
                   </label>
 
                   {error ? (
-                    <p className="mt-4 rounded-2xl border border-[#f0b8b8] bg-[#fff3f3] px-4 py-3 text-sm text-[#9a2323]">
+                    <p id="reset-password-error" role="alert" className="mt-4 rounded-2xl border border-[#f0b8b8] bg-[#fff3f3] px-4 py-3 text-sm text-[#9a2323]">
                       {error}
                     </p>
                   ) : null}
@@ -111,6 +115,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
                   <button
                     type="submit"
                     disabled={loading}
+                    aria-live="polite"
                     className="btn-primary mt-7 inline-flex items-center justify-center gap-2 disabled:opacity-70"
                   >
                     {loading ? "Saving..." : "Reset password"}

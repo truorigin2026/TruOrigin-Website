@@ -55,12 +55,15 @@ export function ForgotPasswordForm() {
                 </div>
               </div>
 
-              {submitted ? (
-                <p className="mt-6 rounded-2xl border border-[color:var(--line)] bg-[#f8fbf9] px-4 py-4 text-sm leading-7 text-[color:var(--foreground)]">
-                  If an account exists for that email, we&apos;ve sent a password reset link.
-                  Check your inbox and follow the link to set a new password.
-                </p>
-              ) : (
+              <div role="status" aria-live="polite">
+                {submitted ? (
+                  <p className="mt-6 rounded-2xl border border-[color:var(--line)] bg-[#f8fbf9] px-4 py-4 text-sm leading-7 text-[color:var(--foreground)]">
+                    If an account exists for that email, we&apos;ve sent a password reset link.
+                    Check your inbox and follow the link to set a new password.
+                  </p>
+                ) : null}
+              </div>
+              {submitted ? null : (
                 <>
                   <p className="mt-4 text-sm leading-7 text-[color:var(--muted)]">
                     Enter the email tied to your brand account and we&apos;ll send you a link to
@@ -80,7 +83,7 @@ export function ForgotPasswordForm() {
                   </label>
 
                   {error ? (
-                    <p className="mt-4 rounded-2xl border border-[#f0b8b8] bg-[#fff3f3] px-4 py-3 text-sm text-[#9a2323]">
+                    <p className="mt-4 rounded-2xl border border-[#f0b8b8] bg-[#fff3f3] px-4 py-3 text-sm text-[#9a2323]" role="alert">
                       {error}
                     </p>
                   ) : null}
@@ -88,6 +91,7 @@ export function ForgotPasswordForm() {
                   <button
                     type="submit"
                     disabled={loading}
+                    aria-live="polite"
                     className="btn-primary mt-7 inline-flex items-center justify-center gap-2 disabled:opacity-70"
                   >
                     {loading ? "Sending..." : "Send reset link"}

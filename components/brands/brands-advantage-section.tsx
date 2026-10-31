@@ -129,7 +129,16 @@ export function BrandsAdvantageSection({ items }: { items: readonly AdvantageIte
 
           {isMobile ? (
             <>
-              <div className="brands-advantage-carousel" ref={carouselRef}>
+              {/* Same fix as the equivalent carousel in
+                  brands-quick-verify-section.tsx -- axe-core confirmed no
+                  keyboard access to this horizontally-scrolling content. */}
+              <div
+                className="brands-advantage-carousel"
+                ref={carouselRef}
+                tabIndex={0}
+                role="region"
+                aria-label="Make every product easier to understand"
+              >
                 {items.map((item) => (
                   <article key={item.title} className="brands-advantage-card brands-advantage-card-carousel">
                     <h3>{item.title}</h3>

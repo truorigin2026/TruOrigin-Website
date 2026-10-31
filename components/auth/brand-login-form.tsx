@@ -73,6 +73,7 @@ export function BrandLoginForm() {
                 type="email"
                 autoComplete="email"
                 placeholder="Email"
+                aria-label="Email"
                 required
                 className="login-input"
               />
@@ -87,6 +88,7 @@ export function BrandLoginForm() {
                 onChange={(event) => setPassword(event.target.value)}
                 autoComplete="current-password"
                 placeholder="Password"
+                aria-label="Password"
                 required
                 className="login-input"
               />
@@ -108,10 +110,10 @@ export function BrandLoginForm() {
             </div>
 
             {error ? (
-              <p className="login-error">{error}</p>
+              <p className="login-error" role="alert">{error}</p>
             ) : null}
 
-            <button type="submit" disabled={loading} className="btn-primary login-submit-btn">
+            <button type="submit" disabled={loading} aria-live="polite" className="btn-primary login-submit-btn">
               <span className="login-submit-btn-label">{loading ? "Signing in..." : "Log in"}</span>
               <span className="login-submit-btn-arrow">
                 <ArrowRight className="h-4 w-4" />

@@ -180,6 +180,9 @@ export function ProductsContent({
             <form className="products-page-search-form" onSubmit={handleSearchSubmit}>
               <div className="products-search-bar products-page-search-bar">
                 <Search size={18} aria-hidden="true" className="products-search-icon" />
+                <label htmlFor="product-page-search" className="sr-only">
+                  Search products, brands, or categories
+                </label>
                 <input
                   id="product-page-search"
                   name="search"
@@ -195,6 +198,15 @@ export function ProductsContent({
               </div>
             </form>
           </div>
+
+          {/* The desktop filter sidebar's own "Filters" <h2> is hidden by
+              CSS below the mobile breakpoint, and the mobile filter sheet's
+              matching <h2> only exists in the DOM while that sheet is open
+              -- leaving mobile viewports with the page's <h1> followed
+              directly by each ProductCard's <h3>, skipping a level. This
+              sr-only heading closes that gap unconditionally, on every
+              viewport, with no visual change. */}
+          <h2 className="sr-only">Product results</h2>
 
           <p className="products-results-count">
             Showing {filtered.length === 0 ? 0 : startIndex + 1}–{startIndex + paginated.length} of{" "}

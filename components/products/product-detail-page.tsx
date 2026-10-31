@@ -81,7 +81,11 @@ export function ProductDetailPage({
               {highlightCards.map((item) => (
                 <div key={item.title} className="product-stat-cell">
                   <p>{item.title}</p>
-                  <h3>{item.value}</h3>
+                  {/* Was an <h3> -- purely a bold stat VALUE next to its
+                      own label, not a heading introducing a section, and
+                      it sat before the page's first real <h2> (inside
+                      ProductDetailTabs below), skipping a level. */}
+                  <p className="product-stat-value">{item.value}</p>
                 </div>
               ))}
             </div>

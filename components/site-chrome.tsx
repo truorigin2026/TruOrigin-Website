@@ -49,14 +49,22 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     chromeHiddenPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 
   if (hideChrome) {
-    return <main className="relative z-10">{children}</main>;
+    return (
+      <main id="main-content" className="relative z-10">
+        {children}
+      </main>
+    );
   }
 
   return (
     <>
+      <a href="#main-content" className="skip-to-content-link">
+        Skip to main content
+      </a>
       <SmoothScroll />
       <SiteHeader />
       <main
+        id="main-content"
         className={`relative z-10 overflow-clip ${isAudienceHome ? "" : "site-content-with-header"}`}
       >
         <AnimatePresence mode="popLayout" initial={false}>

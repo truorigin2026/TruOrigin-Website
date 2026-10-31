@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FilterSidebar } from "./filter-sidebar";
+import { useDialogA11y } from "@/hooks/use-dialog-a11y";
 
 type FilterSidebarMobileProps = {
   selectedCategory: string;
@@ -25,6 +26,7 @@ export function FilterSidebarMobile(props: FilterSidebarMobileProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleClose = () => setIsOpen(false);
+  const dialogRef = useDialogA11y<HTMLDivElement>(isOpen, handleClose);
 
   return (
     <>
@@ -34,6 +36,8 @@ export function FilterSidebarMobile(props: FilterSidebarMobileProps) {
           className="filter-mobile-button"
           onClick={() => setIsOpen(true)}
           aria-label="Open filters"
+          aria-expanded={isOpen}
+          aria-controls="filter-modal"
         >
           <svg
             width="20"
@@ -61,9 +65,18 @@ export function FilterSidebarMobile(props: FilterSidebarMobileProps) {
       {/* Mobile Modal */}
       {isOpen && (
         <div className="filter-modal-overlay" onClick={handleClose}>
-          <div className="filter-modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            id="filter-modal"
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="filter-modal-title"
+            tabIndex={-1}
+            className="filter-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="filter-modal-header">
-              <h2>Filters</h2>
+              <h2 id="filter-modal-title">Filters</h2>
               <button
                 className="filter-modal-close"
                 onClick={handleClose}

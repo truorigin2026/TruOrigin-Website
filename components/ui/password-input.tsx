@@ -18,7 +18,6 @@ export function PasswordInput({ className = "", ...props }: React.ComponentProps
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
-        tabIndex={-1}
         aria-label={visible ? "Hide password" : "Show password"}
         className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center justify-center text-[color:var(--muted)] hover:text-[color:var(--foreground)]"
       >

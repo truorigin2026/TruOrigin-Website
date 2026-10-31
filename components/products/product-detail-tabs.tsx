@@ -317,9 +317,11 @@ export function ProductDetailTabs({ product, productId, showEditControls }: Prod
           {TABS.map((tab) => (
             <button
               key={tab.key}
+              id={`product-tab-${tab.key}`}
               type="button"
               role="tab"
               aria-selected={activeTab === tab.key}
+              aria-controls="product-tab-panel"
               className={`product-tabs-trigger ${activeTab === tab.key ? "is-active" : ""}`}
               onClick={() => switchTab(tab.key)}
             >
@@ -340,6 +342,10 @@ export function ProductDetailTabs({ product, productId, showEditControls }: Prod
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.div
           key={paneKey}
+          id="product-tab-panel"
+          role="tabpanel"
+          aria-labelledby={`product-tab-${activeTab}`}
+          tabIndex={0}
           layout
           className="product-tabs-panel"
           initial={{ opacity: 0 }}

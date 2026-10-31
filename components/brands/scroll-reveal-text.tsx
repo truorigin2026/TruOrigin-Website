@@ -12,7 +12,17 @@ function RevealWord({
   progress: MotionValue<number>;
   range: [number, number];
 }) {
-  const opacity = useTransform(progress, range, [0.18, 1]);
+  // Floor was 0.18: axe-core measured the pre-reveal state (every word,
+  // on initial load, before the user scrolls into this section's trigger
+  // range) at ~1.35:1 against the section's background -- nowhere close
+  // to the 3:1 minimum for this large text on desktop. On mobile this text
+  // renders smaller (confirmed: ~22.4px regular weight, under the "large
+  // text" threshold), which raises the bar to the full 4.5:1 -- 0.65
+  // measured 3.67:1 there, still short. 0.75 passes at ~4.7:1 even at that
+  // smaller mobile size, while still reading as visibly "faded" relative
+  // to the fully-revealed 1.0 end state (the animation itself is
+  // unchanged).
+  const opacity = useTransform(progress, range, [0.75, 1]);
   const y = useTransform(progress, range, [10, 0]);
 
   return (

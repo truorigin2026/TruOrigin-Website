@@ -49,9 +49,17 @@ export function SiteFooter() {
             </div>
           </div>
 
+          {/* h2, not h3: axe-core flagged a heading-order skip on pages
+              whose own content never reaches an h2 before the footer (the
+              404 page is h1-only) -- h1 straight to h3 skips a level. A
+              footer column heading going from any level back up to h2 is
+              never a skip, regardless of what precedes it on the page, and
+              these columns are genuinely their own top-level sections
+              within the footer landmark, not sub-sections of something
+              else on the page. */}
           <div className="saas-footer-columns">
             <div className="saas-footer-link-group">
-              <h3>For Brands</h3>
+              <h2>For Brands</h2>
               <ul>
                 {brandLinks.map(([label, href]) => (
                   <li key={href}>
@@ -62,7 +70,7 @@ export function SiteFooter() {
             </div>
 
             <div className="saas-footer-link-group">
-              <h3>For Products</h3>
+              <h2>For Products</h2>
               <ul>
                 {productLinks.map(([label, href]) => (
                   <li key={href}>
@@ -73,7 +81,7 @@ export function SiteFooter() {
             </div>
 
             <div className="saas-footer-link-group">
-              <h3>Business</h3>
+              <h2>Business</h2>
               <ul>
                 {businessLinks.map(([label, href]) => (
                   <li key={href}>

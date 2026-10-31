@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useDialogA11y } from "@/hooks/use-dialog-a11y";
 import logo from "../../public/images/TruOrigin logo.png";
 import facebookIcon from "../../public/images/icons/facebook.svg";
 import instagramIcon from "../../public/images/icons/instagram.svg";
@@ -48,6 +49,7 @@ function DesktopNavDropdown({ group, pathname }: { group: NavGroup; pathname: st
   };
 
   const groupActive = group.items.some((item) => isActive(pathname, item.href));
+  const panelId = `nav-dropdown-panel-${group.label.replace(/\s+/g, "-").toLowerCase()}`;
 
   return (
     <div className="nav-dropdown" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
@@ -55,6 +57,7 @@ function DesktopNavDropdown({ group, pathname }: { group: NavGroup; pathname: st
         type="button"
         className={`desktop-nav-link nav-dropdown-trigger ${groupActive ? "is-active" : ""}`}
         aria-expanded={open}
+        aria-controls={panelId}
         onClick={() => setOpen((current) => !current)}
       >
         {group.label}
@@ -64,6 +67,7 @@ function DesktopNavDropdown({ group, pathname }: { group: NavGroup; pathname: st
       <AnimatePresence>
         {open ? (
           <motion.div
+            id={panelId}
             className="nav-dropdown-panel"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -113,6 +117,7 @@ export function SiteHeader() {
   const isProductsLandingPage = pathname === "/for-products" || pathname.startsWith("/for-products/");
   const navItems = isLandingPage ? landingNavItems : isProductsLandingPage ? productNavItems : audience === "brands" ? brandNavItems : productNavItems;
   const logoHref = isLandingPage ? "/for-brands/home" : isProductsLandingPage ? "/for-products/home" : audience === "brands" ? "/" : "/for-products";
+  const drawerRef = useDialogA11y<HTMLDivElement>(menuOpen, () => setMenuOpen(false));
 
   useEffect(() => {
     setMenuOpen(false);
@@ -224,6 +229,7 @@ export function SiteHeader() {
                 className={`stylish-hamburger-btn ${menuOpen ? "is-open" : ""}`}
                 aria-label={menuOpen ? "Close navigation" : "Open navigation"}
                 aria-expanded={menuOpen}
+                aria-controls="mobile-nav-drawer"
                 onClick={() => setMenuOpen((current) => !current)}
               >
                 <span className="hamburger-lines">
@@ -246,7 +252,19 @@ export function SiteHeader() {
             exit={{ opacity: 0 }}
             onClick={() => setMenuOpen(false)}
           >
-            <motion.aside
+            {/* motion.div, not motion.aside: axe-core's aria-allowed-role
+                rule doesn't permit overriding <aside>'s implicit
+                "complementary" role with "dialog" -- a plain div has no
+                implicit role, so the override is always valid. Framer
+                Motion renders this identically either way; only the tag
+                name changes. */}
+            <motion.div
+              id="mobile-nav-drawer"
+              ref={drawerRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Mobile navigation"
+              tabIndex={-1}
               className="mobile-drawer is-open"
               initial={{ x: "105%" }}
               animate={{ x: 0 }}
@@ -369,7 +387,7 @@ export function SiteHeader() {
                   ))}
                 </div>
               </div>
-            </motion.aside>
+            </motion.div>
           </motion.div>
         ) : null}
       </AnimatePresence>

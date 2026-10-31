@@ -44,7 +44,12 @@ function FilterOption({
   href: string;
 }) {
   return (
-    <Link href={href} scroll={false} className={`filter-sidebar-option ${active ? "is-active" : ""}`}>
+    <Link
+      href={href}
+      scroll={false}
+      aria-current={active ? "true" : undefined}
+      className={`filter-sidebar-option ${active ? "is-active" : ""}`}
+    >
       <span className="filter-sidebar-tick" aria-hidden="true">
         {active ? "✓" : ""}
       </span>

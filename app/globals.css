@@ -86,6 +86,29 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Visually hidden until focused -- the first focusable element on every
+     page with a header, so a keyboard user can jump past the full nav
+     (logo, audience toggle, every nav item, hamburger) in one Tab + Enter
+     instead of tabbing through all of it on every single page. */
+  .skip-to-content-link {
+    position: absolute;
+    top: -100px;
+    left: 16px;
+    z-index: 1000;
+    padding: 10px 18px;
+    border-radius: 10px;
+    background: var(--brand-dark);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.15s ease;
+  }
+
+  .skip-to-content-link:focus {
+    top: 16px;
+  }
+
   h1,
   h2,
   h3,
@@ -2423,7 +2446,12 @@
 .products-search-button {
   border: 0;
   border-radius: 14px;
-  background: #4caf50;
+  /* Was #4caf50: measured by axe-core at 2.77:1 against the white label
+     text, well under the 4.5:1 AA minimum. var(--brand) is this site's
+     actual primary green used on every other brand-colored button and
+     passes at 5.38:1 -- the lighter shade was an inconsistent one-off,
+     not a deliberate design choice. */
+  background: var(--brand);
   color: #ffffff;
   padding: 0 18px;
   min-height: 48px;
@@ -2434,7 +2462,9 @@
 
 .products-search-button:hover:not(:disabled) {
   transform: translateY(-1px);
-  background: #3f973f;
+  /* Same contrast issue as the base rule above (#3f973f measured ~3.68:1
+     against white) -- var(--brand-dark) passes comfortably. */
+  background: var(--brand-dark);
 }
 
 .products-search-button:disabled {
@@ -4809,7 +4839,7 @@ a.contact-method-value:hover {
   color: var(--muted);
 }
 
-.product-stat-cell h3 {
+.product-stat-cell .product-stat-value {
   margin: 6px 0 0;
   font-size: 16px;
   line-height: 1.3;
@@ -5663,7 +5693,7 @@ a.contact-method-value:hover {
   min-width: 140px;
 }
 
-.saas-footer-link-group h3 {
+.saas-footer-link-group h2 {
   margin: 0 0 16px;
   font-size: 12px;
   font-weight: 800;
@@ -5723,7 +5753,10 @@ a.contact-method-value:hover {
   gap: 24px;
   padding: 20px 0;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
+  /* Was 0.5: axe-core measured the composited result against the footer's
+     #0a4a28 background at 3.85:1, under the 4.5:1 AA minimum. 0.75 passes
+     at ~6.6:1. */
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .saas-footer-bottom p {
@@ -5741,7 +5774,8 @@ a.contact-method-value:hover {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: rgba(255, 255, 255, 0.5);
+  /* Same fix as .saas-footer-bottom above (3.85:1 measured, 4.5:1 needed). */
+  color: rgba(255, 255, 255, 0.75);
   transition: color 0.2s ease;
 }
 
@@ -5773,7 +5807,8 @@ a.contact-method-value:hover {
 }
 
 .saas-footer-legal a {
-  color: rgba(255, 255, 255, 0.5);
+  /* Same fix as .saas-footer-bottom above (3.85:1 measured, 4.5:1 needed). */
+  color: rgba(255, 255, 255, 0.75);
   transition: color 0.2s ease;
 }
 
@@ -6924,7 +6959,11 @@ a.contact-method-value:hover {
 .products-hero-search-button {
   border: 0;
   border-radius: 999px;
-  background: #54d97d;
+  /* Was #54d97d: axe-core measured white text against it at 1.81:1, far
+     under the 4.5:1 AA minimum -- var(--brand) (this site's actual
+     primary green, used on every other brand-colored button) passes at
+     5.38:1. */
+  background: var(--brand);
   color: #ffffff;
   font-size: 0.95rem;
   font-weight: 700;
@@ -6935,7 +6974,8 @@ a.contact-method-value:hover {
 
 .products-hero-search-button:hover,
 .products-hero-search-button:focus-visible {
-  background: #31b656;
+  /* Was #31b656 (2.64:1, also failing). */
+  background: var(--brand-dark);
 }
 
 .products-hero-tag {
@@ -8529,7 +8569,10 @@ a.contact-method-value:hover {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #4caf50;
+  /* Was #4caf50: measured by axe-core at ~2.5:1 against this section's
+     near-white background, well under the 4.5:1 AA minimum for text this
+     small. var(--brand) passes at ~5:1. */
+  color: var(--brand);
 }
 
 .brands-eyebrow.centered {
@@ -8553,7 +8596,8 @@ a.contact-method-value:hover {
 .brands-text-accent {
   font-family: var(--ff-dm-serif-display), Georgia, serif;
   font-weight: 400;
-  color: #4caf50;
+  /* Same fix as .brands-eyebrow above. */
+  color: var(--brand);
 }
 
 .brands-section-lead {
@@ -9147,12 +9191,16 @@ a.contact-method-value:hover {
   padding-top: 3px;
   font-size: 13px;
   font-weight: 600;
-  color: rgba(76, 175, 80, 0.55);
+  /* Was rgba(76,175,80,0.55): axe-core measured 1.66:1 against this
+     section's background. var(--brand) passes at ~5:1 while still reading
+     as clearly less emphasized than the active-state color below. */
+  color: var(--brand);
   transition: color 0.35s ease;
 }
 
 .brands-verify-step.is-active .brands-verify-step-index {
-  color: #2e8b3f;
+  /* Was #2e8b3f (4.01:1, just under 4.5:1). */
+  color: var(--brand-dark);
 }
 
 .brands-verify-step-content {
@@ -9165,7 +9213,10 @@ a.contact-method-value:hover {
   font-family: var(--font-playfair), "Sora", sans-serif;
   font-size: clamp(1.15rem, 1.5vw, 1.5rem);
   font-weight: 600;
-  color: rgba(10, 31, 22, 0.42);
+  /* Was rgba(10,31,22,0.42): axe-core measured 2.62:1. var(--muted) is
+     this app's established "de-emphasized but still legible" token and
+     passes at ~5.3:1. */
+  color: var(--muted);
   transition: color 0.35s ease;
 }
 
@@ -9178,7 +9229,11 @@ a.contact-method-value:hover {
   margin: 0;
   font-size: 15px;
   line-height: 1.65;
-  color: rgba(15, 26, 20, 0.6);
+  /* Was rgba(15,26,20,0.6): axe-core measured this at just under 4.5:1
+     (this text is only visible at all when its parent step is active --
+     inactive steps keep opacity:0/max-height:0 below). var(--muted)
+     passes with real margin (~5.3:1). */
+  color: var(--muted);
   max-height: 0;
   opacity: 0;
   overflow: hidden;
@@ -9274,7 +9329,11 @@ a.contact-method-value:hover {
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgba(76, 175, 80, 0.85);
+    /* Was rgba(76,175,80,0.85): axe-core measured 3.59:1 against this
+       card's dark #173d2a background. #8cf5b3 is the same light-green
+       accent already used elsewhere in this file on an equivalent dark
+       background and already passes there. */
+    color: #8cf5b3;
   }
 
   .brands-verify-card-body h3 {
@@ -9900,7 +9959,10 @@ a.contact-method-value:hover {
 }
 
 .brands-hero-btn-primary {
-  background: #4caf50;
+  /* Was #4caf50: axe-core measured white text against it at 2.77:1.
+     var(--brand) passes at ~5.38:1 -- same fix as the other buttons in
+     this pass that used this same inconsistent, lighter shade. */
+  background: var(--brand);
   color: #ffffff;
   box-shadow: 0 12px 24px rgba(76, 175, 80, 0.28);
 }
@@ -10627,7 +10689,9 @@ a.contact-method-value:hover {
 
 .desktop-nav-link:hover,
 .desktop-nav-link.is-active {
-  color: #4caf50;
+  /* Was #4caf50: axe-core measured 2.77:1 against the static (scrolled)
+     header's white background. var(--brand) passes at ~5.38:1. */
+  color: var(--brand);
 }
 
 .hero-glass-header.is-scrolled .desktop-nav-link:hover {
