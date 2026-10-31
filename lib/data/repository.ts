@@ -11,7 +11,7 @@
 
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "../../generated/prisma/client";
+import { Prisma, ClaimStatus } from "../../generated/prisma/client";
 import {
   sampleProducts,
   sampleBrand,
@@ -45,6 +45,33 @@ const productInclude = {
     where: { status: "PUBLISHED" as const },
     orderBy: { publishedAt: "desc" as const },
     take: 1,
+  },
+} satisfies Prisma.ProductInclude;
+
+// Claim statuses a consumer-facing page or the public /api/verify API may
+// expose. PARTIALLY_VERIFIED is deliberately excluded: nothing in the
+// current public UI (ClaimRow in product-detail-tabs.tsx) renders a status
+// badge at all, so a partially-verified claim would be indistinguishable
+// from a fully verified one -- showing it publicly today would just be a
+// quieter version of the same defect this filter exists to close. Revisit
+// once the UI can actually label it as partial.
+const PUBLIC_CLAIM_STATUSES: ClaimStatus[] = [ClaimStatus.VERIFIED];
+
+// Same shape as productInclude, but the claims relation is filtered to
+// only publicly-approved statuses. A claim defaults to UNVERIFIED the
+// moment a brand creates or edits it (lib/product-submission.ts) and is
+// only ever promoted to VERIFIED or demoted to REJECTED by an explicit
+// admin decision (app/api/admin/claims/[id]/decision/route.ts) -- an
+// approved PRODUCT does not mean every claim on it has itself been
+// reviewed. Used by every PUBLIC product read path below
+// (getProductBySlug, getProductBySerial). getProductForBrandPreview
+// intentionally keeps the unfiltered productInclude above: a brand must
+// still see the real status of its own claims there.
+const publicProductInclude = {
+  ...productInclude,
+  claims: {
+    where: { status: { in: PUBLIC_CLAIM_STATUSES } },
+    include: { certificates: true },
   },
 } satisfies Prisma.ProductInclude;
 
@@ -286,7 +313,7 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Product
 async function getProductBySlugUncached(slug: string): Promise<ProductRecord | null> {
   const product = (await prisma.product.findFirst({
     where: { slug, status: "APPROVED", hidden: false, archived: false, deletedAt: null },
-    include: productInclude,
+    include: publicProductInclude,
   })) as DbProduct | null;
 
   if (product) {
@@ -312,7 +339,7 @@ async function getProductBySerialUncached(serial: string): Promise<ProductRecord
       deletedAt: null,
       serialNumber: { equals: normalized, mode: "insensitive" },
     },
-    include: productInclude,
+    include: publicProductInclude,
   })) as DbProduct | null;
 
   if (product) {

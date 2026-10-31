@@ -12,7 +12,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
     "test:e2e:dbfree": "playwright test --config=playwright.dbfree.config.ts",
-    "test:rate-limit": "node --import tsx tests/rate-limit/run.mts"
+    "test:rate-limit": "node --import tsx tests/rate-limit/run.mts",
+    "test:claims-visibility": "node --import tsx tests/claims-visibility/run.mts"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
