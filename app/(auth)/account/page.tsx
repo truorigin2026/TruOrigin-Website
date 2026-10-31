@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/session";
+import { requireBrandUser } from "@/lib/session";
 import { getNeedsAttention } from "@/lib/notifications";
 import { MountFadeIn } from "@/components/motion";
 import { ActivityList, ActivityRow } from "@/components/dashboard/activity-list";
@@ -10,20 +10,22 @@ import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export default async function AccountPage() {
-  const user = await getCurrentUser();
-
-  if (!user || user.role !== "BRAND" || !user.brandId) {
-    redirect("/login");
-  }
+  // requireBrandUser() (shared with every other brand page) replaces the
+  // inline check this page had -- that check only confirmed a BRAND
+  // session with a brandId existed, never that the account was still
+  // active or the brand hadn't been suspended since login, unlike every
+  // other brand-facing page.
+  const user = await requireBrandUser();
+  const brandId = user.brandId as string;
 
   const [brand, totalProducts, liveProducts, pendingProducts, needsAttention] = await Promise.all([
-    prisma.brand.findUnique({ where: { id: user.brandId } }),
-    prisma.product.count({ where: { brandId: user.brandId } }),
-    prisma.product.count({ where: { brandId: user.brandId, status: "APPROVED" } }),
+    prisma.brand.findUnique({ where: { id: brandId } }),
+    prisma.product.count({ where: { brandId } }),
+    prisma.product.count({ where: { brandId, status: "APPROVED" } }),
     prisma.product.count({
-      where: { brandId: user.brandId, status: { in: ["DRAFT", "SUBMITTED", "IN_REVIEW"] } },
+      where: { brandId, status: { in: ["DRAFT", "SUBMITTED", "IN_REVIEW"] } },
     }),
-    getNeedsAttention(user.brandId),
+    getNeedsAttention(brandId),
   ]);
 
   if (!brand) {
