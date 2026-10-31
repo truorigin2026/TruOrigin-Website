@@ -119,24 +119,32 @@ before(async () => {
     },
   });
 
-  adminToken = await signSession({ sub: admin.id, email: admin.email, role: "ADMIN" });
+  adminToken = await signSession({
+    sub: admin.id,
+    email: admin.email,
+    role: "ADMIN",
+    sessionVersion: admin.sessionVersion,
+  });
   inactiveBrandToken = await signSession({
     sub: inactiveBrandUser.id,
     email: inactiveBrandUser.email,
     role: "BRAND",
     brandId: activeBrandId,
+    sessionVersion: inactiveBrandUser.sessionVersion,
   });
   suspendedBrandToken = await signSession({
     sub: suspendedBrandUser.id,
     email: suspendedBrandUser.email,
     role: "BRAND",
     brandId: suspendedBrandId,
+    sessionVersion: suspendedBrandUser.sessionVersion,
   });
   validBrandToken = await signSession({
     sub: validBrandUser.id,
     email: validBrandUser.email,
     role: "BRAND",
     brandId: activeBrandId,
+    sessionVersion: validBrandUser.sessionVersion,
   });
 });
 

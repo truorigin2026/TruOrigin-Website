@@ -145,6 +145,14 @@ model User {
   role              UserRole   @default(VISITOR)
   active            Boolean    @default(true)
   mustChangePassword Boolean   @default(false)
+  // Revocation epoch for this user's JWT sessions (Phase D.5). Bumped on
+  // password change/reset so every previously-issued token stops
+  // verifying, without needing a per-session record. A token issued
+  // before this column existed has no sessionVersion claim at all --
+  // lib/auth.ts's isSessionRevoked() treats that as 0, matching this
+  // column's own default, so a legacy token stays valid exactly until
+  // the first revocation event for that user.
+  sessionVersion    Int        @default(0)
   lastLoginAt       DateTime?
   resetTokenHash    String?    @unique
   resetTokenExpires DateTime?

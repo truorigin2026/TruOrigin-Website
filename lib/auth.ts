@@ -15,6 +15,13 @@ export type SessionPayload = {
   brandSlug?: string | null;
   brandName?: string | null;
   mustChangePassword?: boolean;
+  // Revocation epoch, copied from User.sessionVersion at sign time (see
+  // the Prisma schema comment). Required here -- every call site must
+  // supply the account's CURRENT value, not an arbitrary one -- so
+  // TypeScript catches any sign-in path that forgets to. A token decoded
+  // from before this field existed simply won't have it in its payload;
+  // isSessionRevoked() below treats that as 0.
+  sessionVersion: number;
 };
 
 function getJwtSecret() {
@@ -40,6 +47,22 @@ export async function verifySessionToken(token: string): Promise<SessionPayload 
   } catch {
     return null;
   }
+}
+
+/**
+ * The single shared comparison every DB-backed session guard uses
+ * (getCurrentUser, requireAdminSession, requireBrandSession) -- a token
+ * is revoked once its own sessionVersion claim no longer matches the
+ * account's current one. `tokenSessionVersion` is read from a decoded
+ * JWT payload at runtime, not type-checked, so a pre-rollout token that
+ * never had this claim at all comes through as `undefined` here; it's
+ * treated as 0, the same default the sessionVersion column itself
+ * starts every existing user at, so a legacy token stays valid exactly
+ * until that user's first revocation event after this ships -- never
+ * retroactively broken, never exempt from a future one.
+ */
+export function isSessionRevoked(tokenSessionVersion: number | undefined, currentSessionVersion: number): boolean {
+  return (tokenSessionVersion ?? 0) !== currentSessionVersion;
 }
 
 export const SESSION_COOKIE_OPTIONS = {

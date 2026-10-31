@@ -73,6 +73,7 @@ export async function POST(request: NextRequest) {
       sub: adminUser.id,
       email: adminUser.email,
       role: "ADMIN",
+      sessionVersion: adminUser.sessionVersion,
     });
 
     const response = NextResponse.json({
@@ -111,7 +112,7 @@ export async function POST(request: NextRequest) {
 
   const token = await signSession(
     user.role === "ADMIN"
-      ? { sub: user.id, email: user.email, role: "ADMIN" }
+      ? { sub: user.id, email: user.email, role: "ADMIN", sessionVersion: user.sessionVersion }
       : {
           sub: user.id,
           email: user.email,
@@ -120,6 +121,7 @@ export async function POST(request: NextRequest) {
           brandSlug: user.brand?.slug ?? null,
           brandName: user.brand?.name ?? null,
           mustChangePassword: user.mustChangePassword,
+          sessionVersion: user.sessionVersion,
         },
   );
 

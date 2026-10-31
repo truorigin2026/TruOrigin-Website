@@ -2,7 +2,7 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
+import { SESSION_COOKIE_NAME, verifySessionToken, isSessionRevoked } from "@/lib/auth";
 
 export async function getSession() {
   const cookieStore = await cookies();
@@ -13,15 +13,24 @@ export async function getSession() {
   return verifySessionToken(token);
 }
 
-/** Cached per-request: a layout + one of its pages both calling this only hits the DB once. */
+/**
+ * Cached per-request: a layout + one of its pages both calling this only
+ * hits the DB once. Centralizes the sessionVersion revocation check here
+ * (rather than in requireAdminUser/requireBrandUser individually) so
+ * both pick it up automatically -- a revoked token comes back as `null`,
+ * exactly like no session/no user, which both already redirect on.
+ */
 export const getCurrentUser = cache(async () => {
   const session = await getSession();
   if (!session) return null;
 
-  return prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: session.sub },
     include: { brand: true },
   });
+  if (!user || isSessionRevoked(session.sessionVersion, user.sessionVersion)) return null;
+
+  return user;
 });
 
 /** Guards admin `page.tsx` server components — redirects if the caller isn't an active ADMIN. */

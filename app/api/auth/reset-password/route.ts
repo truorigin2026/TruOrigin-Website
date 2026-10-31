@@ -41,6 +41,11 @@ export async function POST(request: NextRequest) {
       resetTokenHash: null,
       resetTokenExpires: null,
       mustChangePassword: false,
+      // Invalidates every session issued before this reset -- this route
+      // never signs a new one itself (the caller logs in fresh
+      // afterward), so there's no "current session" to re-sign the way
+      // app/api/brand/account/password/route.ts does.
+      sessionVersion: { increment: 1 },
     },
   });
 

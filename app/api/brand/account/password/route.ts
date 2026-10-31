@@ -45,7 +45,15 @@ export async function PATCH(request: NextRequest) {
   }
 
   const passwordHash = await bcrypt.hash(newPassword, 12);
-  await prisma.user.update({ where: { id: user.id }, data: { passwordHash, mustChangePassword: false } });
+  // Bumping sessionVersion here invalidates every OTHER token issued
+  // before this change (any other device, or a stolen copy) on their
+  // next request -- see lib/auth.ts's isSessionRevoked(). The current
+  // session is kept alive below by re-signing with the NEW value instead
+  // of the stale one it still has in memory.
+  const updated = await prisma.user.update({
+    where: { id: user.id },
+    data: { passwordHash, mustChangePassword: false, sessionVersion: { increment: 1 } },
+  });
 
   await logAudit({
     actor: session,
@@ -57,7 +65,7 @@ export async function PATCH(request: NextRequest) {
   });
 
   const response = NextResponse.json({ ok: true });
-  const token = await signSession({ ...session, mustChangePassword: false });
+  const token = await signSession({ ...session, mustChangePassword: false, sessionVersion: updated.sessionVersion });
   response.cookies.set(SESSION_COOKIE_NAME, token, SESSION_COOKIE_OPTIONS);
   return response;
 }

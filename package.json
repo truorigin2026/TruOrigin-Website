@@ -15,7 +15,8 @@
     "test:rate-limit": "node --import tsx tests/rate-limit/run.mts",
     "test:claims-visibility": "node --import tsx tests/claims-visibility/run.mts",
     "test:auth-guard-consistency": "node --experimental-test-module-mocks --import tsx tests/auth-guard-consistency/run.mts",
-    "test:login-timing-safety": "node --import tsx tests/login-timing-safety/run.mts"
+    "test:login-timing-safety": "node --import tsx tests/login-timing-safety/run.mts",
+    "test:session-revocation": "node --import tsx tests/session-revocation/run.mts"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

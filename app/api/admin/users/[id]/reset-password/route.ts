@@ -27,7 +27,21 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   await prisma.user.update({
     where: { id },
-    data: { resetTokenHash: tokenHash, resetTokenExpires: new Date(Date.now() + RESET_TOKEN_TTL_MS) },
+    data: {
+      resetTokenHash: tokenHash,
+      resetTokenExpires: new Date(Date.now() + RESET_TOKEN_TTL_MS),
+      // Takes effect immediately, not only once the user eventually
+      // completes the reset: an admin triggering this for a specific
+      // account is routinely a response to suspected compromise, and
+      // this route is already gated behind requireAdminSession, so
+      // there's no risk (unlike the self-service forgot-password flow)
+      // of a stranger who merely knows someone's email forcing their
+      // sessions to die by requesting a reset they were never sent.
+      // app/api/auth/reset-password/route.ts bumps this again when the
+      // user actually completes the reset -- harmless, it only ever
+      // moves forward.
+      sessionVersion: { increment: 1 },
+    },
   });
 
   const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/reset-password?token=${token}`;
