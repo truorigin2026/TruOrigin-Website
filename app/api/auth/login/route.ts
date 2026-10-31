@@ -16,6 +16,16 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "";
 // instead of a plaintext `!==`, without changing how ADMIN_PASSWORD is provisioned.
 const ADMIN_PASSWORD_HASH = ADMIN_PASSWORD ? bcrypt.hashSync(ADMIN_PASSWORD, 12) : null;
 
+// Not a real credential -- exists only so the "no such user" branch below
+// can run a bcrypt comparison that costs roughly the same as the real one
+// a few lines down (same cost factor, 12, as every real passwordHash in
+// this codebase). Without this, that branch returned instantly while an
+// existing email always paid bcrypt's ~100ms, measurably distinguishing
+// "this email exists" from "it doesn't" by response time alone. Computed
+// once at module load, like ADMIN_PASSWORD_HASH above -- never
+// regenerated per request, never derived from request input.
+const DUMMY_PASSWORD_HASH = bcrypt.hashSync("not-a-real-password-used-only-for-timing-safety", 12);
+
 export async function POST(request: NextRequest) {
   const rateLimit = await checkRateLimit(`login:${getClientIp(request)}`, 10, 10 * 60 * 1000, "fail-closed");
   if (!rateLimit.allowed) {
@@ -79,6 +89,12 @@ export async function POST(request: NextRequest) {
   });
 
   if (!user || (user.role !== "BRAND" && user.role !== "ADMIN")) {
+    // No real password hash exists for this email (or it isn't a
+    // loggable-in role) -- compare against the fixed dummy hash instead
+    // of skipping bcrypt entirely, so this response doesn't finish
+    // measurably faster than the "wrong password" path below and leak,
+    // via timing alone, which emails are registered.
+    await bcrypt.compare(password, DUMMY_PASSWORD_HASH);
     return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
   }
 
