@@ -9022,10 +9022,17 @@ a.contact-method-value:hover {
     scroll-padding-left: 24px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    border-radius: 24px;
   }
 
   .brands-advantage-carousel::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Same fix as .brands-verify-carousel's equivalent rule. */
+  .brands-advantage-carousel:focus-visible {
+    outline: 2px solid var(--brand-accent);
+    outline-offset: 2px;
   }
 
   .brands-advantage-card {
@@ -9289,10 +9296,19 @@ a.contact-method-value:hover {
     scroll-padding-left: 24px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    border-radius: 24px;
   }
 
   .brands-verify-carousel::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Made keyboard-focusable in this accessibility pass (tabIndex={0}) --
+     needs its own visible indicator since nothing styled this as a focus
+     target before. */
+  .brands-verify-carousel:focus-visible {
+    outline: 2px solid var(--brand-accent);
+    outline-offset: 2px;
   }
 
   .brands-verify-card {
@@ -10954,7 +10970,14 @@ a.contact-method-value:hover {
   inset: -1px;
   z-index: 1;
   border-radius: inherit;
-  background: #4caf50;
+  /* Was #4caf50: this is the same inconsistent, lighter green already
+     fixed elsewhere in this pass for failing contrast against white text
+     (measured 2.77:1 there). axe-core's static pass can't see this one at
+     all since it only renders on :hover, but .btn-fill-sweep-label-light
+     (white text) is revealed by its own clip-path transition at exactly
+     the same moment this fill sweeps in -- same defect, just only visible
+     on hover. var(--brand) passes at ~5.38:1. */
+  background: var(--brand);
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);

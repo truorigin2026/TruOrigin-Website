@@ -46,8 +46,10 @@ test.describe("mobile layout", () => {
     await page.goto("/for-products/home");
     await page.getByRole("button", { name: "Open navigation" }).click();
 
+    // Ordinary navigation link now, not role="tab" -- see
+    // navigation.spec.ts's equivalent header-toggle test for why.
     const drawer = page.locator(".mobile-drawer.is-open");
-    await drawer.getByRole("tab", { name: "For Brands" }).click();
+    await drawer.getByRole("link", { name: "For Brands" }).click();
     await expect(page).toHaveURL(/\/for-brands\/home$/);
 
     // Drawer must have closed itself on navigation, and the new page must

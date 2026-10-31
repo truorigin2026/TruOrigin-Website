@@ -117,7 +117,8 @@ export function SiteHeader() {
   const isProductsLandingPage = pathname === "/for-products" || pathname.startsWith("/for-products/");
   const navItems = isLandingPage ? landingNavItems : isProductsLandingPage ? productNavItems : audience === "brands" ? brandNavItems : productNavItems;
   const logoHref = isLandingPage ? "/for-brands/home" : isProductsLandingPage ? "/for-products/home" : audience === "brands" ? "/" : "/for-products";
-  const drawerRef = useDialogA11y<HTMLDivElement>(menuOpen, () => setMenuOpen(false));
+  const hamburgerRef = useRef<HTMLButtonElement | null>(null);
+  const drawerRef = useDialogA11y<HTMLDivElement>(menuOpen, () => setMenuOpen(false), hamburgerRef);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -165,13 +166,23 @@ export function SiteHeader() {
               <Image src={logo} alt="TruOrigin" className="site-brand-logo" priority />
             </Link>
 
-            <div className="header-audience-toggle" role="tablist" aria-label="Choose experience">
+            {/* Ordinary navigation, not a tabs widget: each link navigates
+                to a genuinely different page (for-brands vs for-products
+                home), not a same-page tabpanel -- confirmed there's no
+                tabpanel anywhere this controls. role="tablist"/"tab" +
+                aria-selected was the textbook ARIA-tabs misuse (and,
+                confirmed directly, broke WebKit's native Tab-key order:
+                browsers give role="tab" elements inside a tablist their
+                own arrow-key-oriented keyboard handling, which was
+                skipping these links in the normal Tab sequence).
+                aria-current="page" is the correct way to mark the active
+                link in ordinary navigation. */}
+            <nav className="header-audience-toggle" aria-label="Choose experience">
               {audienceTabs.map((tab) => (
                 <Link
                   key={tab.key}
                   href={tab.href}
-                  role="tab"
-                  aria-selected={audience === tab.key}
+                  aria-current={audience === tab.key ? "page" : undefined}
                   className={`header-audience-btn ${audience === tab.key ? "is-active" : ""}`}
                 >
                   {audience === tab.key ? (
@@ -184,7 +195,7 @@ export function SiteHeader() {
                   <span className="header-audience-btn-label">{tab.label}</span>
                 </Link>
               ))}
-            </div>
+            </nav>
 
             <nav className="desktop-nav">
               {isLandingPage ? (
@@ -225,12 +236,23 @@ export function SiteHeader() {
               ) : null}
 
               <button
+                ref={hamburgerRef}
                 type="button"
                 className={`stylish-hamburger-btn ${menuOpen ? "is-open" : ""}`}
                 aria-label={menuOpen ? "Close navigation" : "Open navigation"}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-nav-drawer"
-                onClick={() => setMenuOpen((current) => !current)}
+                onClick={(event) => {
+                  // WebKit/Safari doesn't move focus to a button on
+                  // click/tap (confirmed directly: document.activeElement
+                  // stayed on whatever was focused before, not this
+                  // button) -- without this, useDialogA11y's "restore
+                  // focus to whatever opened the dialog" has nothing real
+                  // to restore to on that engine. Forcing it here makes
+                  // that deterministic on every engine.
+                  event.currentTarget.focus();
+                  setMenuOpen((current) => !current);
+                }}
               >
                 <span className="hamburger-lines">
                   <span className="line line-1" />
@@ -273,13 +295,15 @@ export function SiteHeader() {
               onClick={(event) => event.stopPropagation()}
             >
               <div className="mobile-drawer-scroll">
-                <div className="mobile-drawer-toggle" role="tablist" aria-label="Choose experience">
+                {/* Same fix as the desktop header's audience toggle above
+                    -- ordinary navigation between two different pages, not
+                    a same-page tabs widget. */}
+                <nav className="mobile-drawer-toggle" aria-label="Choose experience">
                   {audienceTabs.map((tab) => (
                     <Link
                       key={tab.key}
                       href={tab.href}
-                      role="tab"
-                      aria-selected={audience === tab.key}
+                      aria-current={audience === tab.key ? "page" : undefined}
                       className={`mobile-drawer-toggle-btn ${audience === tab.key ? "is-active" : ""}`}
                       onClick={() => setMenuOpen(false)}
                     >
@@ -293,7 +317,7 @@ export function SiteHeader() {
                       <span className="mobile-drawer-toggle-label">{tab.drawerLabel}</span>
                     </Link>
                   ))}
-                </div>
+                </nav>
 
                 <div className="mobile-drawer-content">
                   {isLandingPage ? (

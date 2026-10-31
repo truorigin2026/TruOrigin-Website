@@ -27,20 +27,31 @@ test.describe("product ↔ brand navigation", () => {
 
     const tracker = trackPageHealth(page, baseURL);
 
+    // Ordinary navigation (plain links with aria-current), not a tabs
+    // widget — confirmed each link navigates to a genuinely different
+    // page, with no same-page tabpanel anywhere. Was role="tab" +
+    // aria-selected, the textbook ARIA-tabs misuse; fixing it also fixed
+    // a real bug, confirmed directly: WebKit gives role="tab" elements
+    // inside a tablist their own arrow-key-oriented keyboard handling,
+    // which was pulling them out of the normal Tab sequence and letting
+    // keyboard focus escape the mobile nav drawer's focus trap entirely
+    // on the very first Tab press (see dialog-keyboard.spec.ts).
+    const toggle = page.getByRole("navigation", { name: "Choose experience" });
+
     await page.goto("/for-products/home");
-    await expect(page.getByRole("tab", { name: "Products" })).toHaveAttribute("aria-selected", "true");
+    await expect(toggle.getByRole("link", { name: "Products" })).toHaveAttribute("aria-current", "page");
 
-    await page.getByRole("tab", { name: "Brands" }).click();
+    await toggle.getByRole("link", { name: "Brands" }).click();
     await expect(page).toHaveURL(/\/for-brands\/home$/);
-    await expect(page.getByRole("tab", { name: "Brands" })).toHaveAttribute("aria-selected", "true");
+    await expect(toggle.getByRole("link", { name: "Brands" })).toHaveAttribute("aria-current", "page");
 
-    await page.getByRole("tab", { name: "Products" }).click();
+    await toggle.getByRole("link", { name: "Products" }).click();
     await expect(page).toHaveURL(/\/for-products\/home$/);
 
     // The page must still be genuinely interactive after the round trip,
     // not just visually present — click something real and confirm it
     // actually navigates.
-    await page.getByRole("tab", { name: "Brands" }).click();
+    await toggle.getByRole("link", { name: "Brands" }).click();
     await expect(page).toHaveURL(/\/for-brands\/home$/);
 
     assertNoUnexpectedErrors(tracker);

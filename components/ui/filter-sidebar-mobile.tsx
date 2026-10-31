@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FilterSidebar } from "./filter-sidebar";
 import { useDialogA11y } from "@/hooks/use-dialog-a11y";
 
@@ -26,15 +26,24 @@ export function FilterSidebarMobile(props: FilterSidebarMobileProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleClose = () => setIsOpen(false);
-  const dialogRef = useDialogA11y<HTMLDivElement>(isOpen, handleClose);
+  const openButtonRef = useRef<HTMLButtonElement | null>(null);
+  const dialogRef = useDialogA11y<HTMLDivElement>(isOpen, handleClose, openButtonRef);
 
   return (
     <>
       {/* Mobile Filter Button */}
       <div className="filter-mobile-button-container">
         <button
+          ref={openButtonRef}
           className="filter-mobile-button"
-          onClick={() => setIsOpen(true)}
+          onClick={(event) => {
+            // Same WebKit fix as the mobile nav drawer's hamburger button
+            // (see its own comment) -- Safari doesn't focus a button on
+            // click, so useDialogA11y's focus-restore-on-close has
+            // nothing real to return to without this.
+            event.currentTarget.focus();
+            setIsOpen(true);
+          }}
           aria-label="Open filters"
           aria-expanded={isOpen}
           aria-controls="filter-modal"

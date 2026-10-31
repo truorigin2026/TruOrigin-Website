@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight, Download, ExternalLink, FileText, Pencil, ShieldCheck } from "lucide-react";
@@ -308,22 +308,49 @@ export function ProductDetailTabs({ product, productId, showEditControls }: Prod
     setSelectedCertificateId(null);
   }
 
+  // ARIA Authoring Practices requires arrow-key navigation (and Home/End)
+  // between tabs in a real tablist -- this is a genuine same-page tabs
+  // widget (confirmed: all four tabs switch content in place, no
+  // navigation), unlike the header's audience toggle elsewhere in this
+  // app, which looked like tabs but wasn't one. Automatic activation
+  // (moving focus also switches the panel) matches this widget's simple
+  // content-panel pattern.
+  function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    let nextIndex: number | null = null;
+    if (event.key === "ArrowRight") nextIndex = (index + 1) % TABS.length;
+    else if (event.key === "ArrowLeft") nextIndex = (index - 1 + TABS.length) % TABS.length;
+    else if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = TABS.length - 1;
+    if (nextIndex === null) return;
+
+    event.preventDefault();
+    const nextTab = TABS[nextIndex];
+    switchTab(nextTab.key);
+    const nextButton = document.getElementById(`product-tab-${nextTab.key}`);
+    nextButton?.focus();
+  }
+
   const paneKey = `${activeTab}:${selectedCertificateId ?? ""}`;
 
   return (
     <div className="product-tabs">
       <div className="product-tabs-bar">
         <nav className="product-tabs-list" role="tablist" aria-label="Product information sections">
-          {TABS.map((tab) => (
+          {TABS.map((tab, index) => (
             <button
               key={tab.key}
               id={`product-tab-${tab.key}`}
               type="button"
               role="tab"
               aria-selected={activeTab === tab.key}
-              aria-controls="product-tab-panel"
+              aria-controls={`product-tab-panel-${tab.key}`}
+              // Roving tabindex: only the active tab is a regular Tab
+              // stop, so Tab itself moves past the whole tablist in one
+              // step -- arrow keys (handled below) move between tabs.
+              tabIndex={activeTab === tab.key ? 0 : -1}
               className={`product-tabs-trigger ${activeTab === tab.key ? "is-active" : ""}`}
               onClick={() => switchTab(tab.key)}
+              onKeyDown={(event) => handleTabKeyDown(event, index)}
             >
               {activeTab === tab.key ? (
                 <motion.span
@@ -342,7 +369,15 @@ export function ProductDetailTabs({ product, productId, showEditControls }: Prod
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.div
           key={paneKey}
-          id="product-tab-panel"
+          // Was a static "product-tab-panel" on every render -- AnimatePresence
+          // briefly keeps the exiting AND entering panel both mounted during
+          // a transition (confirmed directly: a real duplicate-id violation,
+          // caught by a keyboard-driven switch test that didn't wait out the
+          // transition first). Deriving it from activeTab the same way
+          // aria-labelledby already was gives the exiting and entering nodes
+          // distinct ids, since each was rendered with its own activeTab
+          // closure value.
+          id={`product-tab-panel-${activeTab}`}
           role="tabpanel"
           aria-labelledby={`product-tab-${activeTab}`}
           tabIndex={0}

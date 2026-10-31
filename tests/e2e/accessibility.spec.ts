@@ -49,7 +49,16 @@ const SETTLE_MS = 400;
 
 async function gotoAndCheck(page: Page, url: string) {
   await page.goto(url);
-  await page.waitForTimeout(SETTLE_MS);
+  // Not a blind wait: investigated a documented, intermittent flake here
+  // directly (page-has-heading-one failing alongside header-link
+  // color-contrast, Desktop Chrome, only ever on a page's very first
+  // cold navigation in a run) rather than accepting "unreproducible".
+  // Hero pages mount a WebGL shader background (MoltenMetal) that this
+  // project has independently confirmed elsewhere can stall the main
+  // thread on a cold start -- plausible enough to act on directly: wait
+  // for the real h1 to actually exist/be visible, not a fixed delay that
+  // would just be guessing how long that stall can take.
+  await page.locator("h1").first().waitFor({ state: "visible", timeout: 10_000 });
   await runAxe(page);
 }
 
