@@ -343,7 +343,14 @@ export function ProductDetailTabs({ product, productId, showEditControls }: Prod
               type="button"
               role="tab"
               aria-selected={activeTab === tab.key}
-              aria-controls={`product-tab-panel-${tab.key}`}
+              // Only the active tab's own panel is ever actually in the
+              // DOM (AnimatePresence mounts just one at a time, aside
+              // from its brief exit/enter overlap) -- confirmed directly
+              // that setting this unconditionally on every tab left the
+              // three inactive ones pointing at an id that doesn't
+              // currently exist. Only the tab whose panel is real gets a
+              // reference to it.
+              aria-controls={activeTab === tab.key ? `product-tab-panel-${tab.key}` : undefined}
               // Roving tabindex: only the active tab is a regular Tab
               // stop, so Tab itself moves past the whole tablist in one
               // step -- arrow keys (handled below) move between tabs.

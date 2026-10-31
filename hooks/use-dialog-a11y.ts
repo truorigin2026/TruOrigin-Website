@@ -46,7 +46,12 @@ const FOCUSABLE_SELECTOR =
  * Explicit tabindex="0" overrides that per-element default on every
  * browser (confirmed directly: the exact same Tab sequence that
  * previously bounced straight to body/the trigger button now correctly
- * cycles through every link and wraps at both ends).
+ * cycles through every link and wraps at both ends). A MutationObserver
+ * re-applies this to anything added to the panel later -- e.g. the
+ * drawer's own expand/collapse submenus reveal new links well after
+ * open, and confirmed directly that without this, those specific links
+ * were silently unreachable via Tab on WebKit (the one-time pass above
+ * only ever sees what exists at the moment the dialog opens).
  *
  * Attach the returned ref to the panel's own root element (it needs
  * `tabIndex={-1}` as a fallback focus target for when the panel happens to
@@ -114,12 +119,40 @@ export function useDialogA11y<T extends HTMLElement>(
     // anyway, so this can't make something newly focusable that wasn't
     // meant to be.
     const tabIndexedLinks: HTMLAnchorElement[] = [];
-    for (const link of Array.from(container.querySelectorAll<HTMLAnchorElement>("a[href]"))) {
-      if (!link.hasAttribute("tabindex")) {
-        link.setAttribute("tabindex", "0");
-        tabIndexedLinks.push(link);
+    function tabIndexNewLinks(root: ParentNode) {
+      for (const link of Array.from(root.querySelectorAll<HTMLAnchorElement>("a[href]"))) {
+        if (!link.hasAttribute("tabindex")) {
+          link.setAttribute("tabindex", "0");
+          tabIndexedLinks.push(link);
+        }
       }
     }
+    tabIndexNewLinks(container);
+
+    // The drawer has its own expand/collapse submenus (openMobileGroup in
+    // site-header.tsx) that reveal new <a> elements well after the dialog
+    // already opened -- confirmed directly that links revealed this way
+    // never got the pass above and were genuinely unreachable via Tab on
+    // WebKit, since nothing re-ran it. A MutationObserver re-applies the
+    // same treatment to anything added while the dialog stays open,
+    // without the hook needing to know anything about that caller-specific
+    // state.
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const added of Array.from(mutation.addedNodes)) {
+          if (!(added instanceof HTMLElement)) continue;
+          // querySelectorAll only matches descendants, not the node
+          // itself -- cover both in case a <Link> is ever added directly
+          // rather than inside a wrapper.
+          if (added.matches("a[href]") && !added.hasAttribute("tabindex")) {
+            added.setAttribute("tabindex", "0");
+            tabIndexedLinks.push(added as HTMLAnchorElement);
+          }
+          tabIndexNewLinks(added);
+        }
+      }
+    });
+    observer.observe(container, { childList: true, subtree: true });
 
     previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
     const firstFocusable = container.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
@@ -152,6 +185,7 @@ export function useDialogA11y<T extends HTMLElement>(
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
+      observer.disconnect();
       for (const el of madeInert) el.removeAttribute("inert");
       for (const link of tabIndexedLinks) link.removeAttribute("tabindex");
       previouslyFocusedRef.current?.focus();

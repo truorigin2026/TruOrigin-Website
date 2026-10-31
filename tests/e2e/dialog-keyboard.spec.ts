@@ -87,6 +87,40 @@ test.describe("dialog keyboard behavior", () => {
     assertNoUnexpectedErrors(tracker);
   });
 
+  test("mobile nav drawer: links revealed by expanding a submenu AFTER opening are also keyboard-reachable", async ({
+    page,
+    baseURL,
+  }) => {
+    // Regression test for a confirmed bug: useDialogA11y's Safari
+    // tabindex="0" fix only ever ran once, at the moment the dialog
+    // opened -- links revealed later (the drawer's own expand/collapse
+    // submenus, landingNavGroups in site-header.tsx) never got it,
+    // leaving them genuinely unreachable via Tab on WebKit. Fixed with a
+    // MutationObserver inside the hook; this is real keyboard
+    // verification of that fix, not just a tabindex attribute check.
+    const tracker = trackPageHealth(page, baseURL);
+    await page.goto("/for-brands/home"); // the landing page with expandable submenu groups
+
+    await page.locator(".stylish-hamburger-btn").click();
+    const drawer = page.locator("#mobile-nav-drawer");
+    await expect(drawer).toBeVisible();
+
+    const groupTrigger = page.locator(".mobile-drawer-group-trigger").first();
+    await groupTrigger.click();
+
+    const firstSublink = page.locator(".mobile-drawer-sublink").first();
+    await expect(firstSublink).toBeVisible();
+    await expect(firstSublink).toHaveAttribute("tabindex", "0");
+
+    // Not just the attribute -- confirm it's actually reachable via a
+    // real Tab key press from the group trigger that revealed it.
+    await groupTrigger.focus();
+    await page.keyboard.press("Tab");
+    await expect(firstSublink).toBeFocused();
+
+    assertNoUnexpectedErrors(tracker);
+  });
+
   test("mobile nav drawer: closing via the close button and via the backdrop both return focus correctly", async ({
     page,
     baseURL,

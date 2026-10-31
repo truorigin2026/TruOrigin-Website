@@ -92,6 +92,48 @@ test.describe("product detail tabs: keyboard navigation", () => {
 
     assertNoUnexpectedErrors(tracker);
   });
+
+  test("aria-controls only appears on the active tab, and always resolves to a real element", async ({
+    page,
+    baseURL,
+  }) => {
+    // Regression test: only the active tab's panel is ever actually
+    // mounted (AnimatePresence renders one at a time), so setting
+    // aria-controls on every tab unconditionally left the three inactive
+    // ones pointing at an id that didn't exist anywhere in the document
+    // -- confirmed directly before this was fixed.
+    const tracker = trackPageHealth(page, baseURL);
+    const productHref = await getFirstProductHref(page);
+    await page.goto(productHref);
+
+    const results = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('[role="tab"]')).map((tab) => {
+        const controls = tab.getAttribute("aria-controls");
+        return { selected: tab.getAttribute("aria-selected"), controls, resolves: controls ? !!document.getElementById(controls) : null };
+      }),
+    );
+
+    const withControls = results.filter((r) => r.controls !== null);
+    expect(withControls.length).toBe(1);
+    expect(withControls[0].selected).toBe("true");
+    expect(withControls[0].resolves).toBe(true);
+
+    // Same invariant holds after switching tabs via the arrow-key handler.
+    await page.locator('[role="tab"][aria-selected="true"]').focus();
+    await page.keyboard.press("ArrowRight");
+    const resultsAfterSwitch = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('[role="tab"]')).map((tab) => {
+        const controls = tab.getAttribute("aria-controls");
+        return { selected: tab.getAttribute("aria-selected"), controls, resolves: controls ? !!document.getElementById(controls) : null };
+      }),
+    );
+    const withControlsAfter = resultsAfterSwitch.filter((r) => r.controls !== null);
+    expect(withControlsAfter.length).toBe(1);
+    expect(withControlsAfter[0].selected).toBe("true");
+    expect(withControlsAfter[0].resolves).toBe(true);
+
+    assertNoUnexpectedErrors(tracker);
+  });
 });
 
 test.describe("mobile carousels: keyboard reachability", () => {
