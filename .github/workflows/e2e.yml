@@ -1,5 +1,12 @@
 name: E2E Tests
 
+# Phase D.7: deliberately `pull_request`, never `pull_request_target` --
+# GitHub withholds repository secrets from a `pull_request`-triggered run
+# when the PR comes from a fork, which is exactly the protection
+# `e2e-full` below depends on (it reads STAGING_DATABASE_URL/
+# STAGING_JWT_SECRET). `pull_request_target` runs with the BASE branch's
+# secrets available even for a fork's PR -- changing the trigger below is
+# a security-relevant edit, not a routine one; treat it as such in review.
 on:
   push:
     branches: [main]
@@ -37,6 +44,31 @@ jobs:
           path: playwright-report-dbfree/
           retention-days: 14
 
+  # Phase D.7: regression coverage for the test-environment guard itself
+  # (lib/test-env-guard.ts and its lib/blob.ts/lib/email.ts integrations).
+  # Runs on every push/PR, no secrets and no database of any kind -- every
+  # one of these tests either operates on plain strings/objects or
+  # short-circuits before touching the network. This job is itself a
+  # safety net: it fails the build if a future change weakens the exact
+  # mechanism the other jobs below rely on to keep production credentials
+  # out of test runs.
+  test-env-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run test-environment guardrail tests
+        run: npm run test:env-guard
+
   # The full suite needs real product/brand data, so it needs a real
   # database — DELIBERATELY NEVER the production database. This job only
   # runs when a STAGING_DATABASE_URL repository secret is configured,
@@ -45,12 +77,21 @@ jobs:
   # rather than silently failing or — worse — being wired to production.
   # See tests/e2e/README.md "CI and the database" for what a staging
   # database needs and why production is off the table here.
+  #
+  # STAGING_JWT_SECRET (Phase D.7, renamed from the previous plain
+  # JWT_SECRET): a repository secret independently generated for staging,
+  # never the production signing secret -- a workflow log or artifact
+  # leak of a staging-only value can't be used to forge a production
+  # session. Whether this secret has actually been (re)created with a
+  # staging-specific value, as opposed to still holding whatever the old
+  # JWT_SECRET name held, cannot be verified from this repository and
+  # needs confirming directly in the GitHub repo's Settings -> Secrets.
   e2e-full:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_SECRET: ${{ secrets.STAGING_JWT_SECRET }}
       NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3100
       PLAYWRIGHT_SKIP_BUILD: "1"
     steps:

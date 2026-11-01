@@ -206,13 +206,17 @@ describe("/api/upload authorization — requireBrandSession", () => {
       fakeUploadRequest(validBrandToken, { bytes: new Uint8Array(png), type: "image/png", name: "pixel.png" }),
     );
 
-    // No BLOB_READ_WRITE_TOKEN is set in this test environment (see
-    // run.mts), so a request that gets PAST authorization fails
-    // specifically here -- proof it was never rejected by the guard,
-    // without ever making a real Vercel Blob call.
+    // run.mts (via lib/test-env-guard.ts) sets TRUORIGIN_TEST_MODE=
+    // disposable-test, which lib/blob.ts's uploadFile() now refuses
+    // unconditionally (Phase D.7) -- so a request that gets PAST
+    // authorization fails specifically there, proof it was never
+    // rejected by the guard, without ever making a real Vercel Blob
+    // call. This is a stronger assertion than "no token was present":
+    // it proves the second, independent runtime-layer refusal itself,
+    // not just the absence of a credential.
     assert.notEqual(response.status, 401, "a valid active brand user must not be rejected by the auth guard");
     const body = await response.json();
-    assert.match(body.error ?? "", /storage is not configured/i, "must fail specifically at the (unconfigured) Blob step, not earlier");
+    assert.match(body.error ?? "", /disposable-test.*is active/i, "must fail specifically at the test-mode Blob refusal, not earlier");
   });
 });
 

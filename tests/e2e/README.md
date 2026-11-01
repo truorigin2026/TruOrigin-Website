@@ -167,15 +167,22 @@ highest-risk untested journeys.
 ## CI and the database
 
 **No production database credential is configured in CI.**
-`.github/workflows/e2e.yml` has two jobs:
+`.github/workflows/e2e.yml` has three jobs:
 
 - `e2e-dbfree` — runs on every push/PR, no secrets required.
+- `test-env-guard` (Phase D.7) — runs on every push/PR, no secrets or
+  database of any kind. Regression coverage for `lib/test-env-guard.ts`
+  itself (see `tests/test-env-guard/`) — the centralized helper every
+  disposable-Postgres test suite's own `run.mts` uses to keep production
+  credentials out of its spawned test process.
 - `e2e-full` — the main suite. Only runs if a `STAGING_DATABASE_URL`
   repository secret is configured (read into `DATABASE_URL` for that job
   only); otherwise it prints a clear warning and skips every step after
-  the check. See COVERAGE.md → "CI and the database" for exactly what a
-  staging database needs (schema + minimal seed data) and how to wire it
-  up.
+  the check. Also reads a `STAGING_JWT_SECRET` repository secret (Phase
+  D.7, renamed from a plain `JWT_SECRET` — must be independently
+  generated for staging, never the production signing secret). See
+  COVERAGE.md → "CI and the database" for exactly what a staging database
+  needs (schema + minimal seed data) and how to wire it up.
 
 ## Known gaps / things worth knowing
 

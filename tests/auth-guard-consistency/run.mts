@@ -15,12 +15,23 @@
 // tests/claims-visibility/ (embedded-postgres + `prisma migrate deploy`
 // against the real migration history) -- never the shared dev/production
 // database.
+//
+// Phase D.7: environment construction and database-target validation
+// now go through lib/test-env-guard.ts, which clears BLOB_READ_WRITE_TOKEN
+// (and RESEND_API_KEY/ADMIN_EMAIL/ADMIN_PASSWORD, which this suite didn't
+// previously clear at all) centrally -- this file used to clear only the
+// one token inline, which is exactly the incident this phase exists to
+// stop recurring: see lib/blob.ts's uploadFile() for the second,
+// independent runtime-layer refusal this test's "valid upload" scenario
+// now actually exercises (TRUORIGIN_TEST_MODE=disposable-test), not just
+// the absence of a token.
 import EmbeddedPostgres from "embedded-postgres";
 import { existsSync, mkdirSync } from "fs";
 import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
+import { assertDisposablePostgresTarget, buildDisposableTestEnv } from "../../lib/test-env-guard";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, "../..");
@@ -28,6 +39,7 @@ const PROJECT_ROOT = path.resolve(__dirname, "../..");
 const PORT = 54332;
 const DATA_DIR = path.join(os.tmpdir(), "truorigin-auth-guard-test-pg");
 const DATABASE_URL = `postgres://postgres:postgres@127.0.0.1:${PORT}/postgres?sslmode=disable`;
+assertDisposablePostgresTarget(DATABASE_URL, DATABASE_URL);
 
 const pg = new EmbeddedPostgres({
   databaseDir: DATA_DIR,
@@ -41,7 +53,7 @@ function runToCompletion(command: string, args: string[]): Promise<number> {
   return new Promise((resolve) => {
     const child = spawn(command, args, {
       cwd: PROJECT_ROOT,
-      env: { ...process.env, DATABASE_URL, DIRECT_URL: DATABASE_URL },
+      env: buildDisposableTestEnv(DATABASE_URL),
       stdio: "inherit",
       shell: process.platform === "win32",
     });
@@ -57,15 +69,7 @@ function runTests(): Promise<number> {
       ["--experimental-test-module-mocks", "--import", "tsx", "--test", testFile],
       {
         cwd: PROJECT_ROOT,
-        // BLOB_READ_WRITE_TOKEN must NEVER be inherited here: the "valid
-        // upload" scenario deliberately submits a real file far enough
-        // to prove authorization passed, and relies on the Blob call
-        // itself failing cleanly (uploadFile() throws "storage is not
-        // configured") specifically BECAUSE no token is present. With
-        // .env's real token inherited, that scenario instead performs a
-        // genuine upload to the real production Blob store -- confirmed
-        // this directly happened once before this line was added.
-        env: { ...process.env, DATABASE_URL, DIRECT_URL: DATABASE_URL, BLOB_READ_WRITE_TOKEN: "" },
+        env: buildDisposableTestEnv(DATABASE_URL),
         stdio: "inherit",
       },
     );
@@ -89,6 +93,9 @@ async function main() {
     }
     process.exitCode = await runTests();
   } finally {
+    // Re-validated immediately before cleanup (Phase D.7) -- see
+    // tests/rate-limit/run.mts's identical comment for why.
+    assertDisposablePostgresTarget(DATABASE_URL, DATABASE_URL);
     await pg.stop();
   }
 }

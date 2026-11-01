@@ -19,18 +19,29 @@
 // is exactly the kind of load this project's "no separate test database"
 // rule (see tests/e2e/README.md) exists to keep away from production.
 // This database is 100% disposable and never touches it.
+// Phase D.7: environment construction and database-target validation
+// now go through lib/test-env-guard.ts instead of this file's own
+// ad-hoc `env: { ...process.env, DATABASE_URL }` -- confirmed directly
+// that this was the ONLY one of the five existing suites clearing
+// nothing at all (not even BLOB_READ_WRITE_TOKEN/RESEND_API_KEY), since
+// it was written before the Phase D.3 incident that motivated clearing
+// them. This suite's own test files never call Blob/email, so nothing
+// was actually exploitable here in practice -- but the whole point of
+// centralizing this is to not depend on that being true forever.
 import EmbeddedPostgres from "embedded-postgres";
 import { existsSync, mkdirSync, readFileSync, readdirSync } from "fs";
 import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
+import { assertDisposablePostgresTarget, buildDisposableTestEnv } from "../../lib/test-env-guard";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PORT = 54329;
 const DATA_DIR = path.join(os.tmpdir(), "truorigin-rate-limit-test-pg");
 const DATABASE_URL = `postgres://postgres:postgres@127.0.0.1:${PORT}/postgres?sslmode=disable`;
+assertDisposablePostgresTarget(DATABASE_URL, DATABASE_URL);
 
 const pg = new EmbeddedPostgres({
   databaseDir: DATA_DIR,
@@ -81,7 +92,7 @@ function runTests(): Promise<number> {
 
   return new Promise((resolve) => {
     const child = spawn(process.execPath, ["--import", "tsx", "--test", ...testFiles], {
-      env: { ...process.env, DATABASE_URL },
+      env: buildDisposableTestEnv(DATABASE_URL),
       stdio: "inherit",
     });
     child.on("close", (code) => resolve(code ?? 1));
@@ -101,6 +112,11 @@ async function main() {
     await ensureSchema();
     process.exitCode = await runTests();
   } finally {
+    // Re-validated immediately before cleanup (Phase D.7), not just at
+    // setup: a stale/mutated DATABASE_URL at this point would mean
+    // pg.stop() is about to tear down something other than what was
+    // actually started.
+    assertDisposablePostgresTarget(DATABASE_URL, DATABASE_URL);
     await pg.stop();
   }
 }

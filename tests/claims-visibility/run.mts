@@ -14,12 +14,20 @@
 // returned" needs a product that actually HAS an unverified claim sitting
 // next to a verified one -- fixture data this suite controls precisely,
 // on a database that's 100% disposable and never touches the real one.
+// Phase D.7: environment construction and database-target validation
+// now go through lib/test-env-guard.ts -- confirmed directly that this
+// suite, like tests/rate-limit, was written before the Phase D.3
+// incident and cleared none of BLOB_READ_WRITE_TOKEN/RESEND_API_KEY/
+// ADMIN_EMAIL/ADMIN_PASSWORD. Its own test files don't call Blob/email
+// either, but see tests/rate-limit/run.mts for why that was never the
+// point of centralizing this.
 import EmbeddedPostgres from "embedded-postgres";
 import { existsSync, mkdirSync } from "fs";
 import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
+import { assertDisposablePostgresTarget, buildDisposableTestEnv } from "../../lib/test-env-guard";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, "../..");
@@ -27,6 +35,7 @@ const PROJECT_ROOT = path.resolve(__dirname, "../..");
 const PORT = 54330;
 const DATA_DIR = path.join(os.tmpdir(), "truorigin-claims-visibility-test-pg");
 const DATABASE_URL = `postgres://postgres:postgres@127.0.0.1:${PORT}/postgres?sslmode=disable`;
+assertDisposablePostgresTarget(DATABASE_URL, DATABASE_URL);
 
 const pg = new EmbeddedPostgres({
   databaseDir: DATA_DIR,
@@ -53,7 +62,7 @@ function runToCompletion(command: string, args: string[]): Promise<number> {
       // point at the disposable instance so migrate deploy can never
       // reach anything else, regardless of which one a given Prisma CLI
       // version or config path consults.
-      env: { ...process.env, DATABASE_URL, DIRECT_URL: DATABASE_URL },
+      env: buildDisposableTestEnv(DATABASE_URL),
       stdio: "inherit",
       shell: process.platform === "win32",
     });
@@ -66,7 +75,7 @@ function runTests(): Promise<number> {
   return new Promise((resolve) => {
     const child = spawn(process.execPath, ["--import", "tsx", "--test", testFile], {
       cwd: PROJECT_ROOT,
-      env: { ...process.env, DATABASE_URL, DIRECT_URL: DATABASE_URL },
+      env: buildDisposableTestEnv(DATABASE_URL),
       stdio: "inherit",
     });
     child.on("close", (code) => resolve(code ?? 1));
@@ -89,6 +98,9 @@ async function main() {
     }
     process.exitCode = await runTests();
   } finally {
+    // Re-validated immediately before cleanup (Phase D.7) -- see
+    // tests/rate-limit/run.mts's identical comment for why.
+    assertDisposablePostgresTarget(DATABASE_URL, DATABASE_URL);
     await pg.stop();
   }
 }

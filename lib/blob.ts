@@ -7,6 +7,7 @@
 
 import { put } from "@vercel/blob";
 import sharp from "sharp";
+import { isDisposableTestModeActive } from "./test-env-guard";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10MB
 
@@ -99,6 +100,21 @@ export function isTrustedBlobUrl(url: string): boolean {
 }
 
 export async function uploadFile(file: File, folder: string) {
+  // Second, independent layer (see lib/test-env-guard.ts): the
+  // orchestrator already clears BLOB_READ_WRITE_TOKEN before spawning a
+  // disposable test, but this runs inside that same process regardless
+  // of whether that clearing was somehow bypassed -- confirmed directly
+  // that this exact gap once let a test reach real production Blob
+  // storage. Refuses unconditionally while the marker is active, even if
+  // a real token is somehow still present; inert otherwise, so normal
+  // development/staging/production uploads are unaffected.
+  if (isDisposableTestModeActive()) {
+    throw new Error(
+      "[lib/blob.ts] Refusing to upload: TRUORIGIN_TEST_MODE=disposable-test is active. " +
+        "uploadFile() must never reach real Vercel Blob storage during a disposable test run.",
+    );
+  }
+
   assertUploadableFile(file);
 
   const headerBytes = new Uint8Array(await file.slice(0, 12).arrayBuffer());
