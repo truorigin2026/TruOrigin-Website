@@ -8,6 +8,7 @@ generated/
 *.p12
 *.pfx
 .vercel/
+.claude/settings.local.json
 
 # Playwright
 /test-results/
