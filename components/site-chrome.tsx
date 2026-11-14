@@ -7,15 +7,17 @@ import { SiteHeader } from "@/components/common/site-header";
 import { SmoothScroll } from "@/components/smooth-scroll";
 
 /**
- * popLayout keeps the outgoing page mounted and absolutely-positioned on
- * top of the incoming one until its exit animation finishes. If that exit
- * is ever interrupted (confirmed live: happens very often on browser
- * back/forward navigation) the old page's layer never unmounts — it then
- * silently blocks every click on the real page underneath, and its
- * leftover height pads the document's scrollable area past the real
- * footer. useIsPresent flips pointer-events off the instant the exit
- * starts, so a stuck layer can never intercept a click no matter why the
- * exit failed to complete.
+ * Previously used AnimatePresence mode="popLayout", which keeps the
+ * outgoing page mounted and overlapping the incoming one until its exit
+ * animation finishes. Confirmed live: that exit gets interrupted often
+ * enough (rapid navigation, back/forward) that the old page's layer never
+ * unmounts — it then blocks clicks on the page underneath and its
+ * leftover height pads the document's scrollable area, pushing the real
+ * (new) page's content far below the fold until the user scrolls past it.
+ * mode="wait" fixes this at the root: the outgoing pane is never rendered
+ * at the same time as the incoming one, so there is never a second,
+ * possibly-stuck layer to leave behind. useIsPresent is kept as a harmless
+ * extra safety net, not the primary fix.
  */
 function PageTransitionPane({ children }: { children: React.ReactNode }) {
   const isPresent = useIsPresent();
@@ -67,7 +69,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         id="main-content"
         className={`relative z-10 overflow-clip ${isAudienceHome ? "" : "site-content-with-header"}`}
       >
-        <AnimatePresence mode="popLayout" initial={false}>
+        <AnimatePresence mode="wait" initial={false}>
           <PageTransitionPane key={pathname}>{children}</PageTransitionPane>
         </AnimatePresence>
       </main>
