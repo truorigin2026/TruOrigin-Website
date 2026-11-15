@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FadeIn, HeroReveal } from "@/components/motion";
 import { ShaderErrorBoundary } from "@/components/gateway/shader-error-boundary";
 import { useBfcacheRemountKey } from "@/lib/use-bfcache-remount";
@@ -14,16 +14,42 @@ const GatewayShaderBackground = dynamic(
   { ssr: false },
 );
 
+/**
+ * The shader is a real-time WebGL/Three.js render — on a weak GPU or a
+ * reduced-motion preference it's slow to compile/first-paint and keeps
+ * costing CPU/GPU for as long as the page is open. `.gateway-page` already
+ * has a static CSS gradient behind this layer as its own background, so
+ * skipping the shader is a complete, intentional fallback, not a broken
+ * state. hardwareConcurrency is a widely-supported, no-permission signal;
+ * it's a coarse proxy for device capability, not a precise GPU benchmark,
+ * but it's safe to run on every device and errs toward skipping the
+ * heavy path rather than risking it.
+ */
+function useShouldRenderShader() {
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const lowCoreCount = typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
+    setShouldRender(!prefersReducedMotion && !lowCoreCount);
+  }, []);
+
+  return shouldRender;
+}
+
 export function SiteGateway() {
   const [bgRevealed, setBgRevealed] = useState(false);
   const bfcacheKey = useBfcacheRemountKey();
+  const shouldRenderShader = useShouldRenderShader();
 
   return (
     <div className="gateway-page">
       <div className={`gateway-shader-bg${bgRevealed ? " is-revealed" : ""}`} aria-hidden="true">
-        <ShaderErrorBoundary key={bfcacheKey}>
-          <GatewayShaderBackground onReady={() => setBgRevealed(true)} />
-        </ShaderErrorBoundary>
+        {shouldRenderShader && (
+          <ShaderErrorBoundary key={bfcacheKey}>
+            <GatewayShaderBackground onReady={() => setBgRevealed(true)} />
+          </ShaderErrorBoundary>
+        )}
       </div>
 
       <div className="container-shell gateway-inner">
