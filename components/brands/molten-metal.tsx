@@ -160,6 +160,17 @@ export function MoltenMetal({
     const container = containerRef.current;
     if (!container) return;
 
+    // Real-time WebGL render -- heavy to compile and continuously costly
+    // on a weak GPU, the same class of issue that made the homepage's
+    // gateway shader feel slow (since removed in favor of pure CSS). The
+    // container this mounts into already has its own solid/gradient CSS
+    // background behind it, so skipping this is a complete fallback, not
+    // a broken state. hardwareConcurrency is a coarse, no-permission,
+    // universally-safe proxy for device capability.
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const lowCoreCount = typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
+    if (prefersReducedMotion || lowCoreCount) return;
+
     const renderer = new Renderer({
       webgl: 2,
       alpha: true,

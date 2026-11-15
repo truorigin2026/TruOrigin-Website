@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { FadeIn } from "@/components/motion";
 
@@ -31,19 +30,14 @@ export function FaqAccordion({ items }: { items: readonly FaqItem[] }) {
                 </span>
                 <span>{item.question}</span>
               </button>
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <motion.div
-                    className="faq-accordion-body-wrap"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                  >
-                    <div className="faq-accordion-body">{item.answer}</div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/* CSS grid-template-rows 0fr/1fr instead of framer-motion's
+                  height:"auto" animation -- that measured content height via
+                  JS every frame (a real layout-thrashing cost on weak
+                  devices); this hands the same collapse/expand to the
+                  browser's own layout engine with no per-frame JS at all. */}
+              <div className="faq-accordion-body-wrap" aria-hidden={!isOpen} inert={!isOpen || undefined}>
+                <div className="faq-accordion-body">{item.answer}</div>
+              </div>
             </div>
           </FadeIn>
         );

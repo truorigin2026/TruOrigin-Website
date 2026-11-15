@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll } from "framer-motion";
 import { AssetImage } from "@/components/brands/asset-image";
 
 type Step = {
@@ -17,12 +17,15 @@ export function HowItWorksTimeline({ steps }: { steps: readonly Step[] }) {
     target: containerRef,
     offset: ["start 0.8", "end 0.4"],
   });
-  const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
     <div className="hiw-timeline" ref={containerRef}>
       <div className="hiw-timeline-track" aria-hidden="true">
-        <motion.div className="hiw-timeline-progress" style={{ height: lineHeight }} />
+        {/* scaleY instead of height: a compositor-only transform, so this
+            scroll-linked fill doesn't force layout on every scroll frame
+            the way animating height did. scrollYProgress is already a 0-1
+            motion value, so it maps directly with no extra useTransform. */}
+        <motion.div className="hiw-timeline-progress" style={{ scaleY: scrollYProgress }} />
       </div>
 
       <div className="hiw-timeline-steps">

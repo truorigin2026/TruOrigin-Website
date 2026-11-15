@@ -161,6 +161,18 @@ export default function ColorBends({
     const container = containerRef.current;
     if (!container) return;
 
+    // Real-time WebGL/Three.js render -- heavy to compile and continuously
+    // costly on a weak GPU (the same class of issue that made the
+    // homepage's gateway shader feel slow, since removed in favor of pure
+    // CSS). This component's container already has a solid/gradient CSS
+    // background behind it (brands-hero-card / products-hero-card-premium
+    // in globals.css), so skipping this is a complete fallback, not a
+    // broken state. hardwareConcurrency is a coarse, no-permission,
+    // universally-safe proxy for device capability.
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const lowCoreCount = typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
+    if (prefersReducedMotion || lowCoreCount) return;
+
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 

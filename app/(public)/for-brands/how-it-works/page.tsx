@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LayoutDashboard, Cpu, Users } from "lucide-react";
+import { LayoutDashboard, Cpu, Users, Check } from "lucide-react";
 import { HowItWorksTimeline } from "@/components/brands/how-it-works-timeline";
 import { FaqAccordion } from "@/components/brands/faq-accordion";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -212,7 +212,12 @@ export default function ForBrandsHowItWorksPage() {
               {reviewChecklist.map((item, index) => (
                 <FadeIn key={item.title} delay={index * 0.06}>
                   <div className="hiw-review-item">
-                    <span className="hiw-review-item-index">{index + 1}</span>
+                    {/* This is a checklist of what gets reviewed, not a
+                        sequence -- a checkmark says "this is verified",
+                        a number would falsely imply an order. */}
+                    <span className="hiw-review-item-index" aria-hidden="true">
+                      <Check size={16} strokeWidth={3} />
+                    </span>
                     <div>
                       <h3>{item.title}</h3>
                       <p>{item.description}</p>
