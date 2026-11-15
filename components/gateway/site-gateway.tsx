@@ -1,57 +1,24 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { FadeIn, HeroReveal } from "@/components/motion";
-import { ShaderErrorBoundary } from "@/components/gateway/shader-error-boundary";
-import { useBfcacheRemountKey } from "@/lib/use-bfcache-remount";
 import logo from "../../public/images/logos/truorigin-logo.svg";
 
-const GatewayShaderBackground = dynamic(
-  () => import("@/components/gateway/gateway-shader-background").then((mod) => mod.GatewayShaderBackground),
-  { ssr: false },
-);
-
 /**
- * The shader is a real-time WebGL/Three.js render — on a weak GPU or a
- * reduced-motion preference it's slow to compile/first-paint and keeps
- * costing CPU/GPU for as long as the page is open. `.gateway-page` already
- * has a static CSS gradient behind this layer as its own background, so
- * skipping the shader is a complete, intentional fallback, not a broken
- * state. hardwareConcurrency is a widely-supported, no-permission signal;
- * it's a coarse proxy for device capability, not a precise GPU benchmark,
- * but it's safe to run on every device and errs toward skipping the
- * heavy path rather than risking it.
+ * No WebGL/Three.js shader here anymore — it was a real-time render,
+ * heavy and slow to first-paint on weaker GPUs (reported live), and its
+ * own JS-driven reveal could fail in ways a pure-CSS reveal can't. The
+ * background is the same animated gradient everything else on this page
+ * already used as the shader's fallback; its corner clip-path reveal
+ * (gateway-reveal, in globals.css) runs unconditionally on mount with no
+ * JS wait at all, so it can't get stuck, and it works identically on
+ * every device/GPU since it's CSS-only. prefers-reduced-motion still
+ * shows the full gradient immediately with no wipe (see globals.css).
  */
-function useShouldRenderShader() {
-  const [shouldRender, setShouldRender] = useState(false);
-
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const lowCoreCount = typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
-    setShouldRender(!prefersReducedMotion && !lowCoreCount);
-  }, []);
-
-  return shouldRender;
-}
-
 export function SiteGateway() {
-  const [bgRevealed, setBgRevealed] = useState(false);
-  const bfcacheKey = useBfcacheRemountKey();
-  const shouldRenderShader = useShouldRenderShader();
-
   return (
     <div className="gateway-page">
-      <div className={`gateway-shader-bg${bgRevealed ? " is-revealed" : ""}`} aria-hidden="true">
-        {shouldRenderShader && (
-          <ShaderErrorBoundary key={bfcacheKey}>
-            <GatewayShaderBackground onReady={() => setBgRevealed(true)} />
-          </ShaderErrorBoundary>
-        )}
-      </div>
-
       <div className="container-shell gateway-inner">
         <HeroReveal>
           <Image src={logo} alt="TruOrigin" className="gateway-logo" priority />
