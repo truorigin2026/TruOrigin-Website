@@ -45,7 +45,16 @@ export function SiteGateway() {
         </h1>
 
         <div className="gateway-choice-grid">
-          <Link href="/for-products" className="gateway-choice-card">
+          {/* Straight to /home, not /for-products -- that's a redirect-only
+              page with no content and no loading state of its own
+              (permanentRedirect, see app/(public)/for-products/page.tsx).
+              Under a slow connection, the redirect hop itself has an empty
+              <main> with nothing to show, which let the footer visually
+              jump up under the header until the real destination arrived
+              (confirmed live, reported as "footer shows first"). Going
+              straight to /home means the destination's own loading.tsx
+              applies immediately instead. */}
+          <Link href="/for-products/home" className="gateway-choice-card">
             <p className="gateway-choice-eyebrow">For Consumers</p>
             <h2 className="gateway-choice-title">Explore a Product</h2>
             <p className="gateway-choice-copy">
@@ -55,7 +64,7 @@ export function SiteGateway() {
             <span className="gateway-choice-cta">Open product information</span>
           </Link>
 
-          <Link href="/for-brands" className="gateway-choice-card">
+          <Link href="/for-brands/home" className="gateway-choice-card">
             <p className="gateway-choice-eyebrow">For Brands</p>
             <h2 className="gateway-choice-title">Organize Your Product</h2>
             <p className="gateway-choice-copy">

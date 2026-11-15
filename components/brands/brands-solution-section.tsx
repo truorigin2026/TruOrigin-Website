@@ -26,7 +26,11 @@ export function BrandsSolutionSection() {
             </FadeIn>
 
             <FadeIn delay={0.55}>
-              <PillButton href="/for-products" variant="primary" icon={<ArrowIcon />} className="brands-solution-cta">
+              {/* /for-products/home directly, not /for-products -- see
+                  site-gateway.tsx's comment: the bare route is a
+                  redirect-only page with no loading state of its own,
+                  which could let the footer jump up during the hop. */}
+              <PillButton href="/for-products/home" variant="primary" icon={<ArrowIcon />} className="brands-solution-cta">
                 Check Products Section
               </PillButton>
             </FadeIn>
