@@ -10272,33 +10272,15 @@ a.contact-method-value:hover {
   overflow: hidden;
   /* The whole background: a slowly-drifting gradient (color palette
      matches what used to be a WebGL shader, now removed entirely -- see
-     site-gateway.tsx) that reveals once on load via a clip-path circle
-     growing from the top-right corner to fill the screen, then keeps
-     drifting indefinitely. Both animations are pure CSS running
-     unconditionally from first paint, with no JS readiness wait of any
-     kind, so there's nothing here that can get stuck or fail to reveal --
-     every device gets the identical sequence. circle() only supports
-     closest-side/farthest-side keywords, not farthest-corner (that's a
-     radial-gradient() extent keyword) -- 150% safely clears the diagonal
-     to the opposite corner from any aspect ratio, since a percentage
-     radius resolves against sqrt((w²+h²)/2). */
+     site-gateway.tsx). Fully visible from first paint, no entrance wipe --
+     just the ongoing drift, pure CSS, running unconditionally with no JS
+     readiness wait of any kind, so it works identically on every device. */
   background:
     radial-gradient(circle at var(--gw-x1) var(--gw-y1), rgba(10, 255, 16, 0.28), transparent 50%),
     radial-gradient(circle at var(--gw-x2) var(--gw-y2), rgba(115, 191, 196, 0.22), transparent 55%),
     radial-gradient(circle at var(--gw-x3) var(--gw-y3), rgba(141, 160, 206, 0.16), transparent 50%),
     #060b09;
-  animation:
-    gateway-reveal 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-    gateway-bg-drift 28s ease-in-out 1.6s infinite alternate;
-}
-
-@keyframes gateway-reveal {
-  from {
-    clip-path: circle(0% at 100% 0%);
-  }
-  to {
-    clip-path: circle(150% at 100% 0%);
-  }
+  animation: gateway-bg-drift 28s ease-in-out infinite alternate;
 }
 
 @keyframes gateway-bg-drift {
@@ -10322,7 +10304,6 @@ a.contact-method-value:hover {
 @media (prefers-reduced-motion: reduce) {
   .gateway-page {
     animation: none;
-    clip-path: none;
   }
 }
 
