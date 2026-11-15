@@ -25,6 +25,45 @@
   --switcher-height: 40px;
 }
 
+/* Smooth caret: caret-color is itself an animatable CSS property, so this
+   replaces every native text-entry caret's default abrupt on/off blink
+   with a smoothly eased fade between the brand color and transparent --
+   no JS, no fake overlay caret, so native behavior (IME composition,
+   selection, autofill, screen readers) is completely untouched. Scoped to
+   every element that actually shows a caret; excluded input types
+   (checkbox/radio/range/file/color/etc.) don't render one anyway, so
+   including them would be harmless, but excluding them keeps the
+   selector's intent explicit. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+textarea,
+[contenteditable="true"] {
+  caret-color: var(--primary, var(--brand));
+  animation: smooth-caret-blink 1.1s ease-in-out infinite;
+}
+
+@keyframes smooth-caret-blink {
+  0%,
+  45% {
+    caret-color: var(--primary, var(--brand));
+  }
+  50%,
+  95% {
+    caret-color: transparent;
+  }
+  100% {
+    caret-color: var(--primary, var(--brand));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+  textarea,
+  [contenteditable="true"] {
+    animation: none;
+    caret-color: var(--primary, var(--brand));
+  }
+}
+
 /* Modern sans pairing, scoped to the for-brands landing page only */
 .brands-landing-page {
   --font-inter: var(--ff-inter), "Segoe UI", system-ui, sans-serif;
