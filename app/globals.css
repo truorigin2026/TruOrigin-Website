@@ -10209,6 +10209,13 @@ a.contact-method-value:hover {
 /* Site Gateway — neutral root split-path chooser (Brands / Products) */
 /* ------------------------------------------------------------------ */
 
+@property --gw-x1 { syntax: "<percentage>"; inherits: false; initial-value: 100%; }
+@property --gw-y1 { syntax: "<percentage>"; inherits: false; initial-value: 0%; }
+@property --gw-x2 { syntax: "<percentage>"; inherits: false; initial-value: 15%; }
+@property --gw-y2 { syntax: "<percentage>"; inherits: false; initial-value: 85%; }
+@property --gw-x3 { syntax: "<percentage>"; inherits: false; initial-value: 80%; }
+@property --gw-y3 { syntax: "<percentage>"; inherits: false; initial-value: 90%; }
+
 .gateway-page {
   position: relative;
   min-height: 100dvh;
@@ -10220,18 +10227,49 @@ a.contact-method-value:hover {
      gateway-shader-background.tsx), visible the instant this page paints —
      the actual shader is a lazy-loaded, Three.js-backed canvas that can
      take several real seconds to download/compile/load its environment
-     texture before it renders anything. Without this, that whole window
-     is a flat #060b09 void: the corner clip-path reveal below still runs
-     on schedule, it's just revealing nothing yet, so the shader's actual
+     texture before it renders anything, and is skipped entirely on
+     low-core-count devices and prefers-reduced-motion (site-gateway.tsx).
+     Without this, that whole window -- permanent on skip -- is a flat
+     #060b09 void: the corner clip-path reveal below still runs on
+     schedule, it's just revealing nothing yet, so the shader's actual
      first frame then pops in on its own later instead of appearing as
      part of a smooth reveal. This fallback means there's always a
      reasonable background from frame one, and the real shader crossfades
-     in on top of it once ready rather than against emptiness. */
+     in on top of it once ready rather than against emptiness. The three
+     radial-gradient centers drift slowly via animated custom properties --
+     a plain background repaint, nowhere near the cost of the WebGL
+     shader's per-frame 3D render -- so the page still feels alive on the
+     devices/preferences that intentionally never load that shader. */
   background:
-    radial-gradient(circle at 100% 0%, rgba(10, 255, 16, 0.28), transparent 50%),
-    radial-gradient(circle at 15% 85%, rgba(115, 191, 196, 0.22), transparent 55%),
-    radial-gradient(circle at 80% 90%, rgba(141, 160, 206, 0.16), transparent 50%),
+    radial-gradient(circle at var(--gw-x1) var(--gw-y1), rgba(10, 255, 16, 0.28), transparent 50%),
+    radial-gradient(circle at var(--gw-x2) var(--gw-y2), rgba(115, 191, 196, 0.22), transparent 55%),
+    radial-gradient(circle at var(--gw-x3) var(--gw-y3), rgba(141, 160, 206, 0.16), transparent 50%),
     #060b09;
+  animation: gateway-bg-drift 28s ease-in-out infinite alternate;
+}
+
+@keyframes gateway-bg-drift {
+  0% {
+    --gw-x1: 100%; --gw-y1: 0%;
+    --gw-x2: 15%; --gw-y2: 85%;
+    --gw-x3: 80%; --gw-y3: 90%;
+  }
+  50% {
+    --gw-x1: 78%; --gw-y1: 22%;
+    --gw-x2: 28%; --gw-y2: 68%;
+    --gw-x3: 62%; --gw-y3: 72%;
+  }
+  100% {
+    --gw-x1: 90%; --gw-y1: 8%;
+    --gw-x2: 20%; --gw-y2: 80%;
+    --gw-x3: 72%; --gw-y3: 84%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gateway-page {
+    animation: none;
+  }
 }
 
 .gateway-shader-bg {
